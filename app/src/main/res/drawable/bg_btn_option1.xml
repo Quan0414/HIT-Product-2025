@@ -1,0 +1,10 @@
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- Nền của EditText -->
+    <solid android:color="@android:color/white"/> <!-- Màu nền có thể thay đổi -->
+
+    <!-- Bo góc cho EditText -->
+    <corners android:radius="12dp"/> <!-- Đặt bán kính bo góc -->
+
+    <!-- Viền EditText -->
+    <stroke android:color="@color/orange" android:width="2dp"/> <!-- Màu viền và độ dày -->
+</shape>

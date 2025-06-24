@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".screen.authentication.login.LoginActivity">
+
+    <net.orandja.shadowlayout.ShadowLayout
+        android:id="@+id/shadow_btn_bg"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_rounded"
+        app:layout_constraintBottom_toBottomOf="@+id/backIcon"
+        app:layout_constraintEnd_toEndOf="@+id/backIcon"
+        app:layout_constraintStart_toStartOf="@+id/backIcon"
+        app:layout_constraintTop_toTopOf="@+id/backIcon"
+        app:shadow_cast_only_background="true"
+        app:shadow_color="#33FFC09C"
+        app:shadow_radius="8"
+        app:shadow_with_color="false"
+        app:shadow_with_css_scale="true"
+        app:shadow_with_dpi_scale="true"
+        app:shadow_x_shift="2dp"
+        app:shadow_y_shift="2dp">
+
+    </net.orandja.shadowlayout.ShadowLayout>
+
+    <ImageView
+        android:id="@+id/backIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/ic_back_1"
+        android:padding="10dp"
+        android:src="@drawable/ic_arrow"
+        app:layout_constraintStart_toStartOf="@+id/shadow_bg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <net.orandja.shadowlayout.ShadowLayout
+        android:id="@+id/shadow_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_rounded"
+        app:layout_constraintBottom_toBottomOf="@+id/Register"
+        app:layout_constraintEnd_toEndOf="@+id/Register"
+        app:layout_constraintStart_toStartOf="@+id/Register"
+        app:layout_constraintTop_toTopOf="@+id/Register"
+        app:shadow_cast_only_background="true"
+        app:shadow_color="#33FFC09C"
+        app:shadow_radius="8"
+        app:shadow_with_color="false"
+        app:shadow_with_css_scale="true"
+        app:shadow_with_dpi_scale="true"
+        app:shadow_x_shift="2dp"
+        app:shadow_y_shift="2dp">
+
+    </net.orandja.shadowlayout.ShadowLayout>
+
+    <LinearLayout
+        android:id="@+id/Register"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded"
+        android:orientation="vertical"
+        android:padding="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvDangKy"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="@font/f800"
+            android:text="Đăng ký"
+            android:textSize="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/f500"
+            android:text="Tạo một tài khoản để bắt đầu nhé !!!"
+            android:textColor="@color/grayText"
+            android:textSize="12dp" />
+
+        <TextView
+            android:id="@+id/tvTenNguoiDung"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/f700"
+            android:text="Tên người dùng"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/edtTenNguoiDung"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:fontFamily="@font/f500"
+            android:hint="example"
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tvDiaChiEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/f700"
+            android:text="Địa chỉ Email"
+            android:textSize="14dp" />
+
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:fontFamily="@font/f500"
+            android:hint="name@email.com"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tvMatKhau"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/f700"
+            android:text="Mật khẩu"
+            android:textSize="14dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/edtPassword1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_marginStart="0dp"
+                android:background="@drawable/bg_edit_text"
+                android:fontFamily="@font/f500"
+                android:hint="Mật khẩu"
+                android:inputType="textPassword"
+                android:paddingLeft="16dp"
+                android:paddingTop="12dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="12dp"
+                android:textSize="14dp" />
+
+            <ImageView
+                android:id="@+id/eyeIcon1"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Show/Hide Password"
+                android:src="@drawable/ic_eye_visible" />
+        </RelativeLayout>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="8dp"
+            android:fontFamily="@font/f700"
+            android:text="Xác nhận mật khẩu"
+            android:textSize="14dp" />
+
+        <RelativeLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/edtPassword2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:background="@drawable/bg_edit_text"
+                android:fontFamily="@font/f500"
+                android:hint="Nhập lại mật khẩu"
+                android:inputType="textPassword"
+                android:paddingLeft="16dp"
+                android:paddingTop="12dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="12dp"
+                android:textSize="14dp" />
+
+            <ImageView
+                android:id="@+id/eyeIcon2"
+                android:layout_width="20dp"
+                android:layout_height="20dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Show/Hide Password"
+                android:src="@drawable/ic_eye_visible" />
+        </RelativeLayout>
+
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center">
+
+            <ImageView
+                android:id="@+id/imgCheckBox"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="8dp"
+                android:src="@drawable/ic_unchecked" />
+
+            <TextView
+                android:id="@+id/tvCheckBox"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/f500"
+                android:text="Tôi đã đọc và đồng ý với Điều khoản và Điều kiện cũng như Chính sách bảo mật"
+                android:textColor="@color/grayText" />
+
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_disable_btn"
+            android:fontFamily="@font/f900"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp"
+            android:text="Đăng ký"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
+    </LinearLayout>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

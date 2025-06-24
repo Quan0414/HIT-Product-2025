@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".screen.authentication.login.LoginActivity">
+
+    <net.orandja.shadowlayout.ShadowLayout
+        android:id="@+id/shadow_btn_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_rounded"
+        app:layout_constraintBottom_toBottomOf="@+id/backIcon"
+        app:layout_constraintEnd_toEndOf="@+id/backIcon"
+        app:layout_constraintStart_toStartOf="@+id/backIcon"
+        app:layout_constraintTop_toTopOf="@+id/backIcon"
+        app:shadow_cast_only_background="true"
+        app:shadow_color="#33FFC09C"
+        app:shadow_radius="8"
+        app:shadow_with_color="false"
+        app:shadow_with_css_scale="true"
+        app:shadow_with_dpi_scale="true"
+        app:shadow_x_shift="2dp"
+        app:shadow_y_shift="2dp">
+
+
+    </net.orandja.shadowlayout.ShadowLayout>
+
+    <ImageView
+        android:id="@+id/backIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/ic_back_1"
+        android:padding="10dp"
+        android:src="@drawable/ic_arrow"
+        app:layout_constraintStart_toStartOf="@+id/shadow_bg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
+    <net.orandja.shadowlayout.ShadowLayout
+        android:id="@+id/shadow_bg"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:background="@drawable/bg_rounded"
+        app:layout_constraintBottom_toBottomOf="@+id/Login"
+        app:layout_constraintEnd_toEndOf="@+id/Login"
+        app:layout_constraintStart_toStartOf="@+id/Login"
+        app:layout_constraintTop_toTopOf="@+id/Login"
+        app:shadow_cast_only_background="true"
+        app:shadow_color="#33FFC09C"
+        app:shadow_radius="8"
+        app:shadow_with_color="false"
+        app:shadow_with_css_scale="true"
+        app:shadow_with_dpi_scale="true"
+        app:shadow_x_shift="2dp"
+        app:shadow_y_shift="2dp">
+
+    </net.orandja.shadowlayout.ShadowLayout>
+
+    <LinearLayout
+        android:id="@+id/Login"
+        android:layout_width="350dp"
+        android:layout_height="wrap_content"
+        android:background="@drawable/bg_rounded"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingTop="40dp"
+        android:paddingRight="24dp"
+        android:paddingBottom="40dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tvNhapEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/f800"
+            android:text="Nhập email!!"
+            android:textSize="24dp" />
+
+        <EditText
+            android:id="@+id/edtEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/bg_edit_text"
+            android:fontFamily="@font/f700"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tvFindAcc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_disable_btn"
+            android:fontFamily="@font/f900"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp"
+            android:layout_marginBottom="8dp"
+            android:text="Tìm tài khoản"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/tvRegister"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/f700"
+            android:gravity="center"
+            android:paddingTop="16dp"
+            android:text="Chưa có tài khoản? Đăng ký ngay"
+            android:textColor="#71727A"
+            android:textSize="14dp" />
+
+
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
