@@ -33,6 +33,10 @@ android {
     kotlinOptions {
         jvmTarget = "11"
     }
+
+    buildFeatures {
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -45,4 +49,30 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+
+    //auto resize
+    implementation ("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
+
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
+
+    //retrofit
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    // https://mvnrepository.com/artifact/com.google.code.gson/gson
+    implementation("com.google.code.gson:gson:2.10.1")
+
+    implementation("net.orandja.shadowlayout:shadowlayout:1.0.1")
+
+    // Lifecycle ViewModel + LiveData
+    val lifecycle_version = "2.8.7"
+    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
+
+    val navigation_version = "2.5.3"
+    implementation ("androidx.navigation:navigation-fragment:${navigation_version}")
+    implementation ("androidx.navigation:navigation-ui:${navigation_version}")
+    implementation ("androidx.navigation:navigation-fragment-ktx:${navigation_version}")
+    implementation ("androidx.navigation:navigation-ui-ktx:${navigation_version}")
+
 }

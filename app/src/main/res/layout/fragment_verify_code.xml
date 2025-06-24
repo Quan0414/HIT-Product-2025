@@ -1,0 +1,207 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg_login"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".screen.authentication.login.LoginActivity">
+
+    <net.orandja.shadowlayout.ShadowLayout
+        android:id="@+id/shadow_btn_bg"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:background="@drawable/bg_rounded"
+        app:layout_constraintBottom_toBottomOf="@+id/backIcon"
+        app:layout_constraintEnd_toEndOf="@+id/backIcon"
+        app:layout_constraintStart_toStartOf="@+id/backIcon"
+        app:layout_constraintTop_toTopOf="@+id/backIcon"
+        app:shadow_cast_only_background="true"
+        app:shadow_color="#33FFC09C"
+        app:shadow_radius="8"
+        app:shadow_with_color="false"
+        app:shadow_with_css_scale="true"
+        app:shadow_with_dpi_scale="true"
+        app:shadow_x_shift="2dp"
+        app:shadow_y_shift="2dp">
+
+    </net.orandja.shadowlayout.ShadowLayout>
+
+    <ImageView
+        android:id="@+id/backIcon"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="30dp"
+        android:background="@drawable/ic_back_1"
+        android:padding="10dp"
+        android:src="@drawable/ic_arrow"
+        app:layout_constraintStart_toStartOf="@+id/shadow_bg"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <net.orandja.shadowlayout.ShadowLayout
+        android:id="@+id/shadow_bg"
+        android:layout_width="350dp"
+        android:layout_height="365dp"
+        android:background="@drawable/bg_rounded"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:shadow_cast_only_background="true"
+        app:shadow_color="#33FFC09C"
+        app:shadow_radius="8"
+        app:shadow_with_color="false"
+        app:shadow_with_css_scale="true"
+        app:shadow_with_dpi_scale="true"
+        app:shadow_x_shift="2dp"
+        app:shadow_y_shift="2dp">
+
+
+    </net.orandja.shadowlayout.ShadowLayout>
+
+    <LinearLayout
+        android:id="@+id/Register"
+        android:layout_width="350dp"
+        android:layout_height="365dp"
+        android:background="@drawable/bg_rounded"
+        android:fontFamily="@font/f800"
+        android:orientation="vertical"
+        android:paddingLeft="24dp"
+        android:paddingTop="20dp"
+        android:paddingRight="24dp"
+        android:paddingBottom="20dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.498">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="2dp"
+            android:fontFamily="@font/f800"
+            android:gravity="center"
+            android:text="Nhập mã xác nhận"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/tvVerifyCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:fontFamily="@font/f500"
+            android:gravity="center"
+            android:text="Một mã xác nhận đã được gửi đến vietdoanh@gmail.com"
+            android:textColor="@color/grayText"
+            android:textSize="14dp" />
+
+        <!-- 4 ô nhập mã xác nhận -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginBottom="16dp"
+            android:orientation="horizontal"
+            android:weightSum="4">
+
+            <!-- EditText 1 -->
+
+            <!-- EditText 2 -->
+            <EditText
+                android:id="@+id/edtCode1"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_confirm_code"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textSize="18sp" />
+
+            <EditText
+                android:id="@+id/edtCode2"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_confirm_code"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textSize="18sp" />
+
+            <!-- EditText 3 -->
+            <EditText
+                android:id="@+id/edtCode3"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_confirm_code"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textSize="18sp" />
+
+            <!-- EditText 4 -->
+            <EditText
+                android:id="@+id/edtCode4"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_margin="8dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_confirm_code"
+                android:gravity="center"
+                android:inputType="number"
+                android:maxLength="1"
+                android:textSize="18sp" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/tvTime"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="42dp"
+            android:fontFamily="@font/f500"
+            android:gravity="center"
+            android:text="Thời gian hiệu lực: 56s"
+            android:textColor="@color/grayText"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tvSendCode"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/f700"
+            android:gravity="center"
+            android:text="Gửi lại mã"
+            android:textColor="@color/orange"
+            android:textSize="14dp" />
+
+        <TextView
+            android:id="@+id/tvContinue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_disable_btn"
+            android:fontFamily="@font/f900"
+            android:gravity="center"
+            android:paddingLeft="16dp"
+            android:paddingTop="12dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="12dp"
+            android:text="Tiếp tục"
+            android:textColor="@color/white"
+            android:textSize="16dp" />
+
+    </LinearLayout>
+
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

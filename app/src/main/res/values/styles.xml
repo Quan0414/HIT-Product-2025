@@ -1,0 +1,15 @@
+<resources>
+    <style name="Custom.Gender.Dropdown"
+        parent="Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu">
+        <!-- tắt viền mặc định -->
+        <item name="boxStrokeWidth">0dp</item>
+        <item name="boxStrokeWidthFocused">0dp</item>
+        <!-- xóa padding nội tại -->
+        <item name="boxCollapsedPaddingTop">0dp</item>
+
+        <!-- bóp minHeight thành 34dp -->
+        <item name="android:minHeight">34dp</item>
+        <!-- padding ngoài nếu cần -->
+        <item name="android:padding">0dp</item>
+    </style>
+</resources>
