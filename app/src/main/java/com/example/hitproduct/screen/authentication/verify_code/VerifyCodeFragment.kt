@@ -11,8 +11,8 @@ import android.view.ViewGroup
 import androidx.fragment.app.FragmentManager
 import com.example.hitproduct.R
 import com.example.hitproduct.databinding.FragmentVerifyCodeBinding
-import com.example.hitproduct.screen.authentication.forgot_method.CreateNewPasswordFragment
-import com.example.hitproduct.screen.authentication.register.SetUpInformationFragment
+import com.example.hitproduct.screen.authentication.forgot_method.create_new_pass.CreateNewPasswordFragment
+import com.example.hitproduct.screen.authentication.register.set_up_infor.SetUpInformationFragment
 
 
 class VerifyCodeFragment : Fragment() {
@@ -111,6 +111,7 @@ class VerifyCodeFragment : Fragment() {
                 parentFragmentManager.popBackStack("Register", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragmentStart, setUpFragment)
+                    .addToBackStack(null)
                     .commit()
             } else if (flow == "forgot") {
                 // Chuyển sang fragment tạo mật khẩu mới
@@ -118,6 +119,7 @@ class VerifyCodeFragment : Fragment() {
                 parentFragmentManager.popBackStack("EnterEmail", FragmentManager.POP_BACK_STACK_INCLUSIVE)
                 parentFragmentManager.beginTransaction()
                     .replace(R.id.fragmentStart, createNewPasswordFragment)
+                    .addToBackStack(null)
                     .commit()
             }
         }

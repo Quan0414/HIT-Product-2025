@@ -1,18 +1,15 @@
-package com.example.hitproduct.screen.authentication.forgot_method
+package com.example.hitproduct.screen.authentication.forgot_method.create_new_pass
 
-import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.databinding.FragmentCreateNewPasswordBinding
-import com.example.hitproduct.screen.authentication.register.SuccessCreateAccFragment
+import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
 
 
 class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>() {

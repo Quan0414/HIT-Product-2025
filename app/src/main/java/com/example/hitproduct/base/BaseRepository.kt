@@ -14,8 +14,10 @@ open class BaseRepository {
         return withContext(dispatcher) {
             try {
                 DataResult.Success(request())
-            } catch (e: IOException) {
-                DataResult.Error(e)
+            } catch (ioEx: IOException) {
+                DataResult.Error(ioEx)
+            } catch (ex: Exception) {
+                DataResult.Error(ex)
             }
         }
     }

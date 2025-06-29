@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.authentication.register
+package com.example.hitproduct.screen.authentication.register.success
 
 import android.os.Bundle
 import android.view.LayoutInflater

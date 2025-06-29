@@ -1,12 +1,18 @@
 package com.example.hitproduct.screen.authentication.send_invite_code
 
+import android.annotation.SuppressLint
+import android.content.ClipData
+import android.content.ClipboardManager
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import com.example.hitproduct.R
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
 
@@ -24,6 +30,7 @@ class SendInviteCodeFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -62,6 +69,33 @@ class SendInviteCodeFragment : Fragment() {
         binding.backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+
+        //copy
+        binding.tvInviteCode.setOnTouchListener { v, event ->
+            if (event.action == MotionEvent.ACTION_UP) {
+                // Lấy drawableEnd (index 2)
+                val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2]
+                    ?: return@setOnTouchListener false
+
+                // Kiểm tra xem tap có nằm trong bounds của icon hay không
+                if (event.x >= binding.tvInviteCode.width
+                    - binding.tvInviteCode.paddingEnd
+                    - drawableEnd.bounds.width()
+                ) {
+                    v.performClick()
+                    // Copy text
+                    val code = binding.tvInviteCode.text.toString()
+                    val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE)
+                            as ClipboardManager
+                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
+                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
+                    return@setOnTouchListener true
+                }
+            }
+
+            false
+        }
+
     }
 
     override fun onDestroyView() {

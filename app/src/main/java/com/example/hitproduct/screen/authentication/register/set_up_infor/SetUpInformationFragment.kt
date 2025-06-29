@@ -1,20 +1,16 @@
-package com.example.hitproduct.screen.authentication.register
+package com.example.hitproduct.screen.authentication.register.set_up_infor
 
 import android.os.Bundle
 import android.text.Editable
-import android.text.InputType
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.ListPopupWindow
-import androidx.core.content.ContextCompat
-import androidx.core.content.res.ResourcesCompat
 import com.example.hitproduct.R
 import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
+import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
 
 
 class SetUpInformationFragment : Fragment() {

@@ -3,9 +3,9 @@
     <solid android:color="@android:color/white" /> <!-- Màu nền có thể thay đổi -->
 
     <!-- Bo góc cho EditText -->
-    <corners android:radius="12dp" /> <!-- Đặt bán kính bo góc -->
-    <size android:height="48dp" />
+    <corners android:radius="8dp" /> <!-- Đặt bán kính bo góc -->
     <!-- Viền EditText -->
+
     <stroke
         android:width="2dp"
         android:color="@color/orange" /> <!-- Màu viền và độ dày -->

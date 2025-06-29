@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.authentication.register
+package com.example.hitproduct.screen.authentication.register.main
 
 import android.os.Bundle
 import android.text.Editable
@@ -127,6 +127,14 @@ class RegisterFragment : Fragment() {
         val email = binding.edtEmail.text.toString().trim()
         val pass1 = binding.edtPassword1.text.toString()
         val pass2 = binding.edtPassword2.text.toString()
+
+        // 1. Clear error cũ
+        binding.edtPassword2.error = null
+
+        // 2. Nếu cả 2 ô có text nhưng không khớp, show error
+        if (pass1.isNotEmpty() && pass2.isNotEmpty() && pass1 != pass2) {
+            binding.edtPassword2.setError("Mật khẩu không khớp", null)
+        }
 
         return ten.isNotEmpty() && email.isNotEmpty()
                 && pass1.isNotEmpty() && pass2.isNotEmpty()

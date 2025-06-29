@@ -60,6 +60,7 @@ dependencies {
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.10.1")
+    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation("net.orandja.shadowlayout:shadowlayout:1.0.1")
 
@@ -74,5 +75,7 @@ dependencies {
     implementation ("androidx.navigation:navigation-ui:${navigation_version}")
     implementation ("androidx.navigation:navigation-fragment-ktx:${navigation_version}")
     implementation ("androidx.navigation:navigation-ui-ktx:${navigation_version}")
+
+    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.2")
 
 }

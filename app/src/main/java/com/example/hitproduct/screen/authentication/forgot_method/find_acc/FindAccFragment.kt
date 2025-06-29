@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.authentication.forgot_method
+package com.example.hitproduct.screen.authentication.forgot_method.find_acc
 
 import android.os.Bundle
 import android.text.Editable
@@ -15,7 +15,7 @@ import androidx.core.content.ContextCompat
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.databinding.FragmentFindAccBinding
-import com.example.hitproduct.screen.authentication.register.RegisterFragment
+import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.verify_code.VerifyCodeFragment
 
 
