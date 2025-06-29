@@ -11,4 +11,5 @@
             <corners android:radius="20dp" /> <!-- Bo góc -->
         </shape>
     </item>
+    <size android:height="46dp" />
 </selector>

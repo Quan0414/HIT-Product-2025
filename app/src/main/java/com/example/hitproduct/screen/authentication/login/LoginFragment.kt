@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.authentication.login
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -12,22 +13,48 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.navigation.fragment.findNavController
 import com.example.hitproduct.R
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.api.FakeApiService
+import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
-import com.example.hitproduct.screen.authentication.forgot_method.FindAccFragment
-import com.example.hitproduct.screen.authentication.register.RegisterFragment
+import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
+import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 
 class LoginFragment : Fragment() {
 
-    // 1. Khai báo nullable _binding
     private var _binding: FragmentLoginBinding? = null
-
-    // 2. Exposed non-nullable binding
     private val binding get() = _binding!!
 
-    private var isPasswordVisible = false
+    // 1. SharedPreferences
+    private val prefs by lazy {
+        requireContext()
+            .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    // 2. AuthRepository
+    private val authRepo by lazy {
+        AuthRepository(
+            RetrofitClient.getInstance().create(ApiService::class.java),
+            //fake
+            //api  = FakeApiService(),
+            prefs
+        )
+    }
+
+    // 3. ViewModel
+    private val viewModel by viewModels<LoginViewModel> {
+        LoginViewModelFactory(authRepo)
+    }
+
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,8 +68,47 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // Observe loginState để show Loading, Error, Success
+        viewModel.loginState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Idle -> {
+                    // Trạng thái Idle, không làm gì
+                }
 
+                is UiState.Loading -> {
+                    binding.tvLogin.isEnabled = false
+                }
 
+                is UiState.Error -> {
+                    // Lấy message (nếu null thì dùng mặc định)
+                    val msg = state.exception.message ?: "Đăng nhập thất bại"
+                    // Hiển thị thông báo lỗi
+                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                    binding.tvLogin.isEnabled = true
+                }
+
+                is UiState.Success -> {
+                    binding.tvLogin.isEnabled = true
+                    Toast.makeText(
+                        requireContext(),
+                        "Đăng nhập thành công",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    // Chuyển sang HomeFragment nếu đăng nhập thành công
+                    //........
+
+                }
+            }
+        }
+
+        // Nút Đăng nhập: gọi ViewModel.login()
+        binding.tvLogin.setOnClickListener {
+            val email = binding.edtEmail.text.toString().trim()
+            val pass = binding.edtPassword.text.toString()
+            viewModel.login(email, pass)
+        }
+
+        //Form validation
         setUpListeners()
 
         //quen mat khau
@@ -58,7 +124,6 @@ class LoginFragment : Fragment() {
         // Lấy TextView từ binding
         val text = binding.tvRegister
         val spannableString = SpannableString(text.text)
-
 
         //  ClickableSpan chuyen sang dang ky
         val clickableSpan = object : ClickableSpan() {
@@ -119,6 +184,9 @@ class LoginFragment : Fragment() {
         // Clear để tránh giữ reference đến View sau khi destroy
         _binding = null
     }
+
+
+    private var isPasswordVisible = false
 
 
     private fun isFormValid(): Boolean {

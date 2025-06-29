@@ -5,7 +5,6 @@
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@drawable/bg_login"
     android:clipChildren="false"
     android:clipToPadding="false"
     tools:context=".screen.authentication.login.LoginActivity">
@@ -97,19 +96,24 @@
             android:textSize="14dp" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/tvInviteCode"
+            android:layout_width="156dp"
+            android:layout_height="48dp"
             android:layout_gravity="center"
             android:layout_marginBottom="16dp"
             android:background="@drawable/invite_code_bg"
+            android:clickable="true"
             android:fontFamily="@font/f900"
-            android:paddingLeft="32dp"
+            android:gravity="center"
+            android:paddingLeft="24dp"
             android:paddingTop="12dp"
-            android:paddingRight="32dp"
+            android:paddingRight="24dp"
             android:paddingBottom="12dp"
             android:text="AAAAAA"
             android:textColor="@color/orange"
-            android:textSize="14dp" />
+            android:textSize="16dp"
+            android:drawablePadding="4dp"
+            app:drawableEndCompat="@drawable/ic_copy" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -138,21 +142,37 @@
             android:textSize="14dp" />
 
 
-        <TextView
-            android:id="@+id/tvConnect"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:background="@drawable/bg_disable_btn"
-            android:fontFamily="@font/f900"
-            android:gravity="center"
-            android:paddingLeft="16dp"
-            android:paddingTop="12dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="12dp"
-            android:text="Kết nối"
-            android:textColor="@color/white"
-            android:textSize="16dp" />
+            android:layout_marginTop="24dp">
+
+
+            <TextView
+                android:id="@+id/tvConnect"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginRight="12dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_disable_btn"
+                android:fontFamily="@font/f900"
+                android:gravity="center"
+                android:paddingLeft="16dp"
+                android:paddingTop="12dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="12dp"
+                android:text="Gửi yêu cầu"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+
+            <ImageView
+                android:id="@+id/btnNotification"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="0.2"
+                android:src="@drawable/ic_no_noti" />
+
+        </LinearLayout>
 
 
     </LinearLayout>
