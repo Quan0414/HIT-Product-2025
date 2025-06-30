@@ -7,5 +7,5 @@ data class ApiResponse<T>(
 ) {
     // computed property
     val success: Boolean
-        get() = statusCode == 200
+        get() = statusCode in 200..299
 }
