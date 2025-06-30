@@ -4,4 +4,5 @@
     <item android:drawable="@drawable/bg_confirm_code_focused" android:state_focused="true" />
     <!-- Màu viền khi EditText không được focus -->
     <item android:drawable="@drawable/bg_confirm_code_default" />
+
 </selector>

@@ -4,7 +4,7 @@
 
     <!-- Bo góc cho EditText -->
     <corners android:radius="12dp"/> <!-- Đặt bán kính bo góc -->
-
+    <size android:height="46dp" />
     <!-- Viền EditText -->
     <stroke android:color="@color/orange" android:width="2dp"/> <!-- Màu viền và độ dày -->
 </shape>

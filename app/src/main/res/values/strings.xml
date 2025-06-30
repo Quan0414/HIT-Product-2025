@@ -3,5 +3,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="notification_invite_sent">Bạn đã gửi 1 yêu cầu đến %1$s</string>
+    <string name="notification_invite_received">%1$s đã gửi cho bạn 1 yêu cầu kết nối</string>
 
 </resources>
