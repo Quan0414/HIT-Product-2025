@@ -2,7 +2,7 @@
     <item android:state_pressed="true">
         <shape>
             <solid android:color="#FF6A00" /> <!-- Màu khi nhấn -->
-            <corners android:radius="16dp" /> <!-- Bo góc -->
+            <corners android:radius="20dp" /> <!-- Bo góc -->
         </shape>
     </item>
     <item>

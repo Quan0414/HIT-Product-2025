@@ -6,4 +6,5 @@
     <color name="orange">#F28066</color>
     <color name="grayUnderline">#D4D6DD</color>
     <color name="grayBorder">#C5C6CC</color>
+    <color name="error">#FF6365</color>
 </resources>

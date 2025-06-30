@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.authentication.login
 
+//import com.example.hitproduct.data.api.FakeApiService
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
@@ -17,12 +18,11 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.ErrorMessageMapper
 import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.api.FakeApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
@@ -44,8 +44,6 @@ class LoginFragment : Fragment() {
     private val authRepo by lazy {
         AuthRepository(
             RetrofitClient.getInstance().create(ApiService::class.java),
-            //fake
-            //api  = FakeApiService(),
             prefs
         )
     }
@@ -80,10 +78,28 @@ class LoginFragment : Fragment() {
                 }
 
                 is UiState.Error -> {
-                    // Lấy message (nếu null thì dùng mặc định)
-                    val msg = state.exception.message ?: "Đăng nhập thất bại"
-                    // Hiển thị thông báo lỗi
-                    Toast.makeText(requireContext(), msg, Toast.LENGTH_SHORT).show()
+                    // 1. Reset background
+                    val err = state.error
+                    binding.edtEmail.setBackgroundResource(
+                        if (err.emailError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
+                    )
+                    binding.edtPassword.setBackgroundResource(
+                        if (err.passwordError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
+                    )
+
+                    // 2. Thêm dấu X
+//                    val xIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_error_x)
+//                    binding.edtEmail.setCompoundDrawablesRelativeWithIntrinsicBounds(
+//                        null, null,
+//                        if (err.emailError) xIcon else null,
+//                        null
+//                    )
+//                    binding.edtPassword.setCompoundDrawablesRelativeWithIntrinsicBounds(
+//                        null, null,
+//                        if (err.passwordError) xIcon else null,
+//                        null
+//                    )
+                    Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
                     binding.tvLogin.isEnabled = true
                 }
 
@@ -211,7 +227,23 @@ class LoginFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
             }
 
-            override fun afterTextChanged(s: Editable?) = updateLoginButtonState()
+            override fun afterTextChanged(s: Editable?) {
+                // 1. Reset background về bình thường mỗi khi user gõ
+                binding.edtEmail.apply {
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        null, null, null, null
+                    ) // Xóa dấu X nếu có
+                    setBackgroundResource(R.drawable.bg_edit_text)
+                }
+
+                binding.edtPassword.apply {
+                    setCompoundDrawablesRelativeWithIntrinsicBounds(
+                        null, null, null, null
+                    ) // Xóa dấu X nếu có
+                    setBackgroundResource(R.drawable.bg_edit_text)
+                }
+                updateLoginButtonState()
+            }
         }
         binding.edtEmail.addTextChangedListener(watcher)
         binding.edtPassword.addTextChangedListener(watcher)
