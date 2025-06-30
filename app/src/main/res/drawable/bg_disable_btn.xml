@@ -4,7 +4,7 @@
     <solid android:color="#D7D7D7" /> <!-- Màu nền có thể thay đổi -->
 
     <!-- Bo góc cho Button -->
-    <corners android:radius="16dp" />
+    <corners android:radius="20dp" />
 
     <!-- Viền Button -->
     <stroke
