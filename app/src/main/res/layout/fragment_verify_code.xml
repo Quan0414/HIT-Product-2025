@@ -95,7 +95,7 @@
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/f500"
             android:gravity="center"
-            android:text="Một mã xác nhận đã được gửi đến "
+            android:text="@string/verify_code_to"
             android:textColor="@color/grayText"
             android:textSize="14dp" />
 
@@ -169,7 +169,7 @@
             android:layout_marginBottom="42dp"
             android:fontFamily="@font/f500"
             android:gravity="center"
-            android:text="Thời gian hiệu lực: 120s"
+            android:text="@string/code_expired"
             android:textColor="@color/grayText"
             android:textSize="14dp" />
 
@@ -180,7 +180,8 @@
             android:fontFamily="@font/f700"
             android:gravity="center"
             android:text="Gửi lại mã"
-            android:textColor="@color/orange"
+            android:enabled="false"
+            android:textColor="@color/grayText"
             android:textSize="14dp" />
 
         <TextView

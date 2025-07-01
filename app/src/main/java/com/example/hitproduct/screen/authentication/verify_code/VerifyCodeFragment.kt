@@ -2,6 +2,7 @@ package com.example.hitproduct.screen.authentication.verify_code
 
 import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
@@ -9,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
@@ -42,6 +44,7 @@ class VerifyCodeFragment : Fragment() {
         VerifyCodeViewModelFactory(authRepo)
     }
 
+    // Lấy email và flow từ arguments
     private val email by lazy {
         arguments?.getString("email")
             ?: throw IllegalArgumentException("Email argument is required")
@@ -49,6 +52,10 @@ class VerifyCodeFragment : Fragment() {
     private val flow by lazy {
         arguments?.getString("flow") ?: throw IllegalArgumentException("Flow argument is required")
     }
+
+    // Biến để quản lý bộ đếm ngược
+    private var timer: CountDownTimer? = null
+    private val totalTime = 120_000L  // 120s = 120.000 ms
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -61,23 +68,48 @@ class VerifyCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // email đã lấy từ arguments
+        val email = arguments?.getString("email")!!
+
+        // hiển thị text với email thay cho %1$s
+        binding.tvVerifyCode.text = getString(R.string.verify_code_to, email)
+
+        // ban đầu disable và đổi màu nút gửi lại
+        binding.tvSendCode.isEnabled = false
+        binding.tvSendCode.setTextColor(
+            ContextCompat.getColor(requireContext(), R.color.grayText)
+        )
+        startCountdown()
+
         // Quan sát trạng thái gửi OTP
         viewModel.sendOtpState.observe(viewLifecycleOwner) { state ->
-            binding.tvSendCode.isEnabled = state !is UiState.Loading
             when (state) {
-                is UiState.Success -> Toast.makeText(
-                    requireContext(),
-                    state.data,
-                    Toast.LENGTH_SHORT
-                ).show()
+                is UiState.Loading -> {
+                    // show loading nếu cần
+                }
 
-                is UiState.Error -> Toast.makeText(
-                    requireContext(),
-                    state.error.message,
-                    Toast.LENGTH_SHORT
-                ).show()
+                is UiState.Success -> {
+                    Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
+                    // sau khi gửi lại thành công, restart đếm
+                    binding.tvSendCode.isEnabled = false
+                    binding.tvSendCode.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.grayText)
+                    )
+                    startCountdown()
+                }
 
-                else -> {}
+                is UiState.Error -> {
+                    Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
+                    // nếu muốn cho retry ngay khi error, có thể enable:
+                    binding.tvSendCode.isEnabled = true
+                    binding.tvSendCode.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.orange)
+                    )
+                }
+
+                UiState.Idle -> {
+                    // trạng thái idle, có thể không cần làm gì
+                }
             }
         }
 
@@ -102,6 +134,7 @@ class VerifyCodeFragment : Fragment() {
         codes.forEachIndexed { index, editText ->
             editText.addTextChangedListener(object : TextWatcher {
                 override fun afterTextChanged(s: Editable?) {
+                    codes.forEach { it.setBackgroundResource(R.drawable.bg_confirm_code) }
                     if (s?.length == 1 && index < codes.lastIndex) codes[index + 1].requestFocus()
                     updateContinueState()
                 }
@@ -131,11 +164,23 @@ class VerifyCodeFragment : Fragment() {
                     navigateNext()
                 }
 
-                is UiState.Error -> Toast.makeText(
-                    requireContext(),
-                    state.error.message,
-                    Toast.LENGTH_SHORT
-                ).show()
+                is UiState.Error -> {
+                    // Hiển thị thông báo lỗi
+                    val err = state.error
+                    if (err.otp) {
+                        // Nếu lỗi là do OTP không chính xác, highlight các ô nhập
+                        codes.forEach { it.setBackgroundResource(R.drawable.bg_edit_text_error) }
+                    } else {
+                        // Nếu lỗi khác, reset các ô nhập
+                        codes.forEach { it.setBackgroundResource(R.drawable.bg_confirm_code) }
+                    }
+
+                    // Hiển thị Toast với thông báo lỗi
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
 
                 else -> {}
             }
@@ -172,6 +217,26 @@ class VerifyCodeFragment : Fragment() {
                 .commit()
         }
     }
+
+
+    private fun startCountdown() {
+        timer?.cancel()
+        timer = object : CountDownTimer(totalTime, 1_000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val seconds = (millisUntilFinished / 1_000).toInt()
+                binding.tvTime.text = getString(R.string.code_expired, seconds)
+            }
+
+            override fun onFinish() {
+                // Bật lại nút gửi mã và đổi màu
+                binding.tvSendCode.isEnabled = true
+                binding.tvSendCode.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.orange)
+                )
+            }
+        }.start()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()
