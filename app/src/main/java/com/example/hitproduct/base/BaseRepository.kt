@@ -1,16 +1,13 @@
 package com.example.hitproduct.base
 
-import android.util.Log
 import com.example.hitproduct.common.util.ErrorMessageMapper
 import com.example.hitproduct.common.util.MappedError
-import com.example.hitproduct.data.model.response.ApiResponse
+import com.example.hitproduct.data.model.common.ApiResponse
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import retrofit2.HttpException
 import retrofit2.Response
-import java.io.IOException
 
 open class BaseRepository {
     @Suppress("UNCHECKED_CAST")

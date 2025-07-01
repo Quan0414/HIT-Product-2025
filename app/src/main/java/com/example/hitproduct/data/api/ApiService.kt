@@ -1,10 +1,10 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
-import com.example.hitproduct.data.model.auth.LoginRequest
-import com.example.hitproduct.data.model.auth.RegisterRequest
-import com.example.hitproduct.data.model.response.ApiResponse
-import com.example.hitproduct.data.model.response.RegisterResponse
+import com.example.hitproduct.data.model.auth.request.LoginRequest
+import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.POST

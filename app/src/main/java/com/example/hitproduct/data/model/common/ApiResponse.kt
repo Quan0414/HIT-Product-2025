@@ -1,4 +1,4 @@
-package com.example.hitproduct.data.model.response
+package com.example.hitproduct.data.model.common
 
 data class ApiResponse<T>(
     val statusCode: Int,

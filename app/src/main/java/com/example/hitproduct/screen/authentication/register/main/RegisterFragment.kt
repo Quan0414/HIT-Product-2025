@@ -98,10 +98,10 @@ class RegisterFragment : Fragment() {
                 is UiState.Error -> {
                     val err = state.error
                     binding.edtTenNguoiDung.setBackgroundResource(
-                        if (err.usernameError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
+                        if (err.accountExits) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
                     )
                     binding.edtEmail.setBackgroundResource(
-                        if (err.emailError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
+                        if (err.accountExits || err.emailError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
                     )
                     binding.edtPassword1.setBackgroundResource(
                         if (err.passwordError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text

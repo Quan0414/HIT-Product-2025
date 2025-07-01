@@ -5,10 +5,10 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.model.auth.LoginRequest
-import com.example.hitproduct.data.model.auth.RegisterRequest
-import com.example.hitproduct.data.model.response.ApiResponse
-import com.example.hitproduct.data.model.response.RegisterResponse
+import com.example.hitproduct.data.model.auth.request.LoginRequest
+import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.auth.response.RegisterResponse
 
 class AuthRepository(
     private val api: ApiService,

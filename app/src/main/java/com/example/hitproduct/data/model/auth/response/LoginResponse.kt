@@ -1,4 +1,4 @@
-//package com.example.hitproduct.data.model.response
+package com.example.hitproduct.data.model.auth.response//package com.example.hitproduct.data.model.response
 //
 //import com.google.gson.annotations.SerializedName
 //

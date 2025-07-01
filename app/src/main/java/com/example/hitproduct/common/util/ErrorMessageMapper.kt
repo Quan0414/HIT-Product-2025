@@ -2,7 +2,7 @@ package com.example.hitproduct.common.util
 
 data class MappedError(
     val message: String,
-    val usernameError: Boolean = false,
+    val accountExits: Boolean = false,
     val emailError: Boolean = false,
     val passwordError: Boolean = false,
     val confirmPasswordError: Boolean = false
@@ -20,15 +20,15 @@ object ErrorMessageMapper {
         val confirmPasswordError =
             raw.contains("Mật khẩu nhập lại không khớp với mật khẩu.", ignoreCase = true)
 
-        val usernameExits = raw.contains("tài khoản đã tồn tại.", ignoreCase = true)
+        val accountExits = raw.contains("tài khoản đã tồn tại.", ignoreCase = true)
 
         //401
         val unauthorized = raw.contains("Email hoặc Password không chính xác.", ignoreCase = true)
 
         val message = when {
 
-            usernameExits ->
-                "Tên người dùng đã tồn tại!"
+            accountExits ->
+                "Tên người dùng hoặc email đã tồn tại!"
 
             emailError ->
                 "Email không hợp lệ!"
@@ -47,15 +47,15 @@ object ErrorMessageMapper {
         }
 
         val emailErrorFlag = emailError || unauthorized
-        val passwordErrorFlag = passwordError || confirmPasswordError || unauthorized
-        val confirmPasswordErrorFlag = confirmPasswordError || passwordError
+        val passwordErrorFlag = passwordError || unauthorized
+        val confirmPasswordErrorFlag = confirmPasswordError
 
         return MappedError(
-            usernameError = usernameExits,
+            accountExits = accountExits,
             message = message,
             emailError = emailErrorFlag,
             passwordError = passwordErrorFlag,
-            confirmPasswordError = confirmPasswordErrorFlag
+            confirmPasswordError = confirmPasswordErrorFlag,
         )
     }
 }

@@ -8,7 +8,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.ErrorMessageMapper
-import com.example.hitproduct.data.model.response.RegisterResponse
+import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
