@@ -2,9 +2,15 @@ package com.example.hitproduct.data.repository
 
 import android.content.SharedPreferences
 import com.example.hitproduct.base.BaseRepository
+import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.model.auth.LoginRequest
+import com.example.hitproduct.data.model.auth.request.LoginRequest
+import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.RegisterResponse
+import com.example.hitproduct.data.model.common.ApiResponse
 
 class AuthRepository(
     private val api: ApiService,
@@ -14,27 +20,52 @@ class AuthRepository(
     /**
      * Gọi API login, nếu statusCode == 200 thì tự động lưu token vào SharedPreferences
      */
-    suspend fun login(email: String, password: String) =
-        getResult {
-            // gọi API, giờ trả về Response<ApiResponse<LoginResponse>>
-            val response = api.login(LoginRequest(email, password))
-
-            // nếu HTTP 2xx và statusCode == 200 thì lưu token
-            if (response.isSuccessful) {
-                response.body()?.let { apiRes ->
-                    if (apiRes.statusCode == 200) {
-                        val token = apiRes.data.token
-                        prefs.edit()
-                            .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
-                            .apply()
-
-                    }
+    suspend fun login(email: String, password: String): DataResult<ApiResponse<String>> =
+        getResult { api.login(LoginRequest(email, password)) }
+            .also { result ->
+                if (result is DataResult.Success) {
+                    // result.data.data chính là token String
+                    val token = result.data.data
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+                        .apply()
                 }
             }
 
-            // trả về nguyên response để BaseRepository xử lý tiếp
-            response
+
+    suspend fun register(
+        username: String, email: String,
+        password: String, repeatPassword: String
+    ): DataResult<RegisterResponse> {
+        val result =
+            getResult { api.register(RegisterRequest(username, email, password, repeatPassword)) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
         }
+    }
+
+    suspend fun sendOtp(email: String): DataResult<String> {
+        val result = getResult { api.sendOtp(SendOtpRequest(email)) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.message)
+            is DataResult.Error   -> result
+        }
+    }
+
+
+    suspend fun verifyCode(
+        otp: String,
+        email: String,
+        type: String
+    ): DataResult<String> {
+        val result = getResult { api.verifyCode(VerifyCodeRequest(otp, email, type)) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.message)
+            is DataResult.Error   -> result
+        }
+    }
+
 
     /**
      * Lấy token đã lưu (hoặc null nếu chưa lưu)

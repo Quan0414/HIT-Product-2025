@@ -1,6 +1,5 @@
 package com.example.hitproduct.screen.authentication.login
 
-//import com.example.hitproduct.data.api.FakeApiService
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable

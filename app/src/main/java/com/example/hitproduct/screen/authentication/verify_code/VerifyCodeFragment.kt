@@ -1,30 +1,66 @@
 package com.example.hitproduct.screen.authentication.verify_code
 
+import android.content.Context
 import android.os.Bundle
+import android.os.CountDownTimer
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.KeyEvent
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
+import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentVerifyCodeBinding
 import com.example.hitproduct.screen.authentication.forgot_method.create_new_pass.CreateNewPasswordFragment
 import com.example.hitproduct.screen.authentication.register.set_up_infor.SetUpInformationFragment
 
-
 class VerifyCodeFragment : Fragment() {
-
     private var _binding: FragmentVerifyCodeBinding? = null
-
     private val binding get() = _binding!!
+
+    private val prefs by lazy {
+        requireContext().getSharedPreferences(
+            AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE
+        )
+    }
+    private val authRepo by lazy {
+        AuthRepository(
+            RetrofitClient.getInstance().create(ApiService::class.java),
+            prefs
+        )
+    }
+    private val viewModel by viewModels<VerifyCodeViewModel> {
+        VerifyCodeViewModelFactory(authRepo)
+    }
+
+    // Lấy email và flow từ arguments
+    private val email by lazy {
+        arguments?.getString("email")
+            ?: throw IllegalArgumentException("Email argument is required")
+    }
+    private val flow by lazy {
+        arguments?.getString("flow") ?: throw IllegalArgumentException("Flow argument is required")
+    }
+
+    // Biến để quản lý bộ đếm ngược
+    private var timer: CountDownTimer? = null
+    private val totalTime = 120_000L  // 120s = 120.000 ms
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentVerifyCodeBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -32,98 +68,175 @@ class VerifyCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        // email đã lấy từ arguments
+        val email = arguments?.getString("email")!!
+
+        // hiển thị text với email thay cho %1$s
+        binding.tvVerifyCode.text = getString(R.string.verify_code_to, email)
+
+        // ban đầu disable và đổi màu nút gửi lại
+        binding.tvSendCode.isEnabled = false
+        binding.tvSendCode.setTextColor(
+            ContextCompat.getColor(requireContext(), R.color.grayText)
+        )
+        startCountdown()
+
+        // Quan sát trạng thái gửi OTP
+        viewModel.sendOtpState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+                    // show loading nếu cần
+                }
+
+                is UiState.Success -> {
+                    Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
+                    // sau khi gửi lại thành công, restart đếm
+                    binding.tvSendCode.isEnabled = false
+                    binding.tvSendCode.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.grayText)
+                    )
+                    startCountdown()
+                }
+
+                is UiState.Error -> {
+                    Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
+                    // nếu muốn cho retry ngay khi error, có thể enable:
+                    binding.tvSendCode.isEnabled = true
+                    binding.tvSendCode.setTextColor(
+                        ContextCompat.getColor(requireContext(), R.color.orange)
+                    )
+                }
+
+                UiState.Idle -> {
+                    // trạng thái idle, có thể không cần làm gì
+                }
+            }
+        }
+
+        // Nút gửi lại OTP
+        binding.tvSendCode.setOnClickListener {
+            viewModel.sendOtp(email)
+        }
+
+        // Chuẩn bị các ô nhập OTP
         val codes = listOf(
-            binding.edtCode1,
-            binding.edtCode2,
-            binding.edtCode3,
-            binding.edtCode4
+            binding.edtCode1, binding.edtCode2,
+            binding.edtCode3, binding.edtCode4
         )
 
-        val btnContinue = binding.tvContinue
-
-        fun updateButtonState() {
-            // Nếu tất cả ô đều đã nhập 1 ký tự thì enable và đổi màu
+        fun updateContinueState() {
             val allFilled = codes.all { it.text?.length == 1 }
-            if (allFilled) {
-                btnContinue.isEnabled = true
-                btnContinue.setBackgroundResource(R.drawable.bg_enable_btn)
-            } else {
-                btnContinue.isEnabled = false
-                btnContinue.setBackgroundResource(R.drawable.bg_disable_btn)
-            }
+            binding.tvContinue.isEnabled = allFilled
+            binding.tvContinue.setBackgroundResource(
+                if (allFilled) R.drawable.bg_enable_btn else R.drawable.bg_disable_btn
+            )
         }
-
-        // 1. Thêm TextWatcher cho từng EditText
         codes.forEachIndexed { index, editText ->
             editText.addTextChangedListener(object : TextWatcher {
-                override fun beforeTextChanged(
-                    s: CharSequence?,
-                    start: Int,
-                    count: Int,
-                    after: Int
-                ) {
-                }
-
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
                 override fun afterTextChanged(s: Editable?) {
-                    if (s?.length == 1) {
-                        // Nếu chưa phải ô cuối cùng, chuyển focus
-                        if (index < codes.size - 1) {
-                            codes[index + 1].requestFocus()
-                        }
-                    }
-                    updateButtonState()
+                    codes.forEach { it.setBackgroundResource(R.drawable.bg_confirm_code) }
+                    if (s?.length == 1 && index < codes.lastIndex) codes[index + 1].requestFocus()
+                    updateContinueState()
                 }
-            })
 
-            // 2. Bắt phím DEL để quay lại ô trước
-            editText.setOnKeyListener { _, keyCode, _ ->
-                if (keyCode == KeyEvent.KEYCODE_DEL
-                    && editText.text.isEmpty()
-                    && index > 0
-                ) {
-                    codes[index - 1].requestFocus()
-                    codes[index - 1].text = null
-                    updateButtonState()
+                override fun beforeTextChanged(s: CharSequence?, st: Int, c: Int, a: Int) {}
+                override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
+            })
+            editText.setOnKeyListener { _, keyCode, event ->
+                if (keyCode == KeyEvent.KEYCODE_DEL && editText.text.isEmpty() && index > 0) {
+                    codes[index - 1].apply {
+                        text?.clear()
+                        requestFocus()
+                    }
+                    updateContinueState()
                     true
-                } else {
-                    false
+                } else false
+            }
+        }
+        updateContinueState()
+
+        // Quan sát xác thực OTP
+        viewModel.verifyCodeState.observe(viewLifecycleOwner) { state ->
+            binding.tvContinue.isEnabled = state !is UiState.Loading
+            when (state) {
+                is UiState.Success -> {
+                    Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
+                    navigateNext()
                 }
+
+                is UiState.Error -> {
+                    // Hiển thị thông báo lỗi
+                    val err = state.error
+                    if (err.otp) {
+                        // Nếu lỗi là do OTP không chính xác, highlight các ô nhập
+                        codes.forEach { it.setBackgroundResource(R.drawable.bg_edit_text_error) }
+                    } else {
+                        // Nếu lỗi khác, reset các ô nhập
+                        codes.forEach { it.setBackgroundResource(R.drawable.bg_confirm_code) }
+                    }
+
+                    // Hiển thị Toast với thông báo lỗi
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {}
             }
         }
 
-        updateButtonState()
+        // Nút xác thực
+        binding.tvContinue.setOnClickListener {
+            val otp = codes.joinToString(separator = "") { it.text.toString() }
+            viewModel.verifyCode(otp, email, flow)
+        }
 
-
-        //nut back
+        // Nút back
         binding.backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+    }
 
-        //chuyen man
-
-
-        binding.tvContinue.setOnClickListener {
-            val flow = arguments?.getString("flow")
-            if (flow == "register") {
-                // Chuyển sang fragment thiết lập tài khoản
-                val setUpFragment = SetUpInformationFragment()
-                parentFragmentManager.popBackStack("Register", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentStart, setUpFragment)
-                    .addToBackStack(null)
-                    .commit()
-            } else if (flow == "forgot") {
-                // Chuyển sang fragment tạo mật khẩu mới
-                val createNewPasswordFragment = CreateNewPasswordFragment()
-                parentFragmentManager.popBackStack("EnterEmail", FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                parentFragmentManager.beginTransaction()
-                    .replace(R.id.fragmentStart, createNewPasswordFragment)
-                    .addToBackStack(null)
-                    .commit()
-            }
+    private fun navigateNext() {
+        if (flow == "register") {
+            parentFragmentManager.popBackStack(
+                "Register", FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentStart, SetUpInformationFragment())
+                .addToBackStack(null)
+                .commit()
+        } else {
+            parentFragmentManager.popBackStack(
+                "EnterEmail", FragmentManager.POP_BACK_STACK_INCLUSIVE
+            )
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentStart, CreateNewPasswordFragment())
+                .addToBackStack(null)
+                .commit()
         }
     }
+
+
+    private fun startCountdown() {
+        timer?.cancel()
+        timer = object : CountDownTimer(totalTime, 1_000) {
+            override fun onTick(millisUntilFinished: Long) {
+                val seconds = (millisUntilFinished / 1_000).toInt()
+                binding.tvTime.text = getString(R.string.code_expired, seconds)
+            }
+
+            override fun onFinish() {
+                // Bật lại nút gửi mã và đổi màu
+                binding.tvSendCode.isEnabled = true
+                binding.tvSendCode.setTextColor(
+                    ContextCompat.getColor(requireContext(), R.color.orange)
+                )
+            }
+        }.start()
+    }
+
 
     override fun onDestroyView() {
         super.onDestroyView()

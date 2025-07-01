@@ -1,4 +1,4 @@
-package com.example.hitproduct.data.model.auth
+package com.example.hitproduct.data.model.auth.request
 
 import com.google.gson.annotations.SerializedName
 

@@ -2,6 +2,9 @@
     <string name="app_name">HIT Product</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    
+    <string name="verify_code_to">Một mã xác nhận đã được gửi đến %1$s</string>
+    <string name="code_expired">Thời gian hiệu lực: %1$d</string>
 
     <string name="notification_invite_sent">Bạn đã gửi 1 yêu cầu đến %1$s</string>
     <string name="notification_invite_received">%1$s đã gửi cho bạn 1 yêu cầu kết nối</string>

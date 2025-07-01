@@ -1,4 +1,4 @@
-package com.example.hitproduct.data.model.auth
+package com.example.hitproduct.data.model.auth.request
 
 data class RegisterRequest (
     val username: String,

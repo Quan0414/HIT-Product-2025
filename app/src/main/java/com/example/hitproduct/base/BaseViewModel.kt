@@ -4,48 +4,36 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.hitproduct.common.util.MappedError
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 open class BaseViewModel : ViewModel() {
-    private val loading: MutableLiveData<Boolean> = MutableLiveData(false)
-    protected val isLoading: LiveData<Boolean>
-        get() = loading
+    private val loading = MutableLiveData(false)
+    protected val isLoading: LiveData<Boolean> get() = loading
 
-    private val error: MutableLiveData<String> = MutableLiveData("")
-    protected val hasError: LiveData<String>
-        get() = error
+    private val error = MutableLiveData<MappedError>()
+    protected val hasError: LiveData<MappedError> get() = error
 
     protected fun <T> executeTask(
         request: suspend CoroutineScope.() -> DataResult<T>,
         onSuccess: (T) -> Unit,
-        onError: (Exception) -> Unit = {},
+        onError: (MappedError) -> Unit = {},
         showLoading: Boolean = true
     ) {
-        if (showLoading) showLoading()
+        if (showLoading) loading.value = true
         viewModelScope.launch {
             when (val response = request(this)) {
                 is DataResult.Success -> {
                     onSuccess(response.data)
-                    hideLoading()
                 }
-
                 is DataResult.Error -> {
-                    onError(response.exception)
-                    hideLoading()
+                    // dùng response.error
+                    onError(response.error)
+                    error.value = response.error
                 }
             }
+            loading.value = false
         }
     }
-
-
-    private fun showLoading() {
-        loading.value = true
-    }
-
-    private fun hideLoading() {
-        loading.value = false
-    }
-
-
 }

@@ -1,4 +1,4 @@
-package com.example.hitproduct.data.model.response
+package com.example.hitproduct.data.model.common
 
 data class ApiResponse<T>(
     val statusCode: Int,
@@ -7,5 +7,5 @@ data class ApiResponse<T>(
 ) {
     // computed property
     val success: Boolean
-        get() = statusCode == 200
+        get() = statusCode in 200..299
 }
