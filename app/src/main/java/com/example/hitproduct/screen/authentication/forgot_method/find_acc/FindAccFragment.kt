@@ -125,8 +125,12 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
 
         //chuyen qua verify code
         binding.tvFindAcc.setOnClickListener {
+            val userEmail = binding.edtEmail.text.toString().trim()
             val fragment = VerifyCodeFragment().apply {
-                arguments = Bundle().apply { putString("flow", "forgot") }
+                arguments = Bundle().apply {
+                    putString("email", userEmail)
+                    putString("flow", "forgot-password")
+                }
             }
             parentFragmentManager.beginTransaction()
                 .replace(R.id.fragmentStart, fragment)

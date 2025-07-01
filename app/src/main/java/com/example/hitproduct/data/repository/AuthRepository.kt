@@ -7,8 +7,10 @@ import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
-import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
+import com.example.hitproduct.data.model.common.ApiResponse
 
 class AuthRepository(
     private val api: ApiService,
@@ -38,8 +40,29 @@ class AuthRepository(
         val result =
             getResult { api.register(RegisterRequest(username, email, password, repeatPassword)) }
         return when (result) {
-            is DataResult.Success -> DataResult.Success(result.data.data)   // unwrap .data thành RegisterResponse
+            is DataResult.Success -> DataResult.Success(result.data.data)
             is DataResult.Error -> result
+        }
+    }
+
+    suspend fun sendOtp(email: String): DataResult<String> {
+        val result = getResult { api.sendOtp(SendOtpRequest(email)) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.message)
+            is DataResult.Error   -> result
+        }
+    }
+
+
+    suspend fun verifyCode(
+        otp: String,
+        email: String,
+        type: String
+    ): DataResult<String> {
+        val result = getResult { api.verifyCode(VerifyCodeRequest(otp, email, type)) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.message)
+            is DataResult.Error   -> result
         }
     }
 

@@ -133,7 +133,10 @@ class RegisterFragment : Fragment() {
 
                     // Navigate to VerifyCodeFragment
                     val verifyCodeFragment = VerifyCodeFragment().apply {
-                        arguments = Bundle().apply { putString("flow", "register") }
+                        arguments = Bundle().apply {
+                            putString("email", binding.edtEmail.text.toString().trim())
+                            putString("flow", "register")
+                        }
                     }
                     parentFragmentManager.beginTransaction()
                         .replace(R.id.fragmentStart, verifyCodeFragment)
