@@ -90,6 +90,14 @@ class SetUpInformationFragment : Fragment() {
         })
 
 
+        //skip button
+        binding.tvSkip.setOnClickListener {
+            val successCreateAccFragment = SuccessCreateAccFragment()
+            parentFragmentManager.beginTransaction()
+                .replace(R.id.fragmentStart, successCreateAccFragment)
+                .commit()
+        }
+
         //nut back
         binding.backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()

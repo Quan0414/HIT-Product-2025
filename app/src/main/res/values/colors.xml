@@ -7,4 +7,6 @@
     <color name="grayUnderline">#D4D6DD</color>
     <color name="grayBorder">#C5C6CC</color>
     <color name="error">#FF6365</color>
+    <color name="textBrown">#A5623D</color>
+    <color name="borderBrown">#FFC09C</color>
 </resources>
