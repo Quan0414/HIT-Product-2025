@@ -68,9 +68,6 @@ class VerifyCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // email đã lấy từ arguments
-        val email = arguments?.getString("email")!!
-
         // hiển thị text với email thay cho %1$s
         binding.tvVerifyCode.text = getString(R.string.verify_code_to, email)
 
@@ -223,11 +220,13 @@ class VerifyCodeFragment : Fragment() {
         timer?.cancel()
         timer = object : CountDownTimer(totalTime, 1_000) {
             override fun onTick(millisUntilFinished: Long) {
+                if (_binding == null) return
                 val seconds = (millisUntilFinished / 1_000).toInt()
                 binding.tvTime.text = getString(R.string.code_expired, seconds)
             }
 
             override fun onFinish() {
+                if (_binding == null) return
                 // Bật lại nút gửi mã và đổi màu
                 binding.tvSendCode.isEnabled = true
                 binding.tvSendCode.setTextColor(
@@ -240,6 +239,8 @@ class VerifyCodeFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        timer?.cancel()
+        timer = null
         _binding = null
     }
 }
