@@ -9,8 +9,12 @@ import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.EditProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
+import retrofit2.Response
 
 class AuthRepository(
     private val api: ApiService,
@@ -49,7 +53,7 @@ class AuthRepository(
         val result = getResult { api.sendOtp(SendOtpRequest(email)) }
         return when (result) {
             is DataResult.Success -> DataResult.Success(result.data.message)
-            is DataResult.Error   -> result
+            is DataResult.Error -> result
         }
     }
 
@@ -59,12 +63,45 @@ class AuthRepository(
         email: String,
         type: String
     ): DataResult<String> {
-        val result = getResult { api.verifyCode(VerifyCodeRequest(otp, email, type)) }
-        return when (result) {
-            is DataResult.Success -> DataResult.Success(result.data.message)
-            is DataResult.Error   -> result
+        // gọi api, result.data.data là String token
+        return when (val result =
+            getResult { api.verifyCode(VerifyCodeRequest(otp, email, type)) }) {
+            is DataResult.Success -> {
+                val token = result.data.data
+                if (type == "register") {
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+                        .apply()
+                }
+                DataResult.Success(token)    // <-- phải return token
+            }
+
+            is DataResult.Error -> result
         }
     }
+
+    /**
+     * Gọi API chỉnh sửa thông tin cá nhân, nếu thành công sẽ trả về EditProfileResponse
+     * @param fields là Map<String, RequestBody> chứa các trường cần chỉnh sửa
+     * @param avatar là MultipartBody.Part? chứa ảnh đại diện (có thể null)
+     */
+    suspend fun editProfile(
+        fields: Map<String, RequestBody>,
+        avatar: MultipartBody.Part?
+    ): DataResult<EditProfileResponse> {
+        // getResult ở đây trả về DataResult<ApiResponse<EditProfileResponse>>
+        val result = getResult { api.editProfile(fields, avatar) }
+
+        return when (result) {
+            is DataResult.Success -> {
+                // result.data là ApiResponse<EditProfileResponse>
+                // result.data.data là payload EditProfileResponse
+                DataResult.Success(result.data.data)
+            }
+            is DataResult.Error -> result
+        }
+    }
+
 
 
     /**

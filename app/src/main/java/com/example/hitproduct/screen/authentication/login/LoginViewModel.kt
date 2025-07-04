@@ -18,15 +18,15 @@ class LoginViewModel(
 
     fun login(email: String, password: String) {
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _loginState.value = UiState.Error(
-                ErrorMessageMapper.fromBackend("\"email\" must be a valid email")
-            )
-            return
-        }
+//        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            _loginState.value = UiState.Error(
+//                ErrorMessageMapper.fromBackend("must be a valid email")
+//            )
+//            return
+//        }
         if (password.length < 6) {
             _loginState.value = UiState.Error(
-                ErrorMessageMapper.fromBackend("\"password\" length must be at least 6 characters long")
+                ErrorMessageMapper.fromBackend("length must be at least 6 characters long")
             )
             return
         }

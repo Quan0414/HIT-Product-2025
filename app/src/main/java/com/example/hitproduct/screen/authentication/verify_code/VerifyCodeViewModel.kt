@@ -18,10 +18,6 @@ class VerifyCodeViewModel(
     private val _verifyCodeState = MutableLiveData<UiState<String>>(UiState.Idle)
     val verifyCodeState: MutableLiveData<UiState<String>> = _verifyCodeState
 
-    fun clearRegisterState() {
-        _verifyCodeState.value = UiState.Idle
-    }
-
     fun sendOtp(email: String) {
 
         viewModelScope.launch {

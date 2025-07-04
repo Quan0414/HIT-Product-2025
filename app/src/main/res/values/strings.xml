@@ -9,4 +9,10 @@
     <string name="notification_invite_sent">Bạn đã gửi 1 yêu cầu đến %1$s</string>
     <string name="notification_invite_received">%1$s đã gửi cho bạn 1 yêu cầu kết nối</string>
 
+    <string name="year">%1$d</string>
+    <string name="month">%1$d</string>
+    <string name="week">%1$d</string>
+    <string name="day">%1$d</string>
+
+
 </resources>

@@ -13,9 +13,9 @@ object ErrorMessageMapper {
     fun fromBackend(raw: String): MappedError {
 
 
-        val emailError = raw.contains("\"email\" must be a valid email", ignoreCase = true)
+        val emailError = raw.contains("must be a valid email", ignoreCase = true)
         val passwordError = raw.contains(
-            "\"password\" length must be at least 6 characters long",
+            "length must be at least 6 characters long",
             ignoreCase = true
         )
         val confirmPasswordError =
@@ -24,13 +24,17 @@ object ErrorMessageMapper {
         val accountExits = raw.contains("tài khoản đã tồn tại.", ignoreCase = true)
 
         //401
-        val unauthorized = raw.contains("Email hoặc Password không chính xác.", ignoreCase = true)
+        val wrongAccount = raw.contains("Email hoặc Password không chính xác.", ignoreCase = true)
+        val unauthorized = raw.contains("Tài khoản chưa được xác nhận.", ignoreCase = true)
 
         val otpError = raw.contains("Nhập mã OTP sai.", ignoreCase = true)
         val otpExprired =
             raw.contains("OTP hết hạn.", ignoreCase = true)
 
         val message = when {
+
+            unauthorized ->
+                "Tài khoản chưa được xác nhận!"
 
             accountExits ->
                 "Tên người dùng hoặc email đã tồn tại!"
@@ -44,7 +48,7 @@ object ErrorMessageMapper {
             confirmPasswordError ->
                 "Mật khẩu không khớp!"
 
-            unauthorized ->
+            wrongAccount ->
                 "Email hoặc mật khẩu không chính xác!"
 
             otpError ->
@@ -54,11 +58,11 @@ object ErrorMessageMapper {
                 "Mã OTP hết hạn!"
 
             else ->
-                "App lỗi rồi, gọi Huy Hoàng đi!"
+                "Lỗi chưa xác định, bật logcat lên!"
         }
 
-        val emailErrorFlag = emailError || unauthorized
-        val passwordErrorFlag = passwordError || unauthorized
+        val emailErrorFlag = emailError || wrongAccount
+        val passwordErrorFlag = passwordError || wrongAccount
         val otpFlag = otpError || otpExprired
 
         return MappedError(

@@ -12,6 +12,7 @@ object ApiConstants {
     const val AUTH_VERIFY_CODE = "api/v1/auth/register/confirm-otp"
 
     // User
+    const val AUTH_EDIT_PROFILE = "api/v1/auth/profile"
     const val USER_PROFILE = "api/user/profile"
     const val USER_UPDATE = "api/user/update"
 
