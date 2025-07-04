@@ -1,6 +1,7 @@
 package com.example.hitproduct.data.api
 
 import android.content.Context
+import com.example.hitproduct.common.constants.ApiConstants
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import okhttp3.Interceptor
 import okhttp3.OkHttpClient
@@ -26,7 +27,7 @@ class AuthInterceptor(
 
 object NetworkClient {
 
-    private const val BASE_URL = "https://love-story-app-v1.onrender.com/"
+    private const val BASE_URL = ApiConstants.BASE_URL
 
     // 2. Build OkHttpClient kèm AuthInterceptor và logging
     fun provideOkHttpClient(context: Context): OkHttpClient {

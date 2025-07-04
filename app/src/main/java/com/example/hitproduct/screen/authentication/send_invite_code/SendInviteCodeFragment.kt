@@ -1,20 +1,28 @@
 package com.example.hitproduct.screen.authentication.send_invite_code
 
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
+import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
+import com.example.hitproduct.screen.adapter.InviteAdapter
 
 class SendInviteCodeFragment : Fragment() {
 
@@ -96,10 +104,63 @@ class SendInviteCodeFragment : Fragment() {
             false
         }
 
+        //thong bao
+        binding.btnNotification.setOnClickListener {
+            showInviteDialog()
+        }
+
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
     }
+
+    private fun showInviteDialog() {
+        // 1. Inflate layout XML của dialog
+        val dialogView = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_invite, null)
+
+        // 2. Thiết lập RecyclerView
+        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView)
+        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        // 3. Tạo adapter
+        val inviteAdapter = InviteAdapter(
+            onAccept = { item ->
+                // gọi API accept
+                Log.d("InviteDebug", "Accept clicked for: $item")
+            },
+            onReject = { item ->
+                // gọi API reject
+                Log.d("InviteDebug", "Reject clicked for: $item")
+            }
+        )
+
+        // 4. SET ADAPTER TRƯỚC KHI SUBMIT LIST
+        recyclerView.adapter = inviteAdapter
+
+        // 5. Fake data list
+        val fakeList = listOf(
+            InviteItem.Received(fromUser = "Alice"),
+            InviteItem.Received(fromUser = "Bob"),
+            InviteItem.Sent(toUser = "Charlie")
+        )
+
+        // 6. SAU ĐÓ MỚI SUBMIT LIST
+        inviteAdapter.submitList(fakeList)
+
+        // 7. Show dialog
+        val dialog = AlertDialog.Builder(requireContext())
+            .setView(dialogView)
+            .create()
+
+        dialog.setCancelable(true)
+        dialog.setCanceledOnTouchOutside(true)
+        dialog.show()
+        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
+
+
 }
