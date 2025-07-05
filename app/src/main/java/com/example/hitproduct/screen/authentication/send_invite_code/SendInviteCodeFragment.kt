@@ -10,17 +10,22 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
+import com.example.hitproduct.base.DataResult
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.invite.InviteItem
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
 import com.example.hitproduct.screen.adapter.InviteAdapter
 
@@ -29,6 +34,18 @@ class SendInviteCodeFragment : Fragment() {
     private var _binding: FragmentSendInviteCodeBinding? = null
 
     private val binding get() = _binding!!
+
+    private val prefs by lazy {
+        requireContext().getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val authRepo by lazy {
+        AuthRepository(RetrofitClient.getInstance().create(ApiService::class.java), prefs)
+    }
+
+    private val viewModel by lazy {
+        SendInviteCodeViewModel(authRepo)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -106,7 +123,25 @@ class SendInviteCodeFragment : Fragment() {
 
         //thong bao
         binding.btnNotification.setOnClickListener {
-            showInviteDialog()
+            val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: ""
+            viewModel.checkInvite(token)
+        }
+
+
+        viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is DataResult.Success -> showInviteDialog(result.data)
+                is DataResult.Error ->
+                    Toast.makeText(requireContext(), "Error fetch data", Toast.LENGTH_SHORT).show()
+            }
+        }
+
+
+        //nut connect
+        btnConnect.setOnClickListener {
+            val inviteCode = edtInviteCode.text.toString().trim()
+            if (inviteCode.isNotBlank()) {
+            }
         }
 
     }
@@ -116,51 +151,46 @@ class SendInviteCodeFragment : Fragment() {
         _binding = null
     }
 
-    private fun showInviteDialog() {
-        // 1. Inflate layout XML của dialog
+    private fun showInviteDialog(inviteData: InviteData) {
         val dialogView = LayoutInflater.from(requireContext())
             .inflate(R.layout.dialog_invite, null)
-
-        // 2. Thiết lập RecyclerView
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        // 3. Tạo adapter
         val inviteAdapter = InviteAdapter(
-            onAccept = { item ->
-                // gọi API accept
-                Log.d("InviteDebug", "Accept clicked for: $item")
-            },
-            onReject = { item ->
-                // gọi API reject
-                Log.d("InviteDebug", "Reject clicked for: $item")
-            }
+            onAccept = { item -> /* gọi API accept ở đây */ },
+            onReject = { item -> /* gọi API reject ở đây */ }
         )
-
-        // 4. SET ADAPTER TRƯỚC KHI SUBMIT LIST
         recyclerView.adapter = inviteAdapter
 
-        // 5. Fake data list
-        val fakeList = listOf(
-            InviteItem.Received(fromUser = "Alice"),
-            InviteItem.Received(fromUser = "Bob"),
-            InviteItem.Sent(toUser = "Charlie")
-        )
+        // 2. Set dữ liệu cho adapter:
+        val items = inviteData.requestFriends.map {
+            InviteItem.Received(
+                fromUser = it.username,
+                userId = it.id
+            )
+        } + inviteData.acceptFriends.map {
+            InviteItem.Sent(
+                toUser = it.username,
+                userId = it.id
+            )
+        }
+        inviteAdapter.submitList(items)
 
-        // 6. SAU ĐÓ MỚI SUBMIT LIST
-        inviteAdapter.submitList(fakeList)
 
-        // 7. Show dialog
+        // 3. Tạo và show dialog, rồi style:
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
 
-        dialog.setCancelable(true)
-        dialog.setCanceledOnTouchOutside(true)
-        dialog.show()
+        // style window trước khi show hoặc sau show cũng được
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+
+        dialog.show()
+
+        // set lại kích thước
+        val width = (resources.displayMetrics.widthPixels * 0.83).toInt()
+        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
     }
-
-
 
 }

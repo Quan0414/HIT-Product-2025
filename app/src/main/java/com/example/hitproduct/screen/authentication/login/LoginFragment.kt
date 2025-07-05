@@ -15,22 +15,18 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.isInvisible
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.example.hitproduct.HomeFragment
-import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.common.util.ErrorMessageMapper
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
+import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
 
 class LoginFragment : Fragment() {
 
@@ -119,6 +115,18 @@ class LoginFragment : Fragment() {
             val email = binding.edtEmail.text.toString().trim()
             val pass = binding.edtPassword.text.toString()
             viewModel.login(email, pass)
+
+            //thanh cong se chuyen sang man SendInviteCodeFragment
+            viewModel.loginState.observe(viewLifecycleOwner) { state ->
+                if (state is UiState.Success) {
+                    // Chuyển sang SendInviteCodeFragment
+                    val sendInviteCodeFragment = SendInviteCodeFragment()
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentStart, sendInviteCodeFragment)
+                        .addToBackStack(null)
+                        .commit()
+                }
+            }
         }
 
         //Form validation
@@ -219,7 +227,14 @@ class LoginFragment : Fragment() {
     private fun setUpListeners() {
         // Watcher cho email: ẩn X và reset background
         binding.edtEmail.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
@@ -234,7 +249,14 @@ class LoginFragment : Fragment() {
 
         // Watcher cho password: ẩn X, hiện lại mắt và reset background
         binding.edtPassword.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {

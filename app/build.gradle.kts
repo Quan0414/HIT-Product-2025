@@ -81,4 +81,11 @@ dependencies {
     //lottie
     implementation ("com.airbnb.android:lottie:5.2.0")
 
+    //socket io
+    implementation("io.socket:socket.io-client:2.1.1") {
+        exclude(group = "org.json", module = "json")
+    }
+
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
+
 }

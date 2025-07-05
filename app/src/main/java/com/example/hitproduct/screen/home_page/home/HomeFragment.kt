@@ -1,9 +1,6 @@
-package com.example.hitproduct
+package com.example.hitproduct.screen.home_page.home
 
-import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.databinding.FragmentHomeBinding

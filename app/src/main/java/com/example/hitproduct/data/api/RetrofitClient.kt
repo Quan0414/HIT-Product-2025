@@ -20,6 +20,7 @@ class RetrofitClient {
             }
 
         private fun createRetrofit(): Retrofit {
+
             val interceptor = HttpLoggingInterceptor().apply {
                 level = HttpLoggingInterceptor.Level.BODY
             }

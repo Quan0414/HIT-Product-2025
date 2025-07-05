@@ -32,7 +32,6 @@ class InviteAdapter(
         parent: ViewGroup,
         viewType: Int
     ): RecyclerView.ViewHolder {
-        Log.d("InviteDebug", "onCreateViewHolder viewType=$viewType")
         val inflater = LayoutInflater.from(parent.context)
         return when (viewType) {
             TYPE_SENT -> {
@@ -55,12 +54,9 @@ class InviteAdapter(
             is SentViewHolder -> holder.bind(inviteRequest[position] as InviteItem.Sent)
             is ReceivedViewHolder -> holder.bind(inviteRequest[position] as InviteItem.Received)
         }
-        Log.d("InviteDebug", "Bind pos=$position, item=${inviteRequest[position]}")
-
     }
 
     override fun getItemCount(): Int {
-        Log.d("InviteDebug", "itemCount = ${inviteRequest.size}")
         return inviteRequest.size
     }
 
@@ -69,7 +65,6 @@ class InviteAdapter(
             is InviteItem.Sent -> TYPE_SENT
             is InviteItem.Received -> TYPE_RECEIVED
         }
-        Log.d("InviteDebug", "getItemViewType pos=$position → type=$type")
         return type
     }
 

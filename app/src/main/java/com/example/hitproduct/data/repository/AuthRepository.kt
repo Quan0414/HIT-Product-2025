@@ -12,9 +12,9 @@ import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.EditProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.invite.InviteData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
-import retrofit2.Response
 
 class AuthRepository(
     private val api: ApiService,
@@ -101,6 +101,21 @@ class AuthRepository(
             is DataResult.Error -> result
         }
     }
+
+    // AuthRepository.kt
+    suspend fun checkInvite(token: String): DataResult<InviteData> {
+        return when (val result = getResult {
+            api.checkInvite("Bearer $token")
+        }) {
+            is DataResult.Success -> {
+                // result.data: ApiResponse<InviteData>
+                DataResult.Success(result.data.data)   // now InviteData
+            }
+            is DataResult.Error -> result
+        }
+    }
+
+
 
 
 

@@ -6,17 +6,18 @@ import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.EditProfileResponse
-import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
+import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.invite.InviteData
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
-import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.PartMap
 
@@ -48,5 +49,10 @@ interface ApiService {
         fields: @JvmSuppressWildcards Map<String, RequestBody>,
         @Part avatar: MultipartBody.Part?
     ): Response<ApiResponse<EditProfileResponse>>
+
+    @GET(ApiConstants.CHECK_INVITE)
+    suspend fun checkInvite(
+        @Header("Authorization") token: String
+    ): Response<ApiResponse<InviteData>>
 
 }
