@@ -147,21 +147,13 @@ class SendInviteCodeFragment : Fragment() {
 
         }
 
-
-
-        // --- 7. Bắt lỗi socket ---
-        SocketManager.onError { errMsg ->
-            requireActivity().runOnUiThread {
-                Toast.makeText(requireContext(), "Lỗi: $errMsg", Toast.LENGTH_SHORT).show()
+        viewModel.inviteMessage.observe(viewLifecycleOwner) { message ->
+            if (message.isNotBlank()) {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
 
-        SocketManager.onSuccess { errMsg ->
-            Log.e("SendInviteCodeFragment", "Socket error: $errMsg")
-            requireActivity().runOnUiThread {
-                Toast.makeText(requireContext(), " $errMsg", Toast.LENGTH_SHORT).show()
-            }
-        }
+
     }
 
     override fun onDestroyView() {
