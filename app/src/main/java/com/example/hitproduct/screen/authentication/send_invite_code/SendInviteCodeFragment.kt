@@ -10,6 +10,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.MotionEvent
 import android.view.View
@@ -21,6 +22,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.constants.AuthPrefersConstants.USER_ID
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.model.invite.InviteData
@@ -28,6 +30,7 @@ import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
 import com.example.hitproduct.screen.adapter.InviteAdapter
+import com.example.hitproduct.socket.SocketManager
 
 class SendInviteCodeFragment : Fragment() {
 
@@ -46,6 +49,8 @@ class SendInviteCodeFragment : Fragment() {
     private val viewModel by lazy {
         SendInviteCodeViewModel(authRepo)
     }
+
+    lateinit var inviteAdapter: InviteAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -130,7 +135,19 @@ class SendInviteCodeFragment : Fragment() {
 
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             when (result) {
-                is DataResult.Success -> showInviteDialog(result.data)
+                is DataResult.Success -> {
+                    val inviteData = result.data
+
+                    // 1. Lấy userId từ response và lưu vào SharedPreferences
+                    val currentUserId = inviteData.userId
+                    prefs.edit()
+                        .putString(USER_ID, currentUserId)
+                        .apply()
+
+                    // 2. Hiển thị dialog
+                    showInviteDialog(inviteData)
+                }
+
                 is DataResult.Error ->
                     Toast.makeText(requireContext(), "Error fetch data", Toast.LENGTH_SHORT).show()
             }
@@ -138,12 +155,30 @@ class SendInviteCodeFragment : Fragment() {
 
 
         //nut connect
-        btnConnect.setOnClickListener {
-            val inviteCode = edtInviteCode.text.toString().trim()
-            if (inviteCode.isNotBlank()) {
+        binding.tvConnect.setOnClickListener {
+            val code = binding.edtInviteCode.text.toString().trim()
+            val myId = prefs.getString(USER_ID, "") ?: ""
+
+            Log.d("SendInviteCode", "Click - Code: $code, UserID: $myId")
+
+            SocketManager.sendFriendRequest(myId, code) { success, _ ->
+                Log.d("SendInviteCode", "Socket ACK - Success: $success")
+                if (success) {
+                    Toast.makeText(
+                        requireContext(),
+                        "Gửi thành công!", Toast.LENGTH_SHORT
+                    ).show()
+                    binding.edtInviteCode.text?.clear()
+                }
+                // Không toast ở đây khi success = false
+                // vì lỗi đã được bắt và toast trong onError()
             }
         }
 
+
+        SocketManager.onError { errMsg ->
+            Toast.makeText(requireContext(), "Lỗi: $errMsg", Toast.LENGTH_SHORT).show()
+        }
     }
 
     override fun onDestroyView() {
@@ -157,38 +192,50 @@ class SendInviteCodeFragment : Fragment() {
         val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        val inviteAdapter = InviteAdapter(
-            onAccept = { item -> /* gọi API accept ở đây */ },
-            onReject = { item -> /* gọi API reject ở đây */ }
-        )
-        recyclerView.adapter = inviteAdapter
-
-        // 2. Set dữ liệu cho adapter:
-        val items = inviteData.requestFriends.map {
-            InviteItem.Received(
-                fromUser = it.username,
-                userId = it.id
-            )
-        } + inviteData.acceptFriends.map {
-            InviteItem.Sent(
-                toUser = it.username,
-                userId = it.id
-            )
+        // 1. Dùng MutableList để có thể xóa item
+        val items = mutableListOf<InviteItem>().apply {
+            addAll(inviteData.acceptFriends.map {
+                InviteItem.Received(fromUser = it.username, userId = it.id)
+            })
+            addAll(inviteData.requestFriends.map {
+                InviteItem.Sent(toUser = it.username, userId = it.id)
+            })
         }
-        inviteAdapter.submitList(items)
 
+        // 2. Lấy myUserId
+        val myId = prefs.getString(USER_ID, "") ?: ""
 
-        // 3. Tạo và show dialog, rồi style:
+        // 3. Tạo adapter, xử lý onCancel ngay trong callback
+        inviteAdapter = InviteAdapter(
+            onAccept = { received ->
+                SocketManager.acceptFriendRequest(myId, received.userId)
+                // (nếu muốn) xóa luôn item này:
+                items.remove(received)
+                inviteAdapter.submitList(items.toList())
+            },
+            onReject = { received ->
+                SocketManager.refuseFriendRequest(myId, received.userId)
+                items.remove(received)
+                inviteAdapter.submitList(items.toList())
+            },
+            onCancel = { sent ->
+                SocketManager.cancelFriendRequest(myId, sent.userId)
+                // Xóa item khỏi list và cập nhật adapter ngay
+                items.remove(sent)
+                inviteAdapter.submitList(items.toList())
+            }
+        )
+
+        // 4. Gán adapter và ban đầu load data
+        recyclerView.adapter = inviteAdapter
+        inviteAdapter.submitList(items.toList())
+
+        // 5. Tạo và show dialog
         val dialog = AlertDialog.Builder(requireContext())
             .setView(dialogView)
             .create()
-
-        // style window trước khi show hoặc sau show cũng được
         dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-
         dialog.show()
-
-        // set lại kích thước
         val width = (resources.displayMetrics.widthPixels * 0.83).toInt()
         dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
     }

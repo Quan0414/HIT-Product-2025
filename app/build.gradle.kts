@@ -85,6 +85,7 @@ dependencies {
     implementation("io.socket:socket.io-client:2.1.1") {
         exclude(group = "org.json", module = "json")
     }
+    implementation("org.json:json:20230227")
 
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 

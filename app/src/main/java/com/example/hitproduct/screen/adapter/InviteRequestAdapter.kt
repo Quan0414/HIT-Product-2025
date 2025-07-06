@@ -1,6 +1,5 @@
 package com.example.hitproduct.screen.adapter
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -11,8 +10,9 @@ import com.example.hitproduct.R
 import com.example.hitproduct.data.model.invite.InviteItem
 
 class InviteAdapter(
-    private val onAccept: (InviteItem) -> Unit,
-    private val onReject: (InviteItem) -> Unit
+    private val onAccept: (InviteItem.Received) -> Unit,
+    private val onReject: (InviteItem.Received) -> Unit,
+    private val onCancel: (InviteItem.Sent) -> Unit
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {
@@ -70,31 +70,31 @@ class InviteAdapter(
 
     inner class SentViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val tvNotification: TextView = itemView.findViewById(R.id.tvNotification)
+        private val ivCancel: ImageView = view.findViewById(R.id.imgDelete)
 
         fun bind(item: InviteItem.Sent) {
             tvNotification.text = itemView.context.getString(
                 R.string.notification_invite_sent,
                 item.toUser
             )
-            itemView.findViewById<ImageView>(R.id.imgDelete)
-                .setOnClickListener { onAccept(item) }
-            itemView.findViewById<ImageView>(R.id.imgSuccess)
-                .setOnClickListener { onReject(item) }
+            // Nút hủy invite
+            ivCancel.setOnClickListener { onCancel(item) }
         }
     }
 
     inner class ReceivedViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val tvNotification: TextView = itemView.findViewById(R.id.tvNotification)
+        private val ivReject: ImageView = view.findViewById(R.id.imgDelete)
+        private val ivAccept: ImageView = view.findViewById(R.id.imgSuccess)
+
 
         fun bind(item: InviteItem.Received) {
             tvNotification.text = itemView.context.getString(
                 R.string.notification_invite_received,
                 item.fromUser
             )
-            itemView.findViewById<ImageView>(R.id.imgDelete)
-                .setOnClickListener { onAccept(item) }
-            itemView.findViewById<ImageView>(R.id.imgSuccess)
-                .setOnClickListener { onReject(item) }
+            ivAccept.setOnClickListener { onAccept(item) }
+            ivReject.setOnClickListener { onReject(item) }
         }
     }
 }

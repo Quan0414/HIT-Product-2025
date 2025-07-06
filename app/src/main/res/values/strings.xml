@@ -14,6 +14,8 @@
     <string name="week">%1$d</string>
     <string name="day">%1$d</string>
 
+    <string name="money">%1$d</string>
+
     <string name="invite_code">%1$s</string>
 
 
