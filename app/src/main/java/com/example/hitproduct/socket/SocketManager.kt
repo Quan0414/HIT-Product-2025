@@ -45,6 +45,18 @@ object SocketManager {
         }
     }
 
+
+    fun onSuccess(listener: (message: String) -> Unit) {
+        socket.on("SUCCESS") { args ->
+            val obj = args.getOrNull(0) as? JSONObject
+            val msg = obj?.optString("message") ?: ""
+            Handler(Looper.getMainLooper()).post {
+                listener(msg)
+            }
+        }
+    }
+
+
     /**
      * Gửi USER_REQUEST_FRIEND kèm ACK
      * server callback({ status:"success"|"error", message:String })
@@ -55,7 +67,7 @@ object SocketManager {
         onResult: (success: Boolean, message: String?) -> Unit
     ) {
         val payload = JSONObject().apply {
-            put("userId", myUserId)
+            put("myUserId", myUserId)
             put("coupleCode", coupleCode)
         }
 

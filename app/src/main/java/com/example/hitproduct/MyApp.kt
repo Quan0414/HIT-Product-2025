@@ -2,7 +2,6 @@ package com.example.hitproduct
 
 import android.app.Application
 import android.widget.Toast
-import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.socket.SocketManager
 
 class MyApp : Application() {

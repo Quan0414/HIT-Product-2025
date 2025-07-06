@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.adapter
+package com.example.hitproduct.screen.authentication.send_invite_code.adapter
 
 import android.view.LayoutInflater
 import android.view.View
