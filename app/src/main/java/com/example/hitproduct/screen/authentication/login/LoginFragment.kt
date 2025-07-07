@@ -1,6 +1,7 @@
 package com.example.hitproduct.screen.authentication.login
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -17,6 +18,7 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
@@ -65,6 +67,49 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: ""
+
+        viewModel.coupleState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+
+                }
+
+                UiState.Idle -> {
+
+                }
+
+                UiState.Loading -> {
+
+                }
+
+                is UiState.Success -> {
+                    val coupleId = state.data.coupleId
+                    if (coupleId == null) {
+                        // Chưa có đôi, chuyển sang SendInviteCodeFragment
+                        val sendInviteCodeFragment = SendInviteCodeFragment()
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentStart, sendInviteCodeFragment)
+                            .addToBackStack(null)
+                            .commit()
+                    } else {
+                        // Đã có đôi, xử lý logic khác nếu cần
+                        Toast.makeText(
+                            requireContext(),
+                            "Bạn đã ghép đôi với người ấy.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        //chuyen den MainActivity
+                        val intent = Intent(requireContext(), MainActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish() // Kết thúc LoginFragment
+                    }
+
+                }
+            }
+        }
+
+
         // Observe loginState để show Loading, Error, Success
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -103,9 +148,10 @@ class LoginFragment : Fragment() {
                         "Đăng nhập thành công",
                         Toast.LENGTH_SHORT
                     ).show()
-                    //chuyen man vao main activity va ket thuc loginactivity
-
-
+                    // đọc lại token vừa lưu
+                    val newToken = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+                    viewModel.checkCouple(newToken)
+                    viewModel.clearLoginState()
                 }
             }
         }
@@ -116,17 +162,6 @@ class LoginFragment : Fragment() {
             val pass = binding.edtPassword.text.toString()
             viewModel.login(email, pass)
 
-            //thanh cong se chuyen sang man SendInviteCodeFragment
-            viewModel.loginState.observe(viewLifecycleOwner) { state ->
-                if (state is UiState.Success) {
-                    // Chuyển sang SendInviteCodeFragment
-                    val sendInviteCodeFragment = SendInviteCodeFragment()
-                    parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentStart, sendInviteCodeFragment)
-                        .addToBackStack(null)
-                        .commit()
-                }
-            }
         }
 
         //Form validation

@@ -8,6 +8,8 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -17,6 +19,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
@@ -25,15 +28,13 @@ import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.constants.AuthPrefersConstants.USER_ID
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
-import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
+import com.example.hitproduct.screen.authentication.login.LoginViewModel
+import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.send_invite_code.adapter.InviteAdapter
 import com.example.hitproduct.socket.SocketManager
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
 class SendInviteCodeFragment : Fragment() {
 
@@ -43,18 +44,43 @@ class SendInviteCodeFragment : Fragment() {
     private val prefs by lazy {
         requireContext().getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
     }
-
     private val authRepo by lazy {
-        AuthRepository(RetrofitClient.getInstance().create(ApiService::class.java), prefs)
+        AuthRepository(
+            RetrofitClient.getInstance().create(ApiService::class.java),
+            prefs
+        )
+    }
+    private val viewModel by viewModels<SendInviteCodeViewModel> {
+        SendInviteCodeViewModelFactory(authRepo)
     }
 
-    private val viewModel by lazy {
-        SendInviteCodeViewModel(authRepo)
+    private fun setupInviteDialog() {
+        val view = LayoutInflater.from(requireContext())
+            .inflate(R.layout.dialog_invite, null)
+        val rv = view.findViewById<RecyclerView>(R.id.recyclerView)
+        rv.layoutManager = LinearLayoutManager(requireContext())
+
+        inviteAdapter = InviteAdapter(
+            onAccept = { itUser -> SocketManager.acceptFriendRequest(itUser.userId) },
+            onReject = { itUser -> SocketManager.refuseFriendRequest(itUser.userId) },
+            onCancel = { itUser -> SocketManager.cancelFriendRequest(itUser.userId) }
+        )
+        rv.adapter = inviteAdapter
+
+        inviteDialog = AlertDialog.Builder(requireContext())
+            .setView(view)
+            .create().apply {
+                window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+            }
     }
+
+
 
     private lateinit var inviteAdapter: InviteAdapter
+    private val currentItems = mutableListOf<InviteItem>()
+    private var inviteDialog: AlertDialog? = null
 
-    private var showOnRefresh = false // flag để biết có cần show dialog hay không
+    private lateinit var token: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -68,22 +94,40 @@ class SendInviteCodeFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        // --- 1. Khi vào màn: chỉ checkInvite để lấy userId ---
-        val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: ""
+        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+        SocketManager.connect(token)
+
+        // 1. Tạo dialog + adapter sẵn, nhưng chưa show
+        setupInviteDialog()
+
+        // 2. Fetch initial list từ API
         viewModel.checkInvite(token)
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             if (result is DataResult.Success) {
-                // lưu userId thôi, không show dialog
-                prefs.edit()
-                    .putString(USER_ID, result.data.userId)
-                    .apply()
-
-                if (showOnRefresh) showInviteDialog(result.data)
+                currentItems.clear()
+                // Received
+                result.data.acceptFriends.forEach {
+                    currentItems.add( InviteItem.Received(fromUser = it.username, userId = it.id) )
+                }
+                // Sent
+                result.data.requestFriends.forEach {
+                    currentItems.add( InviteItem.Sent(toUser = it.username, userId = it.id) )
+                }
+                // Cập nhật adapter
+                inviteAdapter.submitList(currentItems.toList())
             }
-            // lỗi thì ignore (hoặc show toast tuỳ em)
         }
 
-        // --- 2. Setup input + nút Connect ---
+        registerSocketListeners()
+
+        setupInviteInput()
+        setupBackButton()
+        setupCopyInviteCode()
+        setupNotificationButton()
+        setupSendInviteButton()
+    }
+
+    private fun setupInviteInput() {
         val edtInviteCode = binding.edtInviteCode
         val btnConnect = binding.tvConnect
         fun updateButtonState() {
@@ -100,23 +144,27 @@ class SendInviteCodeFragment : Fragment() {
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
         updateButtonState()
+    }
 
-        // --- 3. Nút back ---
+    private fun setupBackButton() {
         binding.backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
+    }
 
-        // --- 4. Copy invite code ---
+    @SuppressLint("ClickableViewAccessibility")
+    private fun setupCopyInviteCode() {
         binding.tvInviteCode.setOnTouchListener { v, event ->
             if (event.action == MotionEvent.ACTION_UP) {
-                val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2] ?: return@setOnTouchListener false
+                val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2]
+                    ?: return@setOnTouchListener false
                 if (event.x >= binding.tvInviteCode.width
                     - binding.tvInviteCode.paddingEnd
                     - drawableEnd.bounds.width()
                 ) {
-                    v.performClick()
                     val code = binding.tvInviteCode.text.toString()
-                    val cm = requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+                    val cm =
+                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
                     cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
                     Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
                     return@setOnTouchListener true
@@ -124,81 +172,151 @@ class SendInviteCodeFragment : Fragment() {
             }
             false
         }
+    }
 
-        // --- 5. Nút Xem thông báo: gọi API mới và show dialog ---
+    private fun setupNotificationButton() {
         binding.btnNotification.setOnClickListener {
-            viewModel.checkInvite(token)   // chỉ cần gọi lại cái này, ViewModel sẽ chạy suspend trong coroutine
-            showOnRefresh = true           // một flag nhỏ cho biết là lần này show dialog
+            // Mở dialog chỉ dựa trên dữ liệu socket
+            showInviteDialog()
         }
+    }
 
-        // --- 6. Gửi lời mời qua socket ---
+    private fun setupSendInviteButton() {
         binding.tvConnect.setOnClickListener {
-            val code = edtInviteCode.text.toString().trim()
-            val myId = prefs.getString(USER_ID, "") ?: ""
+            val code = binding.edtInviteCode.text.toString().trim()
+            if (code.isEmpty()) return@setOnClickListener
 
-            Log.d("SendInviteCodeFragment", "myId: $myId, code: $code")
-            SocketManager.sendFriendRequest(myId, code) { success, _ ->
-                Log.d("SendInviteCodeFragment", "Socket response: success=$success")
-                if (success) {
-                    Toast.makeText(requireContext(), "Gửi thành công!", Toast.LENGTH_SHORT).show()
-                    edtInviteCode.text?.clear()
-                }
-            }
-
+            SocketManager.sendFriendRequest(code)
+            Log.d("SendInvite", "Sent friend request with code=$code")
+            // Mở dialog nếu chưa mở
+//            if (inviteDialog == null || inviteDialog?.isShowing == false) {
+//                showInviteDialog()
+//            }
         }
-
-        viewModel.inviteMessage.observe(viewLifecycleOwner) { message ->
-            if (message.isNotBlank()) {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-            }
-        }
-
-
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+        inviteDialog?.dismiss()
+        SocketManager.disconnect()
     }
 
-    private fun showInviteDialog(inviteData: InviteData) {
-        val dialogView = LayoutInflater.from(requireContext())
-            .inflate(R.layout.dialog_invite, null)
-        val recyclerView = dialogView.findViewById<RecyclerView>(R.id.recyclerView)
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+    private fun showInviteDialog() {
+        if (inviteDialog == null) {
+            val view = LayoutInflater.from(requireContext())
+                .inflate(R.layout.dialog_invite, null)
+            val rv = view.findViewById<RecyclerView>(R.id.recyclerView)
+            rv.layoutManager = LinearLayoutManager(requireContext())
+            inviteAdapter = InviteAdapter(
+                onAccept = { itUser -> SocketManager.acceptFriendRequest(itUser.userId) },
+                onReject = { itUser -> SocketManager.refuseFriendRequest(itUser.userId) },
+                onCancel = { itUser -> SocketManager.cancelFriendRequest(itUser.userId) }
+            )
+            rv.adapter = inviteAdapter
+            inviteDialog = AlertDialog.Builder(requireContext())
+                .setView(view)
+                .create().apply {
+                    window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+                }
+        }
+        inviteAdapter.submitList(currentItems.toList())
+        inviteDialog?.show()
+        inviteDialog?.window?.setLayout(
+            (resources.displayMetrics.widthPixels * 0.83).toInt(),
+            ViewGroup.LayoutParams.WRAP_CONTENT
+        )
+    }
 
-        val items = mutableListOf<InviteItem>().apply {
-            addAll(inviteData.acceptFriends.map {
-                InviteItem.Received(fromUser = it.username, userId = it.id)
-            })
-            addAll(inviteData.requestFriends.map {
-                InviteItem.Sent(toUser = it.username, userId = it.id)
-            })
+    private fun registerSocketListeners() {
+        SocketManager.onSuccess { message ->
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                binding.edtInviteCode.text?.clear()
+            }
+        }
+        SocketManager.onError { message ->
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
+            }
+        }
+        SocketManager.onRequestSent { data ->
+            // Trên background thread của socket, nên post về main thread để cập nhật UI
+            Handler(Looper.getMainLooper()).post {
+                // Lấy đúng userId và username của người nhận
+                val receiverId = data.optString("yourUserId")
+                val receiverName = data.optString("yourUserName")
+
+                // Thêm vào danh sách Sent
+                currentItems.add(
+                    InviteItem.Sent(
+                        toUser = receiverName,
+                        userId = receiverId
+                    )
+                )
+
+                // Cập nhật dialog
+                refreshDialog()
+                if (inviteDialog?.isShowing != true) {
+                    showInviteDialog()
+                }
+            }
         }
 
-        val myId = prefs.getString(USER_ID, "") ?: ""
-        inviteAdapter = InviteAdapter(
-            onAccept = { received ->
-                SocketManager.acceptFriendRequest(myId, received.userId)
-                items.remove(received); inviteAdapter.submitList(items.toList())
-            },
-            onReject = { received ->
-                SocketManager.refuseFriendRequest(myId, received.userId)
-                items.remove(received); inviteAdapter.submitList(items.toList())
-            },
-            onCancel = { sent ->
-                SocketManager.cancelFriendRequest(myId, sent.userId)
-                items.remove(sent); inviteAdapter.submitList(items.toList())
+        // khi có invite đến → thêm vào Received
+        SocketManager.onIncomingRequest { data ->
+            Log.d("SendInvite", "Received incoming request: $data")
+            Handler(Looper.getMainLooper()).post {
+                val id = data.optString("yourUserId")
+                val name = data.optString("yourUserName")
+                currentItems.add(InviteItem.Received(fromUser = name, userId = id))
+                refreshDialog()
+                if (inviteDialog?.isShowing != true) showInviteDialog()
             }
-        )
-        recyclerView.adapter = inviteAdapter
-        inviteAdapter.submitList(items.toList())
+        }
 
-        val dialog = AlertDialog.Builder(requireContext())
-            .setView(dialogView).create()
-        dialog.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        dialog.show()
-        val width = (resources.displayMetrics.widthPixels * 0.83).toInt()
-        dialog.window?.setLayout(width, ViewGroup.LayoutParams.WRAP_CONTENT)
+        // SERVER_RETURN_USER_CANCEL_REQUEST:
+        // server confirm A huỷ lời mời đi (remove from Sent)
+        SocketManager.onRequestCancelled { data ->
+            Handler(Looper.getMainLooper()).post {
+                val cancelledId = data.optString("yourUserId")
+                currentItems.removeAll { it is InviteItem.Sent && it.userId == cancelledId }
+                refreshDialog()
+            }
+        }
+
+        // A huỷ với B → B remove Received
+        SocketManager.onCancelReceived { data ->
+            Handler(Looper.getMainLooper()).post {
+                val cancelledId = data.optString("yourUserId")
+                currentItems.removeAll { it is InviteItem.Received && it.userId == cancelledId }
+                refreshDialog()
+            }
+        }
+
+        // B từ chối A → remove Received
+        SocketManager.onRequestRefused { data ->
+            Handler(Looper.getMainLooper()).post {
+                val refusedId = data.optString("yourUserId")
+                currentItems.removeAll { it is InviteItem.Received && it.userId == refusedId }
+                refreshDialog()
+            }
+        }
+
+        // A nhận được B từ chối → remove Sent
+        SocketManager.onRefusalReceived { data ->
+            Handler(Looper.getMainLooper()).post {
+                val refusedId = data.optString("yourUserId")
+                currentItems.removeAll { it is InviteItem.Sent && it.userId == refusedId }
+                refreshDialog()
+            }
+        }
+
+    }
+
+    private fun refreshDialog() {
+        if (inviteDialog?.isShowing == true) {
+            inviteAdapter.submitList(currentItems.toList())
+        }
     }
 }

@@ -8,6 +8,7 @@ import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.EditProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
+import com.example.hitproduct.data.model.check_couple.CheckCoupleData
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
 import okhttp3.MultipartBody
@@ -54,5 +55,10 @@ interface ApiService {
     suspend fun checkInvite(
         @Header("Authorization") token: String
     ): Response<ApiResponse<InviteData>>
+
+    @GET("api/v1/auth/check")
+    suspend fun checkCouple(
+        @Header("Authorization") bearerToken: String
+    ): Response<ApiResponse<CheckCoupleData>>
 
 }

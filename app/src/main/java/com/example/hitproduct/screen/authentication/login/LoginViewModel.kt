@@ -5,6 +5,7 @@ import androidx.lifecycle.*
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.ErrorMessageMapper
+import com.example.hitproduct.data.model.check_couple.CheckCoupleData
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -15,6 +16,13 @@ class LoginViewModel(
 
     private val _loginState = MutableLiveData<UiState<ApiResponse<String>>>(UiState.Idle)
     val loginState: LiveData<UiState<ApiResponse<String>>> = _loginState
+
+    private val _coupleState = MutableLiveData<UiState<CheckCoupleData>>(UiState.Idle)
+    val coupleState: LiveData<UiState<CheckCoupleData>> = _coupleState
+
+    fun clearLoginState() {
+        _loginState.value = UiState.Idle
+    }
 
     fun login(email: String, password: String) {
 
@@ -43,6 +51,18 @@ class LoginViewModel(
                     // XONG: chỉ show result.error, không cần map lại
                     _loginState.value = UiState.Error(result.error)
                 }
+            }
+        }
+    }
+
+    fun checkCouple(token: String) {
+        viewModelScope.launch {
+            _coupleState.value = UiState.Loading
+            when (val res = authRepository.checkCouple(token)) {
+                is DataResult.Success ->
+                    _coupleState.value = UiState.Success(res.data)
+                is DataResult.Error  ->
+                    _coupleState.value = UiState.Error(res.error)
             }
         }
     }

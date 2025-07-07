@@ -2,118 +2,129 @@ package com.example.hitproduct.socket
 
 import android.os.Handler
 import android.os.Looper
-import io.socket.client.Ack
 import io.socket.client.IO
+import io.socket.client.IO.Options
 import io.socket.client.Socket
 import org.json.JSONObject
 
+/**
+ * SocketManager handles real-time friend request events:
+ * - sendFriendRequest ↔︎ USER_REQUEST_FRIEND
+ * - cancelFriendRequest ↔︎ USER_CANCEL_FRIEND
+ * - refuseFriendRequest ↔︎ USER_REFUSE_FRIEND
+ * - acceptFriendRequest ↔︎ USER_ACCEPT_FRIEND
+ *
+ * Listeners for server responses:
+ * - onRequestSent ↔︎ SERVER_RETURN_USER_REQUEST
+ * - onIncomingRequest ↔︎ SERVER_RETURN_USER_ACCEPT
+ * - onRequestCancelled ↔︎ SERVER_RETURN_USER_CANCEL_REQUEST
+ * - onCancelReceived ↔︎ SERVER_RETURN_USER_CANCEL_ACCEPT
+ * - onRequestRefused ↔︎ SERVER_RETURN_USER_REFUSE_ACCEPT
+ * - onRefusalReceived ↔︎ SERVER_RETURN_USER_REFUSE_REQUEST
+ */
 object SocketManager {
     private lateinit var socket: Socket
     private const val SERVER_URL = "https://love-story-app-1.onrender.com"
+    private var authToken: String? = null
 
-    fun connect() {
-        if (::socket.isInitialized && socket.connected()) return
-        socket = IO.socket(SERVER_URL, IO.Options().apply { reconnection = true })
+    /**
+     * Kết nối tới Socket server kèm token (server lấy myUserId từ token)
+     */
+    fun connect(token: String) {
+        if (::socket.isInitialized && socket.connected() && authToken == token) return
+        authToken = token
+        if (::socket.isInitialized) {
+            socket.disconnect()
+            socket.off()
+        }
+        val opts = Options().apply {
+            reconnection = true
+            auth = mapOf("token" to token)
+        }
+        socket = IO.socket(SERVER_URL, opts)
         socket.connect()
     }
 
-    /** Cho phép đăng ký callback khi kết nối thành công */
+    /**
+     * Callback khi kết nối thành công
+     */
     fun onConnected(listener: () -> Unit) {
         socket.on(Socket.EVENT_CONNECT) {
-            Handler(Looper.getMainLooper()).post {
-                listener()
-            }
+            Handler(Looper.getMainLooper()).post { listener() }
         }
     }
 
-
+    /**
+     * Ngắt kết nối và xóa listeners
+     */
     fun disconnect() {
         if (::socket.isInitialized && socket.connected()) {
             socket.disconnect()
             socket.off()
         }
+        authToken = null
     }
-
-    /** Listener chung cho event ERROR mà server emit không qua callback */
-    fun onError(listener: (message: String) -> Unit) {
-        socket.on("ERROR") { args ->
-            val obj = args.getOrNull(0) as? JSONObject
-            val msg = obj?.optString("message") ?: "Unknown error"
-            Handler(Looper.getMainLooper()).post {
-                listener(msg)
-            }
-        }
-    }
-
-
-    fun onSuccess(listener: (message: String) -> Unit) {
-        socket.on("SUCCESS") { args ->
-            val obj = args.getOrNull(0) as? JSONObject
-            val msg = obj?.optString("message") ?: ""
-            Handler(Looper.getMainLooper()).post {
-                listener(msg)
-            }
-        }
-    }
-
 
     /**
-     * Gửi USER_REQUEST_FRIEND kèm ACK
-     * server callback({ status:"success"|"error", message:String })
+     * Lắng nghe lỗi chung từ server (event 'ERROR')
      */
-    fun sendFriendRequest(
-        myUserId: String,
-        coupleCode: String,
-        onResult: (success: Boolean, message: String?) -> Unit
-    ) {
-        val payload = JSONObject().apply {
-            put("myUserId", myUserId)
-            put("coupleCode", coupleCode)
+    fun onError(listener: (message: String) -> Unit) {
+        socket.on("ERROR") { args ->
+            val msg = (args.getOrNull(0) as? JSONObject)?.optString("message") ?: "Unknown error"
+            Handler(Looper.getMainLooper()).post { listener(msg) }
         }
-
-        socket.emit("USER_REQUEST_FRIEND", payload, Ack { args ->
-            // args[0] là JSONObject { status, message }
-            val ack = args.getOrNull(0) as? JSONObject
-            val status = ack?.optString("status")
-            val message = ack?.optString("message")
-            val success = status == "success"
-            // Đảm bảo chạy callback trên main thread
-            Handler(Looper.getMainLooper()).post {
-                onResult(success, message)
-            }
-        })
     }
 
-    // 2. Hủy lời mời
-    fun cancelFriendRequest(myUserId: String, userId: String) {
-        val payload = JSONObject().apply {
-            put("myUserId", myUserId)
-            put("userId", userId)
+    /**
+     * Lắng nghe thông báo thành công chung từ server (event 'SUCCESS')
+     */
+    fun onSuccess(listener: (message: String) -> Unit) {
+        socket.on("SUCCESS") { args ->
+            val msg = (args.getOrNull(0) as? JSONObject)?.optString("message") ?: ""
+            Handler(Looper.getMainLooper()).post { listener(msg) }
         }
+    }
+
+    // === Emitting events to server ===
+
+    /**
+     * Gửi USER_REQUEST_FRIEND để mời kết đôi chỉ với coupleCode
+     */
+    fun sendFriendRequest(coupleCode: String) {
+        val payload = JSONObject().apply { put("coupleCode", coupleCode) }
+        socket.emit("USER_REQUEST_FRIEND", payload)
+    }
+
+    /**
+     * Gửi USER_CANCEL_FRIEND để huỷ lời mời đã gửi chỉ với yourUserId
+     */
+    fun cancelFriendRequest(yourUserId: String) {
+        val payload = JSONObject().apply { put("yourUserId", yourUserId) }
         socket.emit("USER_CANCEL_FRIEND", payload)
     }
 
-    // 3. Từ chối lời mời đến
-    fun refuseFriendRequest(myUserId: String, userId: String) {
-        val payload = JSONObject().apply {
-            put("myUserId", myUserId)
-            put("userId", userId)
-        }
+    /**
+     * Gửi USER_REFUSE_FRIEND để từ chối lời mời đến chỉ với userId
+     */
+    fun refuseFriendRequest(userId: String) {
+        val payload = JSONObject().apply { put("userId", userId) }
         socket.emit("USER_REFUSE_FRIEND", payload)
     }
 
-    // 4. Chấp nhận lời mời đến
-    fun acceptFriendRequest(myUserId: String, userId: String) {
-        val payload = JSONObject().apply {
-            put("myUserId", myUserId)
-            put("userId", userId)
-        }
+    /**
+     * Gửi USER_ACCEPT_FRIEND để chấp nhận lời mời đến chỉ với yourUserId
+     */
+    fun acceptFriendRequest(yourUserId: String) {
+        val payload = JSONObject().apply { put("yourUserId", yourUserId) }
         socket.emit("USER_ACCEPT_FRIEND", payload)
     }
 
-    // ==== Listeners ====
+    // === Listeners cho event server trả về ===
 
-    /** Khi server confirm bạn vừa gửi thành công (đẩy vào list Sent) */
+    /**
+     * SERVER_RETURN_USER_REQUEST: server xác nhận đã gửi lời mời
+     * Thêm vào list "Sent"
+     */
     fun onRequestSent(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_RETURN_USER_REQUEST") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
@@ -122,7 +133,10 @@ object SocketManager {
         }
     }
 
-    /** Khi có lời mời mới gửi đến bạn (đẩy vào list Received) */
+    /**
+     * SERVER_RETURN_USER_ACCEPT: có lời mời mới đến
+     * Thêm vào list "Received"
+     */
     fun onIncomingRequest(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_RETURN_USER_ACCEPT") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
@@ -131,28 +145,53 @@ object SocketManager {
         }
     }
 
-    /** Khi server confirm bạn vừa hủy request (xoá khỏi Sent) */
+    /**
+     * SERVER_RETURN_USER_CANCEL_REQUEST: server xác nhận huỷ lời mời của A
+     * Xóa khỏi list "Sent"
+     */
     fun onRequestCancelled(listener: (data: JSONObject) -> Unit) {
-        socket.on("SERVER_RETURN_USER_CANCEL") { args ->
+        socket.on("SERVER_RETURN_USER_CANCEL_REQUEST") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
                 Handler(Looper.getMainLooper()).post { listener(data) }
             }
         }
     }
 
-    /** Khi server confirm bạn vừa chấp nhận (cập nhật Received → Friend) */
-    fun onFriendAccepted(listener: (data: JSONObject) -> Unit) {
-        // Tên event có thể là SERVER_RETURN_USER_ACCEPTED hoặc tương tự, tuỳ backend
-        socket.on("SERVER_RETURN_USER_ACCEPTED") { args ->
+    /**
+     * SERVER_RETURN_USER_CANCEL_ACCEPT: A huỷ lời mời, B sẽ xóa khỏi "Received"
+     */
+    fun onCancelReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_USER_CANCEL_ACCEPT") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
                 Handler(Looper.getMainLooper()).post { listener(data) }
             }
         }
     }
 
-
-    fun isConnected(): Boolean {
-        return ::socket.isInitialized && socket.connected()
+    /**
+     * SERVER_RETURN_USER_REFUSE_ACCEPT: A từ chối lời mời, server xác nhận xóa khỏi "Received"
+     */
+    fun onRequestRefused(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_USER_REFUSE_ACCEPT") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
     }
 
+    /**
+     * SERVER_RETURN_USER_REFUSE_REQUEST: B nhận được A từ chối, server xóa khỏi "Sent"
+     */
+    fun onRefusalReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_USER_REFUSE_REQUEST") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    /**
+     * Kiểm tra trạng thái kết nối hiện tại
+     */
+    fun isConnected(): Boolean = ::socket.isInitialized && socket.connected()
 }

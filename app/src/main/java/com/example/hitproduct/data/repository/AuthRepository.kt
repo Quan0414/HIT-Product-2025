@@ -11,6 +11,7 @@ import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.EditProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
+import com.example.hitproduct.data.model.check_couple.CheckCoupleData
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
 import okhttp3.MultipartBody
@@ -111,6 +112,18 @@ class AuthRepository(
                 // result.data: ApiResponse<InviteData>
                 DataResult.Success(result.data.data)   // now InviteData
             }
+            is DataResult.Error -> result
+        }
+    }
+
+
+    suspend fun checkCouple(token: String): DataResult<CheckCoupleData> {
+        return when (val result = getResult {
+            api.checkCouple("Bearer $token")
+        }) {
+            is DataResult.Success ->
+                // result.data: ApiResponse<CheckCoupleData>
+                DataResult.Success(result.data.data)
             is DataResult.Error -> result
         }
     }

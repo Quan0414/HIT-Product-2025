@@ -15,7 +15,7 @@ object ApiConstants {
     const val AUTH_EDIT_PROFILE = "api/v1/auth/profile"
     const val USER_PROFILE = "api/user/profile"
     const val USER_UPDATE = "api/user/update"
-    const val CHECK_INVITE = "api/v1/couple/request"
+    const val CHECK_INVITE = "api/v1/couple/connect"
 
     // Events / Countdown
     const val EVENTS_LIST = "api/events"
