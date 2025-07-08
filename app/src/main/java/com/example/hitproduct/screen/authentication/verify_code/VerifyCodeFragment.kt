@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.viewModels
@@ -84,7 +83,6 @@ class VerifyCodeFragment : Fragment() {
                 is UiState.Loading -> {
                     // show loading nếu cần
                 }
-
                 is UiState.Success -> {
                     Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
                     // sau khi gửi lại thành công, restart đếm
@@ -140,15 +138,23 @@ class VerifyCodeFragment : Fragment() {
                 override fun onTextChanged(s: CharSequence?, st: Int, b: Int, c: Int) {}
             })
             editText.setOnKeyListener { _, keyCode, event ->
-                if (keyCode == KeyEvent.KEYCODE_DEL && editText.text.isEmpty() && index > 0) {
-                    codes[index - 1].apply {
-                        text?.clear()
+                if (keyCode == KeyEvent.KEYCODE_DEL
+                    && event.action == KeyEvent.ACTION_DOWN
+                    && editText.text.isEmpty()
+                    && index > 0
+                ) {
+                    val prev = codes[index - 1]
+                    if (prev.text.isNotEmpty())
+                        prev.text.delete(prev.text.length - 1, prev.text.length)
+                    prev.apply {
                         requestFocus()
+                        setSelection(text.length)
                     }
                     updateContinueState()
                     true
                 } else false
             }
+
         }
         updateContinueState()
 
@@ -157,7 +163,7 @@ class VerifyCodeFragment : Fragment() {
             binding.tvContinue.isEnabled = state !is UiState.Loading
             when (state) {
                 is UiState.Success -> {
-                    Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
                     navigateNext()
                 }
 

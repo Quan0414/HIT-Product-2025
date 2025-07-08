@@ -32,8 +32,11 @@ open class BaseRepository {
                 return@withContext DataResult.Error(mapped)
             }
         } catch (e: Exception) {
-            val mapped = MappedError("Đã xảy ra lỗi không xác định.")
+            e.printStackTrace()                       // in stacktrace
+            val msg = e.message ?: "Unknown exception"
+            val mapped = MappedError("Lỗi: $msg")
             return@withContext DataResult.Error(mapped)
         }
+
     }
 }
