@@ -22,6 +22,8 @@ import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
 import com.example.hitproduct.screen.authentication.login.LoginViewModel
 import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class SetUpInformationFragment : Fragment() {
@@ -90,12 +92,25 @@ class SetUpInformationFragment : Fragment() {
         }
 
         binding.tvContinue.setOnClickListener {
+            val rawDob = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
+            val formattedDob = rawDob?.let {
+                try {
+                    val inputFmt  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val outputFmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    outputFmt.format(inputFmt.parse(it)!!)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
             val firstName   = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
             val lastName    = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
             val nickName    = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
             val gender      = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
-            val dateOfBirth = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
-            val avatarUri   =  null
+            // Chú ý: ở đây phải dùng formattedDob, không phải rawDob hay editText.text
+            val dateOfBirth = formattedDob
+
+            val avatarUri   = null
 
             // Gọi updateProfile trong ViewModel
             viewModel.updateProfile(

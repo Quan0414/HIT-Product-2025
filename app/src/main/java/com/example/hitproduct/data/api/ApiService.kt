@@ -56,7 +56,7 @@ interface ApiService {
         @Header("Authorization") token: String
     ): Response<ApiResponse<InviteData>>
 
-    @GET("api/v1/auth/check")
+    @GET(ApiConstants.USER_PROFILE)
     suspend fun checkCouple(
         @Header("Authorization") bearerToken: String
     ): Response<ApiResponse<CheckCoupleData>>

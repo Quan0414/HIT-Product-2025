@@ -31,7 +31,7 @@ object RequestProfile {
             map["lastName"] = it.toRequestBody("text/plain".toMediaType())
         }
         nickName?.takeIf { it.isNotBlank() }?.let {
-            map["nickName"] = it.toRequestBody("text/plain".toMediaType())
+            map["nickname"] = it.toRequestBody("text/plain".toMediaType())
         }
         gender?.takeIf { it.isNotBlank() }?.let {
             map["gender"] = it.toRequestBody("text/plain".toMediaType())
