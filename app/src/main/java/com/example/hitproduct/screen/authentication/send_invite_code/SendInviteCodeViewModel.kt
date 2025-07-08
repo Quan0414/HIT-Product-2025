@@ -19,8 +19,8 @@ class SendInviteCodeViewModel(
     private val _inviteResult = MutableLiveData<DataResult<InviteData>>()
     val inviteResult: LiveData<DataResult<InviteData>> = _inviteResult
 
-    private val _inviteMessage = MutableLiveData<String>()
-    val inviteMessage: LiveData<String> = _inviteMessage
+    private val _inviteCode = MutableLiveData<String>()
+    val inviteCode: LiveData<String> = _inviteCode
 
     fun checkInvite(token: String) {
         viewModelScope.launch {
@@ -29,21 +29,15 @@ class SendInviteCodeViewModel(
         }
     }
 
-    fun setInviteMessage(message: String) {
-        if (inviteMessage.value == message) return
-        else {
-            _inviteMessage.value = message
-        }
-    }
 
-    init {
-        // --- 7. Bắt lỗi socket ---
-        SocketManager.onError { errMsg ->
-            setInviteMessage(errMsg)
-        }
-
-        SocketManager.onSuccess { errMsg ->
-            setInviteMessage(errMsg)
-        }
-    }
+//    init {
+//        // --- 7. Bắt lỗi socket ---
+//        SocketManager.onError { errMsg ->
+//            setInviteMessage(errMsg)
+//        }
+//
+//        SocketManager.onSuccess { errMsg ->
+//            setInviteMessage(errMsg)
+//        }
+//    }
 }

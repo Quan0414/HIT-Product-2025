@@ -3,6 +3,7 @@
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
+    <string name="invite_code">%1$s</string>
     <string name="verify_code_to">Một mã xác nhận đã được gửi đến %1$s</string>
     <string name="code_expired">Thời gian hiệu lực: %1$d</string>
 
@@ -16,7 +17,13 @@
 
     <string name="money">%1$d</string>
 
-    <string name="invite_code">%1$s</string>
+    <string name="username">%1$s</string>
+    <string name="nickname">%1$s</string>
+    <string name="first_name">%1$s</string>
+    <string name="last_name">%1$s</string>
+    <string name="email">%1$s</string>
+    <string name="gender">%1$s</string>
+    <string name="birthday">%1$s</string>
 
 
 </resources>

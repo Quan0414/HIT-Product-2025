@@ -188,10 +188,6 @@ class SendInviteCodeFragment : Fragment() {
 
             SocketManager.sendFriendRequest(code)
             Log.d("SendInvite", "Sent friend request with code=$code")
-            // Mở dialog nếu chưa mở
-//            if (inviteDialog == null || inviteDialog?.isShowing == false) {
-//                showInviteDialog()
-//            }
         }
     }
 
@@ -241,6 +237,7 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
         SocketManager.onRequestSent { data ->
+            Log.d("SendInvite", "Request sent: $data")
             // Trên background thread của socket, nên post về main thread để cập nhật UI
             Handler(Looper.getMainLooper()).post {
                 // Lấy đúng userId và username của người nhận

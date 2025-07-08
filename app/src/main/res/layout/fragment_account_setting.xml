@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:padding="32dp"
-    tools:context=".screen.user.profile.AccountSettingFragment">
+    tools:context=".screen.home_page.setting.AccountSettingFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -67,12 +67,12 @@
             </FrameLayout>
 
             <TextView
-                android:id="@+id/tvName"
+                android:id="@+id/tvUsername"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/f800"
-                android:text="Viết Doanh"
+                android:text="@string/username"
                 android:textSize="20dp" />
 
             <TextView
@@ -80,7 +80,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f500"
-                android:text="Doanh ở Phủ Lý"
+                android:text="@string/nickname"
                 android:textColor="@color/grayText"
                 android:textSize="14dp" />
         </LinearLayout>
@@ -122,7 +122,7 @@
                         android:drawablePadding="8dp"
                         android:enabled="false"
                         android:fontFamily="@font/f500"
-                        android:text="Trinh"
+                        android:text="@string/first_name"
                         android:textSize="14dp" />
                 </LinearLayout>
 
@@ -149,7 +149,7 @@
                         android:drawablePadding="8dp"
                         android:enabled="false"
                         android:fontFamily="@font/f500"
-                        android:text="Quan"
+                        android:text="@string/last_name"
                         android:textSize="14dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -172,7 +172,7 @@
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
-                android:text="Quan"
+                android:text="@string/nickname"
                 android:textSize="14dp" />
 
             <!-- Email -->
@@ -193,7 +193,7 @@
                 android:enabled="false"
                 android:fontFamily="@font/f500"
                 android:inputType="textEmailAddress"
-                android:text="quan@email.com"
+                android:text="@string/email"
                 android:textSize="14dp" />
 
             <!-- Giới tính -->
@@ -213,7 +213,7 @@
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
-                android:text="Nam"
+                android:text="@string/gender"
                 android:textSize="14dp" />
 
             <!-- Ngày sinh -->
@@ -235,7 +235,7 @@
                 android:enabled="false"
                 android:fontFamily="@font/f500"
                 android:inputType="date"
-                android:text="12/02/2002"
+                android:text="@string/birthday"
                 android:textSize="14dp" />
 
             <!-- Buttons -->

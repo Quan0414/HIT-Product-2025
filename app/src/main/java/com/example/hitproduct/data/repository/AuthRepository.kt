@@ -5,13 +5,13 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.UserData
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.EditProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
-import com.example.hitproduct.data.model.check_couple.CheckCoupleData
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
 import okhttp3.MultipartBody
@@ -87,11 +87,12 @@ class AuthRepository(
      * @param avatar là MultipartBody.Part? chứa ảnh đại diện (có thể null)
      */
     suspend fun editProfile(
+        token: String,
         fields: Map<String, RequestBody>,
         avatar: MultipartBody.Part?
     ): DataResult<EditProfileResponse> {
         // getResult ở đây trả về DataResult<ApiResponse<EditProfileResponse>>
-        val result = getResult { api.editProfile(fields, avatar) }
+        val result = getResult { api.editProfile("Bearer $token", fields, avatar) }
 
         return when (result) {
             is DataResult.Success -> {
@@ -99,11 +100,11 @@ class AuthRepository(
                 // result.data.data là payload EditProfileResponse
                 DataResult.Success(result.data.data)
             }
+
             is DataResult.Error -> result
         }
     }
 
-    // AuthRepository.kt
     suspend fun checkInvite(token: String): DataResult<InviteData> {
         return when (val result = getResult {
             api.checkInvite("Bearer $token")
@@ -112,23 +113,24 @@ class AuthRepository(
                 // result.data: ApiResponse<InviteData>
                 DataResult.Success(result.data.data)   // now InviteData
             }
+
             is DataResult.Error -> result
         }
     }
 
 
-    suspend fun checkCouple(token: String): DataResult<CheckCoupleData> {
+    suspend fun checkCouple(token: String): DataResult<UserData> {
         return when (val result = getResult {
             api.checkCouple("Bearer $token")
         }) {
-            is DataResult.Success ->
-                // result.data: ApiResponse<CheckCoupleData>
-                DataResult.Success(result.data.data)
+            is DataResult.Success -> {
+                val profileResp = result.data.data
+                DataResult.Success(profileResp.data)
+            }
+
             is DataResult.Error -> result
         }
     }
-
-
 
 
 

@@ -90,16 +90,17 @@ class SetUpInformationFragment : Fragment() {
         }
 
         binding.tvContinue.setOnClickListener {
-            val firstName   = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
-            val lastName    = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
-            val nickName    = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
-            val gender      = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
+            val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: ""
+            val firstName = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
+            val lastName = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
+            val nickName = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
+            val gender = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
             val dateOfBirth = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
-            val avatarUri   =  null
+            val avatarUri = null
 
             // Gọi updateProfile trong ViewModel
             viewModel.updateProfile(
-                firstName, lastName, nickName,
+                token, firstName, lastName, nickName,
                 gender, dateOfBirth, avatarUri, requireContext()
             )
         }

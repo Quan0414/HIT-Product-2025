@@ -6,9 +6,9 @@ import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.EditProfileResponse
+import com.example.hitproduct.data.model.auth.response.ProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
-import com.example.hitproduct.data.model.check_couple.CheckCoupleData
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
 import okhttp3.MultipartBody
@@ -47,6 +47,7 @@ interface ApiService {
     @POST(ApiConstants.AUTH_EDIT_PROFILE)
     suspend fun editProfile(
         @PartMap
+        @Header("Authorization") auth: String,
         fields: @JvmSuppressWildcards Map<String, RequestBody>,
         @Part avatar: MultipartBody.Part?
     ): Response<ApiResponse<EditProfileResponse>>
@@ -56,9 +57,10 @@ interface ApiService {
         @Header("Authorization") token: String
     ): Response<ApiResponse<InviteData>>
 
-    @GET("api/v1/auth/check")
+
+    @GET(ApiConstants.CHECK_COUPLE)
     suspend fun checkCouple(
         @Header("Authorization") bearerToken: String
-    ): Response<ApiResponse<CheckCoupleData>>
+    ): Response<ApiResponse<ProfileResponse>>
 
 }

@@ -12,11 +12,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
+import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
-import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import kotlinx.coroutines.launch
 
@@ -59,7 +59,8 @@ class SplashActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 when (val res = authRepo.checkCouple(token)) {
                     is DataResult.Success -> {
-                        val coupleId = res.data.coupleId
+                        val userData = res.data
+                        val coupleId = userData?.coupleId
                         if (coupleId != null) {
                             // Đã có đôi → vào Main
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
@@ -75,6 +76,7 @@ class SplashActivity : AppCompatActivity() {
                         }
                         finish()
                     }
+
                     is DataResult.Error -> {
                         // Lỗi (hết session, mạng…) → xoá token, về Login
                         prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
