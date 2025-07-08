@@ -10,9 +10,10 @@ object ApiConstants {
     const val AUTH_LOGIN = "api/v1/auth/login"
     const val AUTH_SEND_OTP = "api/v1/auth/send-otp"
     const val AUTH_VERIFY_CODE = "api/v1/auth/register/confirm-otp"
+    const val SETUP_PROFILE = "api/v1/auth/profile"
 
     // User
-    const val AUTH_EDIT_PROFILE = "api/v1/auth/profile"
+    const val EDIT_PROFILE = "api/v1/auth/profile"
     const val USER_PROFILE = "api/v1/auth/profile"
     const val USER_UPDATE = "api/user/update"
     const val CHECK_INVITE = "api/v1/couple/connect"

@@ -64,6 +64,7 @@
                 android:background="@drawable/bg_edit_text"
                 android:fontFamily="@font/f700"
                 android:hint="Email"
+                android:inputType="textEmailAddress"
                 android:paddingLeft="16dp"
                 android:paddingTop="12dp"
                 android:paddingRight="16dp"

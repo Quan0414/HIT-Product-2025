@@ -115,7 +115,7 @@ class SetUpInformationFragment : Fragment() {
             // Gọi updateProfile trong ViewModel
             viewModel.updateProfile(
                 firstName, lastName, nickName,
-                gender, dateOfBirth, avatarUri, requireContext()
+                gender, dateOfBirth
             )
         }
 

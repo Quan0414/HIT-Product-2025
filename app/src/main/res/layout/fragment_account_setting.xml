@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:padding="32dp"
-    tools:context=".screen.user.profile.AccountSettingFragment">
+    tools:context=".screen.home_page.setting.AccountSettingFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -188,7 +188,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:drawableEnd="@drawable/ic_edit_text"
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
@@ -243,36 +242,27 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:gravity="center"
                 android:orientation="horizontal">
 
+                <!-- Bỏ hẳn btn_disconnect, chỉ giữ btn_logout -->
                 <TextView
-                    android:id="@+id/btn_disconnect"
-                    android:layout_width="0dp"
+                    android:id="@+id/btn_edit_profile"
+                    android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="12dp"
-                    android:layout_weight="1"
-                    android:background="@drawable/bg_btn_option1"
-                    android:fontFamily="@font/f900"
-                    android:gravity="center"
-                    android:padding="12dp"
-                    android:text="Hủy kết nối"
-                    android:textColor="@color/orange"
-                    android:textSize="16dp" />
-
-                <TextView
-                    android:id="@+id/btn_logout"
-                    android:layout_width="0dp"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:layout_weight="1"
                     android:background="@drawable/bg_btn_option2"
                     android:fontFamily="@font/f900"
                     android:gravity="center"
-                    android:padding="12dp"
-                    android:text="Đăng xuất"
+                    android:paddingTop ='12dp'
+                    android:paddingBottom="12dp"
+                    android:paddingStart="16dp"
+                    android:paddingEnd="16dp"
+                    android:text="Sửa thông tin"
                     android:textColor="@color/white"
                     android:textSize="16dp" />
+
             </LinearLayout>
+
         </LinearLayout>
     </LinearLayout>
 </ScrollView>

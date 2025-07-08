@@ -5,12 +5,13 @@ import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
-import com.example.hitproduct.data.model.auth.response.EditProfileResponse
+import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.check_couple.CheckCoupleData
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -44,12 +45,21 @@ interface ApiService {
     ): Response<ApiResponse<String>>
 
     @Multipart
-    @POST(ApiConstants.AUTH_EDIT_PROFILE)
+    @POST(ApiConstants.SETUP_PROFILE)
+    suspend fun setupProfile(
+        @PartMap
+        fields: @JvmSuppressWildcards Map<String, RequestBody>,
+//        @Part avatar: MultipartBody.Part?
+    ): Response<ApiResponse<SetupProfileResponse>>
+
+    @Multipart
+    @POST(ApiConstants.EDIT_PROFILE)
     suspend fun editProfile(
         @PartMap
         fields: @JvmSuppressWildcards Map<String, RequestBody>,
         @Part avatar: MultipartBody.Part?
-    ): Response<ApiResponse<EditProfileResponse>>
+    ): Response<ApiResponse<UserProfileResponse>>
+
 
     @GET(ApiConstants.CHECK_INVITE)
     suspend fun checkInvite(

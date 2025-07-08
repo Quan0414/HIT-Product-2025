@@ -3,12 +3,9 @@ package com.example.hitproduct
 import android.content.Context
 import android.os.Bundle
 import android.widget.ImageView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 import com.example.hitproduct.screen.home_page.home.HomeFragment
-import com.example.hitproduct.screen.user.profile.AccountSettingFragment
+import com.example.hitproduct.screen.home_page.setting.AccountSettingFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var btnGame: ImageView

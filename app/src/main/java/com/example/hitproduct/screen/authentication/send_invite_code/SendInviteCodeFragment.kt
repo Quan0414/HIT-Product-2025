@@ -25,14 +25,11 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
-import com.example.hitproduct.common.constants.AuthPrefersConstants.USER_ID
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
-import com.example.hitproduct.screen.authentication.login.LoginViewModel
-import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.send_invite_code.adapter.InviteAdapter
 import com.example.hitproduct.socket.SocketManager
 
@@ -75,7 +72,6 @@ class SendInviteCodeFragment : Fragment() {
     }
 
 
-
     private lateinit var inviteAdapter: InviteAdapter
     private val currentItems = mutableListOf<InviteItem>()
     private var inviteDialog: AlertDialog? = null
@@ -107,11 +103,11 @@ class SendInviteCodeFragment : Fragment() {
                 currentItems.clear()
                 // Received
                 result.data.acceptFriends.forEach {
-                    currentItems.add( InviteItem.Received(fromUser = it.username, userId = it.id) )
+                    currentItems.add(InviteItem.Received(fromUser = it.username, userId = it.id))
                 }
                 // Sent
                 result.data.requestFriends.forEach {
-                    currentItems.add( InviteItem.Sent(toUser = it.username, userId = it.id) )
+                    currentItems.add(InviteItem.Sent(toUser = it.username, userId = it.id))
                 }
                 // Cập nhật adapter
                 inviteAdapter.submitList(currentItems.toList())
@@ -154,7 +150,7 @@ class SendInviteCodeFragment : Fragment() {
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupCopyInviteCode() {
-        binding.tvInviteCode.setOnTouchListener { v, event ->
+        binding.tvInviteCode.setOnTouchListener { _, event ->
             if (event.action == MotionEvent.ACTION_UP) {
                 val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2]
                     ?: return@setOnTouchListener false
