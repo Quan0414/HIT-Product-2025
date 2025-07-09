@@ -57,10 +57,10 @@ class SplashActivity : AppCompatActivity() {
         } else {
             // Đã có token → check couple
             lifecycleScope.launch {
-                when (val res = authRepo.checkCouple(token)) {
+                when (val res = authRepo.fetchProfile(token)) {
                     is DataResult.Success -> {
-                        val coupleId = res.data.coupleId
-                        if (coupleId != null) {
+                        val coupleOjb = res.data.couple
+                        if (coupleOjb != null) {
                             // Đã có đôi → vào Main
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                         } else {

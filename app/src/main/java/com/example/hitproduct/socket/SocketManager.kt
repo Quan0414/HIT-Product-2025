@@ -2,6 +2,7 @@ package com.example.hitproduct.socket
 
 import android.os.Handler
 import android.os.Looper
+import com.example.hitproduct.common.constants.ApiConstants
 import io.socket.client.IO
 import io.socket.client.IO.Options
 import io.socket.client.Socket
@@ -24,7 +25,7 @@ import org.json.JSONObject
  */
 object SocketManager {
     private lateinit var socket: Socket
-    private const val SERVER_URL = "https://love-story-app-1.onrender.com"
+    private const val SERVER_URL = ApiConstants.BASE_URL
     private var authToken: String? = null
 
     /**

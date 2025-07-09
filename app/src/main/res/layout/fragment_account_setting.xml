@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_account_settings"
     android:layout_width="match_parent"
@@ -12,8 +13,6 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical">
-
-        <!-- Header -->
 
         <!-- Avatar + Name -->
         <LinearLayout
@@ -118,7 +117,6 @@
                         android:id="@+id/edtHo"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableEnd="@drawable/ic_edit_text"
                         android:drawablePadding="8dp"
                         android:enabled="false"
                         android:fontFamily="@font/f500"
@@ -145,7 +143,6 @@
                         android:id="@+id/edtTen"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableEnd="@drawable/ic_edit_text"
                         android:drawablePadding="8dp"
                         android:enabled="false"
                         android:fontFamily="@font/f500"
@@ -168,7 +165,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:drawableEnd="@drawable/ic_edit_text"
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
@@ -203,17 +199,39 @@
                 android:text="Giới tính"
                 android:textSize="16dp" />
 
-            <EditText
-                android:id="@+id/edtGender"
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/tilGender"
+                style="@style/Custom.Gender.Dropdown"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:drawableEnd="@drawable/ic_arrow_down"
-                android:drawablePadding="8dp"
-                android:enabled="false"
-                android:fontFamily="@font/f500"
-                android:text="Nam"
-                android:textSize="14dp" />
+                android:textColor="@color/black"
+                app:endIconDrawable="@drawable/ic_arrow_down"
+                app:endIconMode="dropdown_menu">
+
+                <com.google.android.material.textfield.MaterialAutoCompleteTextView
+                    android:id="@+id/actvGender"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:completionThreshold="0"
+                    android:fontFamily="@font/f500"
+                    android:gravity="center_vertical"
+                    android:includeFontPadding="false"
+                    android:text="Nam"
+                    android:inputType="none"
+                    android:paddingTop="0dp"
+                    android:paddingBottom="0dp"
+                    android:popupBackground="@drawable/bg_edit_text"
+                    android:textColor="@color/black"
+                    android:textSize="14dp" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:layout_marginTop="-20dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/grayUnderline" />
 
             <!-- Ngày sinh -->
             <TextView
@@ -229,7 +247,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:drawableEnd="@drawable/ic_arrow_down"
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
@@ -245,18 +262,17 @@
                 android:gravity="center"
                 android:orientation="horizontal">
 
-                <!-- Bỏ hẳn btn_disconnect, chỉ giữ btn_logout -->
                 <TextView
                     android:id="@+id/btn_edit_profile"
-                    android:layout_width="wrap_content"
+                    android:layout_width="140dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_btn_option2"
                     android:fontFamily="@font/f900"
                     android:gravity="center"
-                    android:paddingTop ='12dp'
-                    android:paddingBottom="12dp"
                     android:paddingStart="16dp"
+                    android:paddingTop='12dp'
                     android:paddingEnd="16dp"
+                    android:paddingBottom="12dp"
                     android:text="Sửa thông tin"
                     android:textColor="@color/white"
                     android:textSize="16dp" />

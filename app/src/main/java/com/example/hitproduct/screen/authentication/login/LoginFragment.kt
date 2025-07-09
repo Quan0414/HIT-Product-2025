@@ -84,8 +84,8 @@ class LoginFragment : Fragment() {
                 }
 
                 is UiState.Success -> {
-                    val coupleId = state.data.coupleId
-                    if (coupleId == null) {
+                    val coupleOjb = state.data.couple
+                    if (coupleOjb == null) {
                         // Chưa có đôi, chuyển sang SendInviteCodeFragment
                         val sendInviteCodeFragment = SendInviteCodeFragment()
                         parentFragmentManager.beginTransaction()

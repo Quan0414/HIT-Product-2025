@@ -1,14 +1,14 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
+import com.example.hitproduct.data.model.User
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
-import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
-import com.example.hitproduct.data.model.check_couple.CheckCoupleData
+import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
@@ -67,8 +67,8 @@ interface ApiService {
     ): Response<ApiResponse<InviteData>>
 
     @GET(ApiConstants.USER_PROFILE)
-    suspend fun checkCouple(
+    suspend fun getProfile(
         @Header("Authorization") bearerToken: String
-    ): Response<ApiResponse<CheckCoupleData>>
+    ): Response<ApiResponse<User>>
 
 }
