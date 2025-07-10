@@ -191,8 +191,28 @@ object SocketManager {
         }
     }
 
+
+    //B chap nhan loi moi, xoa thong bao ben B
+    fun onAccepted(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_USER_ACCEPT_ACCEPT") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    //B chap nhan loi moi, xoa thong bao ben A
+    fun onTheyAccept(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_USER_REQUEST_REQUEST") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     /**
      * Kiểm tra trạng thái kết nối hiện tại
      */
     fun isConnected(): Boolean = ::socket.isInitialized && socket.connected()
+
 }

@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.home_page.setting
+package com.example.hitproduct.screen.home_page.setting.account_setting
 
 import android.content.Context
 import android.net.Uri

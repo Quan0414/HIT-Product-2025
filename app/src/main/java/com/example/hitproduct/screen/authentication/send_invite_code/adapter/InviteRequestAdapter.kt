@@ -12,7 +12,7 @@ import com.example.hitproduct.data.model.invite.InviteItem
 class InviteAdapter(
     private val onAccept: (InviteItem.Received) -> Unit,
     private val onReject: (InviteItem.Received) -> Unit,
-    private val onCancel: (InviteItem.Sent) -> Unit
+    private val onCancel: (InviteItem.Sent) -> Unit,
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
     companion object {

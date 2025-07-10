@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.home_page.setting
+package com.example.hitproduct.screen.home_page.setting.account_setting
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:fillViewport="true"
     android:padding="32dp"
-    tools:context=".screen.home_page.setting.AccountSettingFragment">
+    tools:context=".screen.home_page.setting.account_setting.AccountSettingFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -71,7 +71,6 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/f800"
-                android:text="Viết Doanh"
                 android:textSize="20dp" />
 
             <TextView
@@ -79,7 +78,6 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f500"
-                android:text="Doanh ở Phủ Lý"
                 android:textColor="@color/grayText"
                 android:textSize="14dp" />
         </LinearLayout>
@@ -110,6 +108,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/f700"
                         android:text="Họ"
+                        android:paddingLeft="4dp"
                         android:textSize="16dp"
                         android:textStyle="bold" />
 
@@ -120,7 +119,6 @@
                         android:drawablePadding="8dp"
                         android:enabled="false"
                         android:fontFamily="@font/f500"
-                        android:text="Trinh"
                         android:textSize="14dp" />
                 </LinearLayout>
 
@@ -136,6 +134,7 @@
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/f700"
                         android:text="Tên"
+                        android:paddingLeft="4dp"
                         android:textSize="16dp"
                         android:textStyle="bold" />
 
@@ -146,7 +145,6 @@
                         android:drawablePadding="8dp"
                         android:enabled="false"
                         android:fontFamily="@font/f500"
-                        android:text="Quan"
                         android:textSize="14dp" />
                 </LinearLayout>
             </LinearLayout>
@@ -157,6 +155,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f700"
+                android:paddingLeft="4dp"
                 android:text="Biệt danh"
                 android:textSize="16dp" />
 
@@ -168,7 +167,6 @@
                 android:drawablePadding="8dp"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
-                android:text="Quan"
                 android:textSize="14dp" />
 
             <!-- Email -->
@@ -177,6 +175,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f700"
                 android:text="Email"
+                android:paddingLeft="4dp"
                 android:textSize="16dp" />
 
             <EditText
@@ -188,7 +187,6 @@
                 android:enabled="false"
                 android:fontFamily="@font/f500"
                 android:inputType="textEmailAddress"
-                android:text="quan@email.com"
                 android:textSize="14dp" />
 
             <!-- Giới tính -->
@@ -197,6 +195,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f700"
                 android:text="Giới tính"
+                android:paddingLeft="4dp"
                 android:textSize="16dp" />
 
             <com.google.android.material.textfield.TextInputLayout
@@ -205,7 +204,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
-                android:textColor="@color/black"
+                android:textColor="@color/grayText"
                 app:endIconDrawable="@drawable/ic_arrow_down"
                 app:endIconMode="dropdown_menu">
 
@@ -217,7 +216,6 @@
                     android:fontFamily="@font/f500"
                     android:gravity="center_vertical"
                     android:includeFontPadding="false"
-                    android:text="Nam"
                     android:inputType="none"
                     android:paddingTop="0dp"
                     android:paddingBottom="0dp"
@@ -238,8 +236,9 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
+                android:paddingLeft="4dp"
                 android:fontFamily="@font/f700"
-                android:text="Ngày sinh"
+                android:text="Ngày xinh"
                 android:textSize="16dp" />
 
             <EditText
@@ -251,7 +250,6 @@
                 android:enabled="false"
                 android:fontFamily="@font/f500"
                 android:inputType="date"
-                android:text="12/02/2002"
                 android:textSize="14dp" />
 
             <!-- Buttons -->
@@ -264,7 +262,7 @@
 
                 <TextView
                     android:id="@+id/btn_edit_profile"
-                    android:layout_width="140dp"
+                    android:layout_width="150dp"
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_btn_option2"
                     android:fontFamily="@font/f900"

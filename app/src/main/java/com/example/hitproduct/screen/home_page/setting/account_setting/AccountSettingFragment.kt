@@ -1,24 +1,19 @@
-package com.example.hitproduct.screen.home_page.setting
+package com.example.hitproduct.screen.home_page.setting.account_setting
 
 import android.content.Context
-import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.NetworkClient
-import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentAccountSettingBinding
-import com.example.hitproduct.screen.authentication.login.LoginViewModel
-import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.google.android.material.textfield.TextInputLayout
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -49,6 +44,29 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
 // Khởi đầu: disable tất cả, ẩn icon
         toggleFields(enabled = false)
 
+        //chọn giới tính
+        // 1. Data
+        val genders = listOf("Nam", "Nữ", "Khác")
+
+        // 2. Adapter
+        val adapter = ArrayAdapter(
+            requireContext(),
+            R.layout.dropdown_gender,
+            genders
+        )
+        binding.actvGender.setAdapter(adapter)
+        binding.actvGender.threshold = 0
+
+        // 3. Show dropdown khi click icon
+        binding.tilGender.setEndIconOnClickListener {
+            binding.actvGender.showDropDown()
+        }
+
+        // 4. Đẩy text vào ô sau khi chọn
+        binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
+            val selected = parent.getItemAtPosition(position) as String
+            binding.actvGender.setText(selected, false)
+        }
     }
 
     override fun initListener() {
@@ -80,6 +98,11 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 )
             }
         }
+
+        binding.btnBack.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
+
     }
 
     override fun initData() {

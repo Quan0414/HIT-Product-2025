@@ -3,9 +3,14 @@ package com.example.hitproduct
 import android.content.Context
 import android.os.Bundle
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
+import com.example.hitproduct.screen.home_page.game.GameFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
-import com.example.hitproduct.screen.home_page.setting.AccountSettingFragment
+import com.example.hitproduct.screen.home_page.message.MessageFragment
+import com.example.hitproduct.screen.home_page.note.NoteFragment
+import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingFragment
+import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
 
 class MainActivity : AppCompatActivity() {
     private lateinit var btnGame: ImageView
@@ -14,6 +19,8 @@ class MainActivity : AppCompatActivity() {
     private lateinit var btnMess: ImageView
     private lateinit var btnSetting: ImageView
     private val fragContainer = R.id.fragmentHomeContainer
+
+    private var currentTab: Tab = Tab.HOME
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -35,12 +42,35 @@ class MainActivity : AppCompatActivity() {
 
         // 3. Mặc định mở Home
         selectTab(Tab.HOME)
+
+        // thêm back‐callback
+        onBackPressedDispatcher.addCallback(this,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    // 1) Nếu có fragment trong back-stack → pop
+                    if (supportFragmentManager.backStackEntryCount > 0) {
+                        supportFragmentManager.popBackStack()
+                    }
+                    // 2) Không còn nested fragment, nhưng đang không ở HOME → về HOME tab
+                    else if (currentTab != Tab.HOME) {
+                        selectTab(Tab.HOME)
+                    }
+                    // 3) Đang ở HOME, back bình thường (thoát app)
+                    else {
+                        isEnabled = false
+                        onBackPressedDispatcher.onBackPressed()
+                    }
+                }
+            }
+        )
+
     }
 
     // enum để dễ maintain
     private enum class Tab { GAME, NOTE, HOME, MESS, SETTING }
 
     private fun selectTab(tab: Tab) {
+        currentTab = tab
         // 1. Reset vị trí + trạng thái icon
         listOf(btnGame, btnNote, btnHome, btnMess, btnSetting).forEach { iv ->
             iv.translationY = 0f
@@ -71,7 +101,7 @@ class MainActivity : AppCompatActivity() {
             Tab.NOTE -> NoteFragment()
             Tab.HOME -> HomeFragment()
             Tab.MESS -> MessageFragment()
-            Tab.SETTING -> AccountSettingFragment()
+            Tab.SETTING -> SettingFragment()
         }
         supportFragmentManager.beginTransaction()
             .replace(fragContainer, frag)

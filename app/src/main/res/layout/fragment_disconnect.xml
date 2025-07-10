@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="300dp"
+    android:layout_height="170dp"
+    android:background="@drawable/bg_rounded"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".DialogLogoutFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/f800"
+            android:text="Hủy kết nối"
+            android:layout_marginBottom="4dp"
+            android:textSize="20dp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/f700"
+            android:gravity="center"
+            android:text="Bạn chắc chắn muốn muốn hủy kết nối với người ấy?"
+            android:textColor="@color/grayText"
+            android:textSize="12dp" />
+
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/btn_close"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity=""
+        android:background="@drawable/bg_btn_option1"
+        android:fontFamily="@font/f500"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingTop='8dp'
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:text="Đóng"
+        android:textColor="@color/orange"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"/>
+
+    <TextView
+        android:id="@+id/btn_logout"
+        android:layout_width="130dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity=""
+        android:background="@drawable/bg_btn_option2"
+        android:fontFamily="@font/f500"
+        android:gravity="center"
+        android:paddingStart="12dp"
+        android:paddingTop='8dp'
+        android:paddingEnd="12dp"
+        android:paddingBottom="8dp"
+        android:text="Hủy kết nối"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

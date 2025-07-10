@@ -49,7 +49,6 @@ interface ApiService {
     suspend fun setupProfile(
         @PartMap
         fields: @JvmSuppressWildcards Map<String, RequestBody>,
-//        @Part avatar: MultipartBody.Part?
     ): Response<ApiResponse<SetupProfileResponse>>
 
     @Multipart

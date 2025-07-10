@@ -54,6 +54,12 @@ class LoginFragment : Fragment() {
         LoginViewModelFactory(authRepo)
     }
 
+    private var isReturningFromNavigation = false
+
+    override fun onResume() {
+        super.onResume()
+        isReturningFromNavigation = false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -86,6 +92,7 @@ class LoginFragment : Fragment() {
                 is UiState.Success -> {
                     val coupleOjb = state.data.couple
                     if (coupleOjb == null) {
+                        isReturningFromNavigation = true
                         // Chưa có đôi, chuyển sang SendInviteCodeFragment
                         val sendInviteCodeFragment = SendInviteCodeFragment()
                         parentFragmentManager.beginTransaction()
@@ -148,13 +155,17 @@ class LoginFragment : Fragment() {
                         "Đăng nhập thành công",
                         Toast.LENGTH_SHORT
                     ).show()
-                    // đọc lại token vừa lưu
-                    val newToken = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
-                    viewModel.checkCouple(newToken)
+
+                    if (!isReturningFromNavigation) {
+                        val newToken = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+                        viewModel.checkCouple(newToken)
+                    }
                     viewModel.clearLoginState()
                 }
             }
         }
+
+        isReturningFromNavigation = false
 
         // Nút Đăng nhập: gọi ViewModel.login()
         binding.tvLogin.setOnClickListener {
