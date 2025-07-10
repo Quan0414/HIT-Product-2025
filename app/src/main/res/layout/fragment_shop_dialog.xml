@@ -31,7 +31,6 @@
         android:layout_margin="3dp"
         android:fontFamily="@font/f900"
         android:gravity="center"
-        android:text="@string/money"
         android:textColor="@color/textBrown"
         android:textSize="14dp"
         app:layout_constraintStart_toStartOf="@id/imgMoney"

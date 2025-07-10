@@ -5,13 +5,13 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.User
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
-import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
-import com.example.hitproduct.data.model.check_couple.CheckCoupleData
+import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
@@ -97,6 +97,7 @@ class AuthRepository(
             is DataResult.Success -> {
                 DataResult.Success(result.data.data)
             }
+
             is DataResult.Error -> result
         }
     }
@@ -110,21 +111,23 @@ class AuthRepository(
                 // result.data: ApiResponse<InviteData>
                 DataResult.Success(result.data.data)   // now InviteData
             }
+
             is DataResult.Error -> result
         }
     }
 
 
-    suspend fun checkCouple(token: String): DataResult<CheckCoupleData> {
+    suspend fun fetchProfile(token: String): DataResult<User> {
         return when (val result = getResult {
-            api.checkCouple("Bearer $token")
+            api.getProfile("Bearer $token")
         }) {
             is DataResult.Success ->
-                // result.data: ApiResponse<CheckCoupleData>
                 DataResult.Success(result.data.data)
+
             is DataResult.Error -> result
         }
     }
+
 
     suspend fun editProfile(
         fields: Map<String, RequestBody>,
@@ -136,9 +139,6 @@ class AuthRepository(
             is DataResult.Error -> result
         }
     }
-
-
-
 
 
     /**

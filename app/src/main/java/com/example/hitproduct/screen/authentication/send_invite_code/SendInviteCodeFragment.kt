@@ -5,6 +5,7 @@ import android.app.AlertDialog
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -22,9 +23,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.model.invite.InviteItem
@@ -60,7 +63,7 @@ class SendInviteCodeFragment : Fragment() {
         inviteAdapter = InviteAdapter(
             onAccept = { itUser -> SocketManager.acceptFriendRequest(itUser.userId) },
             onReject = { itUser -> SocketManager.refuseFriendRequest(itUser.userId) },
-            onCancel = { itUser -> SocketManager.cancelFriendRequest(itUser.userId) }
+            onCancel = { itUser -> SocketManager.cancelFriendRequest(itUser.userId) },
         )
         rv.adapter = inviteAdapter
 
@@ -114,6 +117,23 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
+        viewModel.fetchUserProfile()
+        viewModel.inviteCode.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+                    Log.d("SendInvite", "Error: ${state.error}")
+                }
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    // Hiển thị mã mời
+                    val user = state.data
+                    binding.tvInviteCode.text = user.coupleCode
+                    Log.d("SendInvite", "User invite code: ${user.coupleCode}")
+                }
+            }
+        }
+
         registerSocketListeners()
 
         setupInviteInput()
@@ -144,7 +164,16 @@ class SendInviteCodeFragment : Fragment() {
 
     private fun setupBackButton() {
         binding.backIcon.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            Log.d("SendInvite", "Back button clicked")
+            Log.d("SendInvite", "BackStack count: ${parentFragmentManager.backStackEntryCount}")
+
+            if (parentFragmentManager.backStackEntryCount > 0) {
+                Log.d("SendInvite", "Popping backstack")
+                parentFragmentManager.popBackStack()
+            } else {
+                Log.d("SendInvite", "No backstack, finishing activity")
+                requireActivity().finish()
+            }
         }
     }
 
@@ -207,7 +236,7 @@ class SendInviteCodeFragment : Fragment() {
             inviteAdapter = InviteAdapter(
                 onAccept = { itUser -> SocketManager.acceptFriendRequest(itUser.userId) },
                 onReject = { itUser -> SocketManager.refuseFriendRequest(itUser.userId) },
-                onCancel = { itUser -> SocketManager.cancelFriendRequest(itUser.userId) }
+                onCancel = { itUser -> SocketManager.cancelFriendRequest(itUser.userId) },
             )
             rv.adapter = inviteAdapter
             inviteDialog = AlertDialog.Builder(requireContext())
@@ -308,11 +337,48 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
+        //A gui B, B chap nhan → remove Received, go HomeActivity
+        SocketManager.onAccepted {
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(requireContext(), "Friend request accepted", Toast.LENGTH_SHORT)
+                    .show()
+                // Xoá khỏi danh sách Received
+                currentItems.removeAll { it is InviteItem.Received }
+                refreshDialog()
+
+                goHomeActivity()
+            }
+        }
+
+        // B nhận được A chấp nhận → remove Sent, go HomeActivity
+        SocketManager.onTheyAccept {
+            Handler(Looper.getMainLooper()).post {
+                Toast.makeText(requireContext(), "Friend request accepted", Toast.LENGTH_SHORT)
+                    .show()
+                // Xoá khỏi danh sách Sent
+                currentItems.removeAll { it is InviteItem.Sent }
+                refreshDialog()
+
+                goHomeActivity()
+            }
+        }
+
     }
 
     private fun refreshDialog() {
         if (inviteDialog?.isShowing == true) {
             inviteAdapter.submitList(currentItems.toList())
+        }
+    }
+
+    //vao homeActivity
+    private fun goHomeActivity() {
+        requireActivity().runOnUiThread {
+            val intent = Intent(requireContext(), MainActivity::class.java).apply {
+                // Xóa stack cũ để không quay lại màn này được
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
         }
     }
 }
