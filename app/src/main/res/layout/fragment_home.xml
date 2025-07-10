@@ -2,17 +2,19 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:background="@drawable/bg_home"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".HomeFragment">
+    android:background="@drawable/bg_home"
+    android:clipChildren="false"
+    android:clipToPadding="false"
+    tools:context=".screen.home_page.home.HomeFragment">
 
     <ImageView
         android:id="@+id/imgMoney"
         android:layout_width="140dp"
         android:layout_height="36dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/ic_money"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -24,13 +26,13 @@
         android:layout_margin="3dp"
         android:fontFamily="@font/f900"
         android:gravity="center"
-        android:text="200"
         android:textColor="@color/textBrown"
         android:textSize="14dp"
         app:layout_constraintStart_toStartOf="@id/imgMoney"
         app:layout_constraintTop_toTopOf="@id/imgMoney" />
 
     <ImageView
+        android:id="@+id/imageView"
         android:layout_width="40dp"
         android:layout_height="44dp"
         android:layout_marginEnd="24dp"
@@ -42,8 +44,8 @@
         android:id="@+id/imageView2"
         android:layout_width="202dp"
         android:layout_height="28dp"
-        android:layout_marginTop="48dp"
-        android:background="@drawable/text"
+        android:layout_marginTop="80dp"
+        android:src="@drawable/abc"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgMoney" />
@@ -52,38 +54,250 @@
         android:id="@+id/bgYear"
         android:layout_width="0dp"
         android:layout_height="44dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/bg_display_days"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
-        app:layout_constraintStart_toStartOf="@id/imageView2"
         app:layout_constraintEnd_toStartOf="@+id/bgMonth"
-        app:layout_constraintHorizontal_chainStyle="spread"/>
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@id/imageView2"
+        app:layout_constraintTop_toBottomOf="@id/imageView2" />
+
+    <!-- 1st item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvYearNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvY"
+        app:layout_constraintEnd_toEndOf="@id/bgYear"
+        app:layout_constraintStart_toStartOf="@id/bgYear"
+        app:layout_constraintTop_toTopOf="@id/bgYear"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvY"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Years"
+        android:textColor="@color/white"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgYear"
+        app:layout_constraintEnd_toEndOf="@id/bgYear"
+        app:layout_constraintStart_toStartOf="@id/bgYear"
+        app:layout_constraintTop_toBottomOf="@id/tvYearNumber" />
+
 
     <ImageView
         android:id="@+id/bgMonth"
         android:layout_width="0dp"
         android:layout_height="44dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/bg_display_days"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
+        app:layout_constraintEnd_toStartOf="@+id/bgWeek"
         app:layout_constraintStart_toEndOf="@id/bgYear"
-        app:layout_constraintEnd_toStartOf="@+id/bgWeek"/>
+        app:layout_constraintTop_toBottomOf="@id/imageView2" />
+
+    <!-- 1st item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvMonthNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvM"
+        app:layout_constraintEnd_toEndOf="@id/bgMonth"
+        app:layout_constraintStart_toStartOf="@id/bgMonth"
+        app:layout_constraintTop_toTopOf="@id/bgMonth"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvM"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f700"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Months"
+        android:textColor="@color/white"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgMonth"
+        app:layout_constraintEnd_toEndOf="@id/bgMonth"
+        app:layout_constraintStart_toStartOf="@id/bgMonth"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthNumber" />
+
 
     <ImageView
         android:id="@+id/bgWeek"
         android:layout_width="0dp"
         android:layout_height="44dp"
+        android:layout_marginTop="8dp"
         android:src="@drawable/bg_display_days"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
+        app:layout_constraintEnd_toStartOf="@+id/bgDay"
         app:layout_constraintStart_toEndOf="@id/bgMonth"
-        app:layout_constraintEnd_toStartOf="@+id/bgDay"/>
+        app:layout_constraintTop_toBottomOf="@id/imageView2" />
+
+    <!-- 1st item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvWeekNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvW"
+        app:layout_constraintEnd_toEndOf="@id/bgWeek"
+        app:layout_constraintStart_toStartOf="@id/bgWeek"
+        app:layout_constraintTop_toTopOf="@id/bgWeek"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvW"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f700"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Weeks"
+        android:textColor="@color/white"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgWeek"
+        app:layout_constraintEnd_toEndOf="@id/bgWeek"
+        app:layout_constraintStart_toStartOf="@id/bgWeek"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthNumber" />
 
     <ImageView
         android:id="@+id/bgDay"
         android:layout_width="0dp"
         android:layout_height="44dp"
+        android:layout_marginTop="8dp"
+
         android:src="@drawable/bg_display_days"
-        app:layout_constraintTop_toBottomOf="@id/imageView2"
+        app:layout_constraintEnd_toEndOf="@id/imageView2"
         app:layout_constraintStart_toEndOf="@id/bgWeek"
-        app:layout_constraintEnd_toEndOf="@id/imageView2"/>
+        app:layout_constraintTop_toBottomOf="@id/imageView2" />
+
+    <!-- 1st item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvDayNumber"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="16dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvD"
+        app:layout_constraintEnd_toEndOf="@id/bgDay"
+        app:layout_constraintStart_toStartOf="@id/bgDay"
+        app:layout_constraintTop_toTopOf="@id/bgDay"
+        app:layout_constraintVertical_chainStyle="packed" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <TextView
+        android:id="@+id/tvD"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f700"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Days"
+        android:textColor="@color/white"
+        android:textSize="10dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgDay"
+        app:layout_constraintEnd_toEndOf="@id/bgDay"
+        app:layout_constraintStart_toStartOf="@id/bgDay"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthNumber" />
+
+    <com.airbnb.lottie.LottieAnimationView
+        android:id="@+id/gifCat"
+        android:layout_width="270dp"
+        android:layout_height="270dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/catState"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="-12dp"
+        android:layout_marginRight="6dp"
+        android:orientation="vertical"
+        app:layout_constraintEnd_toEndOf="@id/gifCat"
+        app:layout_constraintStart_toStartOf="@+id/gifCat"
+        app:layout_constraintTop_toBottomOf="@id/gifCat">
+
+        <ImageView
+            android:id="@+id/bgState1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bg_state_1" />
+
+        <ImageView
+            android:id="@+id/bgState2"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:src="@drawable/bg_state_2" />
+
+    </LinearLayout>
+
+
+    <ImageView
+        android:id="@+id/btnFeed"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_marginTop="14dp"
+        android:layout_marginEnd="12dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/btn_feed"
+        app:layout_constraintBottom_toTopOf="@+id/btnMission"
+        app:layout_constraintEnd_toStartOf="@+id/btnQuestion"
+        app:layout_constraintStart_toStartOf="@+id/catState"
+        app:layout_constraintTop_toBottomOf="@id/catState" />
+
+    <ImageView
+        android:id="@+id/btnQuestion"
+        android:layout_width="wrap_content"
+        android:layout_height="44dp"
+        android:layout_marginTop="14dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/btn_have_question"
+        app:layout_constraintEnd_toEndOf="@id/catState"
+        app:layout_constraintStart_toEndOf="@+id/btnFeed"
+        app:layout_constraintTop_toBottomOf="@+id/catState" />
+
+    <ImageView
+        android:id="@+id/btnMission"
+        android:layout_width="0dp"
+        android:layout_height="44dp"
+        android:layout_marginTop="12dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitXY"
+        android:src="@drawable/btn_mission"
+        app:layout_constraintEnd_toEndOf="@+id/btnQuestion"
+        app:layout_constraintStart_toStartOf="@+id/btnFeed"
+        app:layout_constraintTop_toBottomOf="@+id/btnFeed" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

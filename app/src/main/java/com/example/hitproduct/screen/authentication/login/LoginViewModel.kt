@@ -1,10 +1,13 @@
 package com.example.hitproduct.screen.authentication.login
 
-import android.util.Patterns
-import androidx.lifecycle.*
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.ErrorMessageMapper
+import com.example.hitproduct.data.model.User
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -16,17 +19,24 @@ class LoginViewModel(
     private val _loginState = MutableLiveData<UiState<ApiResponse<String>>>(UiState.Idle)
     val loginState: LiveData<UiState<ApiResponse<String>>> = _loginState
 
+    private val _coupleState = MutableLiveData<UiState<User>>(UiState.Idle)
+    val coupleState: LiveData<UiState<User>> = _coupleState
+
+    fun clearLoginState() {
+        _loginState.value = UiState.Idle
+    }
+
     fun login(email: String, password: String) {
 
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _loginState.value = UiState.Error(
-                ErrorMessageMapper.fromBackend("\"email\" must be a valid email")
-            )
-            return
-        }
+//        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            _loginState.value = UiState.Error(
+//                ErrorMessageMapper.fromBackend("must be a valid email")
+//            )
+//            return
+//        }
         if (password.length < 6) {
             _loginState.value = UiState.Error(
-                ErrorMessageMapper.fromBackend("\"password\" length must be at least 6 characters long")
+                ErrorMessageMapper.fromBackend("length must be at least 6 characters long")
             )
             return
         }
@@ -43,6 +53,20 @@ class LoginViewModel(
                     // XONG: chỉ show result.error, không cần map lại
                     _loginState.value = UiState.Error(result.error)
                 }
+            }
+        }
+    }
+
+    fun checkCouple(token: String) {
+        viewModelScope.launch {
+            _coupleState.value = UiState.Loading
+            when (val res = authRepository.fetchProfile(token)) {
+                is DataResult.Success ->
+                    // res.data: UserProfile
+                    _coupleState.value = UiState.Success(res.data)
+
+                is DataResult.Error ->
+                    _coupleState.value = UiState.Error(res.error)
             }
         }
     }

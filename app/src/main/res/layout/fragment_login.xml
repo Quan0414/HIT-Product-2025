@@ -52,20 +52,37 @@
             android:text="Xin chào!!!"
             android:textSize="24dp" />
 
-        <EditText
-            android:id="@+id/edtEmail"
+        <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_edit_text"
-            android:fontFamily="@font/f700"
-            android:hint="Email"
-            android:inputType="textEmailAddress"
-            android:paddingLeft="16dp"
-            android:paddingTop="12dp"
-            android:paddingRight="16dp"
-            android:paddingBottom="12dp"
-            android:textSize="14dp" />
+            android:layout_marginBottom="16dp">
+
+            <EditText
+                android:id="@+id/edtEmail"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_edit_text"
+                android:fontFamily="@font/f700"
+                android:hint="Email"
+                android:inputType="textEmailAddress"
+                android:paddingLeft="16dp"
+                android:paddingTop="12dp"
+                android:paddingRight="16dp"
+                android:paddingBottom="12dp"
+                android:textSize="14dp" />
+
+            <ImageView
+                android:id="@+id/errEmail"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Error icon"
+                android:src="@drawable/ic_error_x"
+                android:visibility="invisible" />
+        </RelativeLayout>
+
 
         <RelativeLayout
             android:layout_width="match_parent"
@@ -96,6 +113,17 @@
                 android:layout_marginEnd="16dp"
                 android:contentDescription="Show/Hide Password"
                 android:src="@drawable/ic_eye_visible" />
+
+            <ImageView
+                android:id="@+id/errPassword"
+                android:layout_width="16dp"
+                android:layout_height="16dp"
+                android:layout_alignParentEnd="true"
+                android:layout_centerVertical="true"
+                android:layout_marginEnd="16dp"
+                android:contentDescription="Show/Hide Password"
+                android:src="@drawable/ic_error_x"
+                android:visibility="invisible" />
         </RelativeLayout>
 
         <TextView

@@ -3,42 +3,48 @@ package com.example.hitproduct.data.model
 import com.google.gson.annotations.SerializedName
 
 data class User(
-    @SerializedName("_id")
-    val id: String,
-
-    @SerializedName("username")
+    @SerializedName("_id")       val id: String,
     val username: String,
-
-    @SerializedName("email")
     val email: String,
-
-    @SerializedName("password")
-    val password: String,
-
-    @SerializedName("gender")
     val gender: String,
-
-    @SerializedName("avatar")
     val avatar: String,
-
-    @SerializedName("isVerified")
     val isVerified: Boolean,
-
-    @SerializedName("role")
     val role: String,
-
-    @SerializedName("createdAt")
+    val requestFriends: List<String>,
+    val acceptFriends: List<String>,
     val createdAt: String,
-
-    @SerializedName("updatedAt")
     val updatedAt: String,
-
-    @SerializedName("coupleCode")
     val coupleCode: String,
+    @SerializedName("__v")       val v: Int,
+    val tokenOtp: String?,
+    val dateOfBirth: String,
+    val firstName: String,
+    val lastName: String,
+    val nickname: String,
+    @SerializedName("coupleId")
+    val couple: Couple?          // null nếu chưa ghép đôi, hoặc object khi đã ghép
+)
 
-    @SerializedName("__v")
-    val version: Int,
+data class Couple(
+    @SerializedName("_id")     val id: String,
+    @SerializedName("userIdA") val userA: UserSummary,
+    @SerializedName("userIdB") val userB: UserSummary
+)
 
-    @SerializedName("tokenOtp")
-    val tokenOtp: String?
+data class UserSummary(
+    @SerializedName("_id")   val id: String,
+    val username: String,
+    val email: String,
+    val gender: String,
+    val avatar: String,
+    val isVerified: Boolean,
+    val role: String,
+    val requestFriends: List<String>,
+    val acceptFriends: List<String>,
+    val createdAt: String,
+    val updatedAt: String,
+    val coupleCode: String,
+    @SerializedName("__v")   val v: Int,
+    val tokenOtp: String?,
+    val coupleId: String?
 )

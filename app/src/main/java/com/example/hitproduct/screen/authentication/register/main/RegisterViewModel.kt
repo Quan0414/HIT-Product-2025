@@ -26,15 +26,15 @@ class RegisterViewModel (
 
     fun register(username: String, email: String, password: String, repeatPassword: String) {
         // Local validation
-        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            _registerState.value = UiState.Error(
-                ErrorMessageMapper.fromBackend("\"email\" must be a valid email")
-            )
-            return
-        }
+//        if (!Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+//            _registerState.value = UiState.Error(
+//                ErrorMessageMapper.fromBackend("must be a valid email")
+//            )
+//            return
+//        }
         if (password.length < 6) {
             _registerState.value = UiState.Error(
-                ErrorMessageMapper.fromBackend("\"password\" length must be at least 6 characters long")
+                ErrorMessageMapper.fromBackend("length must be at least 6 characters long")
             )
             return
         }

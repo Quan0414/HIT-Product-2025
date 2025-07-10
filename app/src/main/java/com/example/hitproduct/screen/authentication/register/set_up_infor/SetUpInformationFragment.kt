@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.authentication.register.set_up_infor
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -8,14 +9,45 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.Toast
+import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
+import com.example.hitproduct.screen.authentication.login.LoginViewModel
+import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 
 class SetUpInformationFragment : Fragment() {
 
     private lateinit var binding: FragmentSetUpInformationBinding
+
+    // 1. SharedPreferences
+    private val prefs by lazy {
+        requireContext()
+            .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    // 2. AuthRepository
+    private val authRepo by lazy {
+        AuthRepository(
+            NetworkClient.provideApiService(requireContext()),
+            prefs
+        )
+    }
+
+    // 3. ViewModel
+    private val viewModel by viewModels<SetUpInformationViewModel> {
+        SetUpInformationViewModelFactory(authRepo)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,6 +60,64 @@ class SetUpInformationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        //observer viewModel
+        viewModel.updateState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+                    val err = state.error
+                    Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
+                }
+
+                UiState.Idle -> {
+
+                }
+
+                UiState.Loading -> {
+
+                }
+
+                is UiState.Success -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Cập nhật thông tin thành công",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    // Chuyển đến SuccessCreateAccFragment
+                    val successCreateAccFragment = SuccessCreateAccFragment()
+                    parentFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentStart, successCreateAccFragment)
+                        .commit()
+                }
+            }
+        }
+
+        binding.tvContinue.setOnClickListener {
+            val rawDob = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
+            val formattedDob = rawDob?.let {
+                try {
+                    val inputFmt  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+                    val outputFmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+                    outputFmt.format(inputFmt.parse(it)!!)
+                } catch (e: Exception) {
+                    null
+                }
+            }
+
+            val firstName   = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
+            val lastName    = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
+            val nickName    = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
+            val gender      = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
+            // Chú ý: ở đây phải dùng formattedDob, không phải rawDob hay editText.text
+            val dateOfBirth = formattedDob
+
+            val avatarUri   = null
+
+            // Gọi updateProfile trong ViewModel
+            viewModel.updateProfile(
+                firstName, lastName, nickName,
+                gender, dateOfBirth
+            )
+        }
 
         //chọn giới tính
         // 1. Data
@@ -103,12 +193,6 @@ class SetUpInformationFragment : Fragment() {
             parentFragmentManager.popBackStack()
         }
 
-        binding.tvContinue.setOnClickListener {
-            val successCreateAccFragment = SuccessCreateAccFragment()
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentStart, successCreateAccFragment)
 
-                .commit()
-        }
     }
 }

@@ -5,12 +5,18 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.User
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
+import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.user_profile.UserProfileResponse
+import okhttp3.MultipartBody
+import okhttp3.RequestBody
 
 class AuthRepository(
     private val api: ApiService,
@@ -49,7 +55,7 @@ class AuthRepository(
         val result = getResult { api.sendOtp(SendOtpRequest(email)) }
         return when (result) {
             is DataResult.Success -> DataResult.Success(result.data.message)
-            is DataResult.Error   -> result
+            is DataResult.Error -> result
         }
     }
 
@@ -59,10 +65,78 @@ class AuthRepository(
         email: String,
         type: String
     ): DataResult<String> {
-        val result = getResult { api.verifyCode(VerifyCodeRequest(otp, email, type)) }
+        // gọi api, result.data.data là String token
+        return when (val result =
+            getResult { api.verifyCode(VerifyCodeRequest(otp, email, type)) }) {
+            is DataResult.Success -> {
+                val token = result.data.data
+                if (type == "register") {
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+                        .apply()
+                }
+                DataResult.Success(token)    // <-- phải return token
+            }
+
+            is DataResult.Error -> result
+        }
+    }
+
+    /**
+     * Gọi API chỉnh sửa thông tin cá nhân, nếu thành công sẽ trả về EditProfileResponse
+     * @param fields là Map<String, RequestBody> chứa các trường cần chỉnh sửa
+     * @param avatar là MultipartBody.Part? chứa ảnh đại diện (có thể null)
+     */
+    suspend fun setupProfile(
+        fields: Map<String, RequestBody>,
+    ): DataResult<SetupProfileResponse> {
+        // getResult ở đây trả về DataResult<ApiResponse<EditProfileResponse>>
+        val result = getResult { api.setupProfile(fields) }
+
         return when (result) {
-            is DataResult.Success -> DataResult.Success(result.data.message)
-            is DataResult.Error   -> result
+            is DataResult.Success -> {
+                DataResult.Success(result.data.data)
+            }
+
+            is DataResult.Error -> result
+        }
+    }
+
+    // AuthRepository.kt
+    suspend fun checkInvite(token: String): DataResult<InviteData> {
+        return when (val result = getResult {
+            api.checkInvite("Bearer $token")
+        }) {
+            is DataResult.Success -> {
+                // result.data: ApiResponse<InviteData>
+                DataResult.Success(result.data.data)   // now InviteData
+            }
+
+            is DataResult.Error -> result
+        }
+    }
+
+
+    suspend fun fetchProfile(token: String): DataResult<User> {
+        return when (val result = getResult {
+            api.getProfile("Bearer $token")
+        }) {
+            is DataResult.Success ->
+                DataResult.Success(result.data.data)
+
+            is DataResult.Error -> result
+        }
+    }
+
+
+    suspend fun editProfile(
+        fields: Map<String, RequestBody>,
+        avatar: MultipartBody.Part?
+    ): DataResult<UserProfileResponse> {
+        val result = getResult { api.editProfile(fields, avatar) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
         }
     }
 

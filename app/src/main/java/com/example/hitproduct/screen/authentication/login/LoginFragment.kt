@@ -1,6 +1,7 @@
 package com.example.hitproduct.screen.authentication.login
 
 import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -17,16 +18,17 @@ import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.common.util.ErrorMessageMapper
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
+import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
 
 class LoginFragment : Fragment() {
 
@@ -52,6 +54,12 @@ class LoginFragment : Fragment() {
         LoginViewModelFactory(authRepo)
     }
 
+    private var isReturningFromNavigation = false
+
+    override fun onResume() {
+        super.onResume()
+        isReturningFromNavigation = false
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -64,6 +72,50 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: ""
+
+        viewModel.coupleState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+
+                }
+
+                UiState.Idle -> {
+
+                }
+
+                UiState.Loading -> {
+
+                }
+
+                is UiState.Success -> {
+                    val coupleOjb = state.data.couple
+                    if (coupleOjb == null) {
+                        isReturningFromNavigation = true
+                        // Chưa có đôi, chuyển sang SendInviteCodeFragment
+                        val sendInviteCodeFragment = SendInviteCodeFragment()
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentStart, sendInviteCodeFragment)
+                            .addToBackStack(null)
+                            .commit()
+                    } else {
+                        // Đã có đôi, xử lý logic khác nếu cần
+                        Toast.makeText(
+                            requireContext(),
+                            "Bạn đã ghép đôi với người ấy.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        //chuyen den MainActivity
+                        val intent = Intent(requireContext(), MainActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish() // Kết thúc LoginFragment
+                    }
+
+                }
+            }
+        }
+
 
         // Observe loginState để show Loading, Error, Success
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
@@ -80,24 +132,18 @@ class LoginFragment : Fragment() {
                     // 1. Reset background
                     val err = state.error
                     binding.edtEmail.setBackgroundResource(
-                        if (err.emailError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
+                        if (err.emailError) R.drawable.bg_edit_text_error
+                        else R.drawable.bg_edit_text
                     )
-                    binding.edtPassword.setBackgroundResource(
-                        if (err.passwordError) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
-                    )
+//                    binding.errEmail.isVisible = err.emailError
 
-                    // 2. Thêm dấu X
-//                    val xIcon = ContextCompat.getDrawable(requireContext(), R.drawable.ic_error_x)
-//                    binding.edtEmail.setCompoundDrawablesRelativeWithIntrinsicBounds(
-//                        null, null,
-//                        if (err.emailError) xIcon else null,
-//                        null
-//                    )
-//                    binding.edtPassword.setCompoundDrawablesRelativeWithIntrinsicBounds(
-//                        null, null,
-//                        if (err.passwordError) xIcon else null,
-//                        null
-//                    )
+                    binding.edtPassword.setBackgroundResource(
+                        if (err.passwordError) R.drawable.bg_edit_text_error
+                        else R.drawable.bg_edit_text
+                    )
+//                    binding.errPassword.isVisible = err.passwordError
+//                    binding.eyeIcon.isVisible = !err.passwordError
+
                     Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
                     binding.tvLogin.isEnabled = true
                 }
@@ -109,18 +155,24 @@ class LoginFragment : Fragment() {
                         "Đăng nhập thành công",
                         Toast.LENGTH_SHORT
                     ).show()
-                    // Chuyển sang HomeFragment nếu đăng nhập thành công
-                    //........
 
+                    if (!isReturningFromNavigation) {
+                        val newToken = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+                        viewModel.checkCouple(newToken)
+                    }
+                    viewModel.clearLoginState()
                 }
             }
         }
+
+        isReturningFromNavigation = false
 
         // Nút Đăng nhập: gọi ViewModel.login()
         binding.tvLogin.setOnClickListener {
             val email = binding.edtEmail.text.toString().trim()
             val pass = binding.edtPassword.text.toString()
             viewModel.login(email, pass)
+
         }
 
         //Form validation
@@ -219,34 +271,51 @@ class LoginFragment : Fragment() {
     }
 
     private fun setUpListeners() {
-        val watcher = object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+        // Watcher cho email: ẩn X và reset background
+        binding.edtEmail.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
             }
 
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-            }
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
 
             override fun afterTextChanged(s: Editable?) {
-                // 1. Reset background về bình thường mỗi khi user gõ
-                binding.edtEmail.apply {
-                    setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        null, null, null, null
-                    ) // Xóa dấu X nếu có
-                    setBackgroundResource(R.drawable.bg_edit_text)
-                }
-
-                binding.edtPassword.apply {
-                    setCompoundDrawablesRelativeWithIntrinsicBounds(
-                        null, null, null, null
-                    ) // Xóa dấu X nếu có
-                    setBackgroundResource(R.drawable.bg_edit_text)
-                }
+                // 1. Ẩn dấu X
+//                binding.errEmail.isVisible = false
+                // 2. Reset nền về bình thường
+                binding.edtEmail.setBackgroundResource(R.drawable.bg_edit_text)
+                // 3. Cập nhật trạng thái nút Đăng Nhập
                 updateLoginButtonState()
             }
-        }
-        binding.edtEmail.addTextChangedListener(watcher)
-        binding.edtPassword.addTextChangedListener(watcher)
+        })
 
-        //...
+        // Watcher cho password: ẩn X, hiện lại mắt và reset background
+        binding.edtPassword.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(
+                s: CharSequence?,
+                start: Int,
+                count: Int,
+                after: Int
+            ) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+
+            override fun afterTextChanged(s: Editable?) {
+                // 1. Ẩn dấu X
+//                binding.errPassword.isVisible = false
+                // 2. Reset nền về bình thường
+                binding.edtPassword.setBackgroundResource(R.drawable.bg_edit_text)
+                // 3. Hiện lại icon mắt
+//                binding.eyeIcon.isVisible = true
+                // 4. Cập nhật trạng thái nút Đăng Nhập
+                updateLoginButtonState()
+            }
+        })
     }
 }
+
