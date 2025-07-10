@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_login"
     android:fillViewport="true"
-    android:paddingTop="32dp"
+    android:paddingTop="30dp"
     tools:context=".screen.home_page.setting.account_setting.AccountSettingFragment">
 
     <LinearLayout
@@ -25,7 +25,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_back_2"
-                android:layout_marginStart="26dp"
+                android:layout_marginStart="30dp"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
                 app:layout_constraintBottom_toBottomOf="parent"/>
@@ -55,11 +55,10 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/imgAvatar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_avatar"
                     android:scaleType="centerCrop"
                     android:src="@drawable/avatar_default" />
 
@@ -71,15 +70,13 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
                 android:fontFamily="@font/f800"
-                android:text="Viết Doanh"
                 android:textSize="20dp" />
 
             <TextView
-                android:id="@+id/tvNickname1"
+                android:id="@+id/tvNickname"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f500"
-                android:text="Doanh ở Phủ Lý"
                 android:textColor="@color/grayText"
                 android:textSize="14dp" />
         </LinearLayout>

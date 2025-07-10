@@ -45,7 +45,7 @@
         android:layout_width="202dp"
         android:layout_height="28dp"
         android:layout_marginTop="80dp"
-        android:src="@drawable/abc"
+        android:src="@drawable/ic_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgMoney" />

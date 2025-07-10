@@ -6,7 +6,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:padding="32dp"
+    android:paddingTop="30dp"
+    android:paddingLeft="30dp"
+    android:paddingRight="30dp"
+    android:layout_marginBottom="80dp"
     tools:context=".screen.home_page.setting.account_setting.AccountSettingFragment">
 
     <LinearLayout
@@ -48,11 +51,10 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp">
 
-                <ImageView
+                <de.hdodenhof.circleimageview.CircleImageView
                     android:id="@+id/imgAvatar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:background="@drawable/bg_avatar"
                     android:scaleType="centerCrop"
                     android:src="@drawable/avatar_default" />
 
@@ -87,7 +89,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:paddingTop="32dp">
+            android:paddingTop="30dp">
 
             <!-- Họ & Tên -->
             <LinearLayout
@@ -118,6 +120,7 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="8dp"
                         android:enabled="false"
+                        android:drawableEnd="@drawable/ic_edit_text"
                         android:fontFamily="@font/f500"
                         android:textSize="14dp" />
                 </LinearLayout>
@@ -144,6 +147,7 @@
                         android:layout_height="wrap_content"
                         android:drawablePadding="8dp"
                         android:enabled="false"
+                        android:drawableEnd="@drawable/ic_edit_text"
                         android:fontFamily="@font/f500"
                         android:textSize="14dp" />
                 </LinearLayout>
@@ -165,6 +169,7 @@
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:drawablePadding="8dp"
+                android:drawableEnd="@drawable/ic_edit_text"
                 android:enabled="false"
                 android:fontFamily="@font/f500"
                 android:textSize="14dp" />
@@ -185,6 +190,8 @@
                 android:layout_marginBottom="16dp"
                 android:drawablePadding="8dp"
                 android:enabled="false"
+                android:drawableEnd="@drawable/ic_edit_text"
+
                 android:fontFamily="@font/f500"
                 android:inputType="textEmailAddress"
                 android:textSize="14dp" />
@@ -248,6 +255,7 @@
                 android:layout_marginBottom="16dp"
                 android:drawablePadding="8dp"
                 android:enabled="false"
+                android:drawableEnd="@drawable/ic_edit_text"
                 android:fontFamily="@font/f500"
                 android:inputType="date"
                 android:textSize="14dp" />
