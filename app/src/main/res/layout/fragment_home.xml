@@ -240,26 +240,58 @@
         android:id="@+id/catState"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="6dp"
         android:layout_marginTop="12dp"
-        android:layout_marginRight="6dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="@id/gifCat"
         app:layout_constraintStart_toStartOf="@+id/gifCat"
         app:layout_constraintTop_toBottomOf="@id/gifCat">
 
-        <ImageView
-            android:id="@+id/bgState1"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/bg_state_1" />
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/bgState2"
+            <ProgressBar
+                android:id="@+id/state1"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:indeterminate="false"
+                android:progress="100"
+                android:progressDrawable="@drawable/bg_status_bar1" />
+
+            <ImageView
+                android:id="@+id/icon1"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="start|center_vertical"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/ic_chicken" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:src="@drawable/bg_state_2" />
+            android:layout_marginTop="8dp">
+
+            <ProgressBar
+                android:id="@+id/state2"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:max="1000"
+                android:layout_gravity="center_vertical"
+                android:indeterminate="false"
+                android:progress="0"
+                android:progressDrawable="@drawable/bg_status_bar2" />
+
+            <ImageView
+                android:id="@+id/icon2"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="start|center_vertical"
+                android:src="@drawable/ic_heart" />
+        </FrameLayout>
 
     </LinearLayout>
 
