@@ -140,6 +140,13 @@ class AuthRepository(
         }
     }
 
+    suspend fun disconnect(): DataResult<ApiResponse<String>> {
+        return when(val result = getResult { api.disconnectCouple() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
 
     /**
      * Lấy token đã lưu (hoặc null nếu chưa lưu)

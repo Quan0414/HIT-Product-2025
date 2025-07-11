@@ -16,6 +16,9 @@ class SettingViewModel(
     private val _userProfileState = MutableLiveData<UiState<User>>(UiState.Idle)
     val userProfileState: LiveData<UiState<User>> = _userProfileState
 
+    private val _disconnectState = MutableLiveData<UiState<String>>(UiState.Idle)
+    val disconnectState: LiveData<UiState<String>> = _disconnectState
+
     fun fetchUserProfile() = viewModelScope.launch {
         _userProfileState.value = UiState.Loading
         when (val result =
@@ -25,6 +28,18 @@ class SettingViewModel(
 
             is DataResult.Error ->
                 _userProfileState.value = UiState.Error(result.error)
+        }
+    }
+
+    fun disconnectCouple() = viewModelScope.launch {
+        _disconnectState.value = UiState.Loading
+        when (val result = authRepository.disconnect()) {
+            is DataResult.Error -> {
+                _disconnectState.value = UiState.Error(result.error)
+            }
+            is DataResult.Success -> {
+                _disconnectState.value = UiState.Success(result.data.message)
+            }
         }
     }
 }

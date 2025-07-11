@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".screen.dialog.FoodDetailDialogFragment">
+    tools:context=".screen.dialog.food_detail.FoodDetailDialogFragment">
 
     <ImageView
         android:id="@+id/imgShop"

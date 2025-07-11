@@ -58,11 +58,9 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
 // Khởi đầu: disable tất cả, ẩn icon
         toggleFields(enabled = false)
 
-        //chọn giới tính
-        // 1. Data
+
         val genders = listOf("Nam", "Nữ", "Khác")
 
-        // 2. Adapter
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.dropdown_gender,
@@ -71,12 +69,10 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         binding.actvGender.setAdapter(adapter)
         binding.actvGender.threshold = 0
 
-        // 3. Show dropdown khi click icon
         binding.tilGender.setEndIconOnClickListener {
             binding.actvGender.showDropDown()
         }
 
-        // 4. Đẩy text vào ô sau khi chọn
         binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
             val selected = parent.getItemAtPosition(position) as String
             binding.actvGender.setText(selected, false)

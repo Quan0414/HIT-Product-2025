@@ -1,8 +1,10 @@
 package com.example.hitproduct.screen.home_page.setting.main
 
 import android.content.Context
+import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.example.hitproduct.R
@@ -12,9 +14,10 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSettingBinding
+import com.example.hitproduct.screen.authentication.login.LoginActivity
+import com.example.hitproduct.screen.dialog.disconnect.DialogDisconnectFragment
 import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingFragment
-import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingViewModelFactory
-import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingViewmodel
+import com.example.hitproduct.screen.splash.SplashActivity
 
 
 class SettingFragment : BaseFragment<FragmentSettingBinding>() {
@@ -50,8 +53,16 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
         }
 
         binding.btnBack.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            requireActivity().onBackPressedDispatcher.onBackPressed()
         }
+
+        binding.btnDisconnect.setOnClickListener {
+            DialogDisconnectFragment {
+                // callback khi bấm "Đồng ý"
+                viewModel.disconnectCouple()
+            }.show(parentFragmentManager, "disconnect_dialog")
+        }
+
 
     }
 
@@ -91,6 +102,28 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                             .error(R.drawable.avatar_default)
                             .into(binding.imgAvatar)
                     }
+                }
+            }
+        }
+
+        viewModel.disconnectState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+                    val err = state.error
+                    Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
+                }
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    Toast.makeText(requireContext(), "Hủy kết nối thành công", Toast.LENGTH_SHORT)
+                        .show()
+
+                    prefs.edit().clear().apply()
+                    // Chuyển về Splash và clear toàn bộ stack
+                    val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+                        flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                    }
+                    startActivity(intent)
                 }
             }
         }
