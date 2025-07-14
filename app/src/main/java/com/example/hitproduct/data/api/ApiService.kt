@@ -1,7 +1,7 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
-import com.example.hitproduct.data.model.User
+import com.example.hitproduct.data.model.CoupleResponse
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
@@ -11,6 +11,8 @@ import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.pet.PetResponse
+import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -75,5 +77,12 @@ interface ApiService {
     suspend fun disconnectCouple(
     ): Response<ApiResponse<String>>
 
+    @GET(ApiConstants.GET_COUPLE)
+    suspend fun getCouple(
+    ): Response<ApiResponse<CoupleResponse>>
+
+    @GET(ApiConstants.GET_PET)
+    suspend fun getPet(
+    ): Response<ApiResponse<PetResponse>>
 
 }

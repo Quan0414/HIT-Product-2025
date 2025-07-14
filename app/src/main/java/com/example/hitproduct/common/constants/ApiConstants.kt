@@ -19,9 +19,9 @@ object ApiConstants {
     const val DISCONNECT_COUPLE = "api/v1/couple/disconnect"
 
 
-    // Events / Countdown
-    const val EVENTS_LIST = "api/events"
-    const val EVENT_CREATE = "api/events/create"
+    // HOME
+    const val GET_COUPLE = "api/v1/couple"
+    const val GET_PET = "api/v1/pet"
     const val EVENT_UPDATE = "api/events/update"
     const val EVENT_DELETE = "api/events/delete"
 

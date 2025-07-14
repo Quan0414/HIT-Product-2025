@@ -5,7 +5,7 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.model.User
+import com.example.hitproduct.data.model.CoupleProfile
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
@@ -14,6 +14,8 @@ import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.pet.Pet
+import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
@@ -141,9 +143,23 @@ class AuthRepository(
     }
 
     suspend fun disconnect(): DataResult<ApiResponse<String>> {
-        return when(val result = getResult { api.disconnectCouple() }) {
+        return when (val result = getResult { api.disconnectCouple() }) {
             is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getCouple(): DataResult<CoupleProfile> {
+        return when (val res = getResult { api.getCouple() }) {
+            is DataResult.Success -> DataResult.Success(res.data.data.couple)
+            is DataResult.Error -> res
+        }
+    }
+
+    suspend fun getPet(): DataResult<Pet> {
+        return when (val res = getResult { api.getPet() }) {
+            is DataResult.Success -> DataResult.Success(res.data.data.pet)
+            is DataResult.Error -> res
         }
     }
 

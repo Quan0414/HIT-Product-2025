@@ -6,7 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.model.User
+import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 

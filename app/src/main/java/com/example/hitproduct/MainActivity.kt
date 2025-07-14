@@ -11,18 +11,43 @@ import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
 import nl.joery.animatedbottombar.AnimatedBottomBar
 
 class MainActivity : AppCompatActivity() {
+
     private lateinit var bottomBar: AnimatedBottomBar
     private val fragContainer = R.id.fragmentHomeContainer
-    private var currentTabId: Int = R.id.home  // giữ id menu để so sánh
+
+    // Giữ tab hiện tại
+    private var currentTabId: Int = R.id.home
+
+    // Tạo sẵn các Fragment và map với tab-id
+    private val fragments: Map<Int, androidx.fragment.app.Fragment> = mapOf(
+        R.id.game    to GameFragment(),
+        R.id.home    to HomeFragment(),
+        R.id.note    to NoteFragment(),
+        R.id.message to MessageFragment(),
+        R.id.setting to SettingFragment()
+    )
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        // 1) Bind AnimatedBottomBar
         bottomBar = findViewById(R.id.animatedBottomBar)
 
-        // 2) Listener để chuyển fragment
+        // Add tất cả fragments, hide hết ngoại trừ HOME
+        supportFragmentManager
+            .beginTransaction()
+            .apply {
+                fragments.forEach { (tabId, fragment) ->
+                    add(fragContainer, fragment, tabId.toString())
+                    if (tabId != currentTabId) hide(fragment)
+                }
+            }
+            .commitNow()
+
+        // Chọn tab HOME làm mặc định
+        bottomBar.selectTabById(currentTabId, true)
+
+        // Lắng nghe sự kiện đổi tab
         bottomBar.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
             override fun onTabSelected(
                 lastIndex: Int,
@@ -30,50 +55,38 @@ class MainActivity : AppCompatActivity() {
                 newIndex: Int,
                 newTab: AnimatedBottomBar.Tab
             ) {
-                // nếu chọn lại tab đang mở, bỏ qua
-                if (newTab.id == currentTabId) return
-                currentTabId = newTab.id
+                val newId = newTab.id
+                // nếu chọn lại tab đang mở thì bỏ qua
+                if (newId == currentTabId) return
 
-                val frag = when (newTab.id) {
-                    R.id.game    -> GameFragment()
-                    R.id.note    -> NoteFragment()
-                    R.id.home    -> HomeFragment()
-                    R.id.message -> MessageFragment()
-                    R.id.setting -> SettingFragment()
-                    else         -> null
-                }
-                frag?.let {
-                    supportFragmentManager.beginTransaction()
-                        .replace(fragContainer, it)
-                        .commit()
-                }
+                supportFragmentManager
+                    .beginTransaction()
+                    .apply {
+                        fragments[currentTabId]?.let { hide(it) }
+                        fragments[newId]?.let { show(it) }
+                    }
+                    .commit()
+
+                currentTabId = newId
             }
+
             override fun onTabReselected(index: Int, tab: AnimatedBottomBar.Tab) {
-                // có thể xử lý khi bấm lại tab đang chọn, nếu cần
+                // Bạn có thể scroll lên đầu hoặc refresh nếu cần
             }
         })
 
-        // 3) Mặc định chọn HOME
-        supportFragmentManager.beginTransaction()
-            .replace(fragContainer, HomeFragment())
-            .commit()
-        // đưa con trỏ của AnimatedBottomBar về tab HOME
-        bottomBar.selectTabById(R.id.home, true)
-
-        // 4) Xử lý back giống trước
-        onBackPressedDispatcher.addCallback(this,
-            object : OnBackPressedCallback(true) {
-                override fun handleOnBackPressed() {
-                    if (supportFragmentManager.backStackEntryCount > 0) {
-                        supportFragmentManager.popBackStack()
-                    } else if (currentTabId != R.id.home) {
-                        bottomBar.selectTabById(R.id.home, true)
-                    } else {
-                        isEnabled = false
-                        onBackPressedDispatcher.onBackPressed()
-                    }
+        // Xử lý back: nếu không phải HOME thì về HOME, ngược lại thoát app
+        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (currentTabId != R.id.home) {
+                    // Quay lại tab HOME
+                    bottomBar.selectTabById(R.id.home, true)
+                } else {
+                    // Cho phép hệ thống xử lý (thoát)
+                    isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
                 }
             }
-        )
+        })
     }
 }

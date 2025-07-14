@@ -5,7 +5,7 @@ import android.content.Intent
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.fragment.app.viewModels
+import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
@@ -17,7 +17,6 @@ import com.example.hitproduct.databinding.FragmentSettingBinding
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.dialog.disconnect.DialogDisconnectFragment
 import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingFragment
-import com.example.hitproduct.screen.splash.SplashActivity
 
 
 class SettingFragment : BaseFragment<FragmentSettingBinding>() {
@@ -34,9 +33,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
         )
     }
 
-    private val viewModel by viewModels<SettingViewModel> {
+    private val viewModel by activityViewModels<SettingViewModel> {
         SettingViewModelFactory(authRepo)
     }
+
 
     override fun initView() {
 

@@ -1,6 +1,7 @@
 package com.example.hitproduct.screen.home_page.home
 
-import android.content.res.ColorStateList
+import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
@@ -15,35 +16,79 @@ import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import com.airbnb.lottie.LottieAnimationView
+import androidx.fragment.app.activityViewModels
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.RenderMode
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
+import java.time.Instant
+import java.time.LocalDate
+import java.time.Period
+import java.time.ZoneId
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
-    private lateinit var lottieView: LottieAnimationView
+    private val prefs by lazy {
+        requireContext().getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val authRepo by lazy {
+        AuthRepository(
+            NetworkClient.provideApiService(requireContext()),
+            prefs
+        )
+    }
+
+    private val viewModel by activityViewModels<HomeViewModel> {
+        HomeViewModelFactory(authRepo)
+    }
+
+    private val hungryCat = listOf(
+        R.raw.angry_cat,
+        R.raw.cat_cry,
+        R.raw.cat_the_luoi
+    )
+    private val normalCat = listOf(
+        R.raw.spicy_cat,
+        R.raw.cat_hands_up,
+        R.raw.sleep_cat,
+    )
+    private val happyCat = listOf(
+        R.raw.dance_cat,
+        R.raw.dance_cat2,
+        R.raw.dance_cat3,
+        R.raw.dance_cat4,
+    )
+
+    private var eattingCat = R.raw.cat_eat
+
+    private var currentCatList: List<Int> = normalCat
+    private var currentCat: Int? = null
 
     override fun initView() {
 
+        binding.gifCat.visibility = View.GONE
         binding.gifCat.apply {
-            setAnimation(R.raw.sleep_cat)
-            // tăng tốc playback
             speed = 3.0f
-            // lặp vô hạn
             repeatCount = LottieDrawable.INFINITE
-            // ưu tiên render GPU
             renderMode = RenderMode.HARDWARE
-            // start
-            playAnimation()
+
+            setOnClickListener {
+                val next = currentCatList
+                    .filter { it != currentCat }
+                    .randomOrNull() ?: currentCatList.random()
+                currentCat = next
+                setAnimation(next)
+                playAnimation()
+            }
         }
 
-        // Khởi tạo 2 thanh ngay khi view được inflate
-        updateStateBar(binding.state1, binding.icon1, 88)   // ví dụ giá trị ban đầu = 0
-        updateStateBar(binding.state2, binding.icon2, 0)
     }
 
     override fun initListener() {
@@ -67,15 +112,82 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
 
     override fun initData() {
-
+        viewModel.getCoupleProfile()
+        viewModel.getPet()
     }
 
     override fun handleEvent() {
 
     }
 
+    @SuppressLint("SetTextI18n")
     override fun bindData() {
+        viewModel.coupleProfile.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    binding.tvMoney.text = state.data.coin.toString()
 
+                    // 1. Parse startDate (ISO string) thành OffsetDateTime
+                    val startDateStr =
+                        state.data.loveStartedAt            // ví dụ "2025-07-11T10:24:04.501Z"
+                    val startInstant = Instant.parse(startDateStr)
+                    val startDate = startInstant
+                        .atZone(ZoneId.systemDefault())
+                        .toLocalDate()
+                    val nowDate = LocalDate.now(ZoneId.systemDefault())
+
+                    val period = Period.between(startDate, nowDate)
+                    val years = period.years
+                    val months = period.months
+                    val daysTotal = period.days
+
+                    // 4. Chuyển days thành tuần + ngày
+                    val weeks = daysTotal / 7
+                    val days = daysTotal % 7
+
+                    // 6. Cập nhật UI
+                    binding.tvYearNumber.text = years.toString()
+                    binding.tvMonthNumber.text = months.toString()
+                    binding.tvWeekNumber.text = weeks.toString()
+                    binding.tvDayNumber.text = days.toString()
+                }
+            }
+        }
+
+        viewModel.pet.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+                    binding.gifCat.visibility = View.GONE
+                }
+
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    val hunger = state.data.hunger
+                    val happiness = state.data.happiness
+
+                    updateStateBar(binding.state1, binding.icon1, 20)
+                    updateStateBar(binding.state2, binding.icon2, 100)
+
+                    currentCatList = when {
+                        hunger < 30 -> hungryCat
+                        hunger < 70 -> normalCat
+                        else -> happyCat
+                    }
+
+                    val first = currentCatList.random()
+                    currentCat = first
+                    binding.gifCat.apply {
+                        visibility = View.VISIBLE
+                        setAnimation(first)
+                        playAnimation()
+                    }
+                }
+            }
+        }
     }
 
     override fun inflateLayout(
@@ -130,7 +242,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
 
-
     private fun updateStateBar(bar: ProgressBar, icon: View, value: Int) {
         bar.progress = value
 
@@ -140,7 +251,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 value <= 24 -> R.color.status1
                 value <= 49 -> R.color.status2
                 value <= 74 -> R.color.status3
-                else        -> R.color.status4
+                else -> R.color.status4
             }
             tintOnlyFill(bar, colorRes)
         }
@@ -176,13 +287,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         val ph = popupView.measuredHeight
 
         val xOffset = anchor.width / 2 - pw / 2
-        val yOffset = - (ph + 80)
+        val yOffset = -(ph + 80)
 
         popup.showAsDropDown(anchor, xOffset, yOffset)
     }
-
-
-
 
 
 }
