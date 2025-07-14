@@ -1,92 +1,111 @@
 package com.example.hitproduct
 
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
+import android.view.View
+import android.widget.FrameLayout
+import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
+import com.example.hitproduct.databinding.ActivityMainBinding
 import com.example.hitproduct.screen.home_page.game.GameFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
 import com.example.hitproduct.screen.home_page.note.NoteFragment
 import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
-import nl.joery.animatedbottombar.AnimatedBottomBar
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var bottomBar: AnimatedBottomBar
-    private val fragContainer = R.id.fragmentHomeContainer
+    private lateinit var binding: ActivityMainBinding
 
-    // Giữ tab hiện tại
-    private var currentTabId: Int = R.id.home
-
-    // Tạo sẵn các Fragment và map với tab-id
-    private val fragments: Map<Int, androidx.fragment.app.Fragment> = mapOf(
-        R.id.game    to GameFragment(),
-        R.id.home    to HomeFragment(),
-        R.id.note    to NoteFragment(),
-        R.id.message to MessageFragment(),
-        R.id.setting to SettingFragment()
+    // index 0..4 tương đương Message, Note, Home, Couple(Game), Setting
+    private val fragments = listOf(
+        MessageFragment(),
+        NoteFragment(),
+        HomeFragment(),
+        GameFragment(),
+        SettingFragment()
     )
+    private var currentIndex = 2   // mặc định show Home
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
 
-        bottomBar = findViewById(R.id.animatedBottomBar)
-
-        // Add tất cả fragments, hide hết ngoại trừ HOME
-        supportFragmentManager
-            .beginTransaction()
-            .apply {
-                fragments.forEach { (tabId, fragment) ->
-                    add(fragContainer, fragment, tabId.toString())
-                    if (tabId != currentTabId) hide(fragment)
-                }
+        // 1) Pre-add all fragments, hide trừ Home (index 2)
+        supportFragmentManager.beginTransaction().apply {
+            fragments.forEachIndexed { idx, frag ->
+                add(
+                    binding.fragmentHomeContainer.id,
+                    frag,
+                    "tab$idx"
+                )
+                if (idx != currentIndex) hide(frag)
             }
-            .commitNow()
+        }.commitNow()
 
-        // Chọn tab HOME làm mặc định
-        bottomBar.selectTabById(currentTabId, true)
+        // 2) Khởi tạo UI bottom nav
+        setupBottomNav()
 
-        // Lắng nghe sự kiện đổi tab
-        bottomBar.setOnTabSelectListener(object : AnimatedBottomBar.OnTabSelectListener {
-            override fun onTabSelected(
-                lastIndex: Int,
-                lastTab: AnimatedBottomBar.Tab?,
-                newIndex: Int,
-                newTab: AnimatedBottomBar.Tab
-            ) {
-                val newId = newTab.id
-                // nếu chọn lại tab đang mở thì bỏ qua
-                if (newId == currentTabId) return
-
-                supportFragmentManager
-                    .beginTransaction()
-                    .apply {
-                        fragments[currentTabId]?.let { hide(it) }
-                        fragments[newId]?.let { show(it) }
-                    }
-                    .commit()
-
-                currentTabId = newId
-            }
-
-            override fun onTabReselected(index: Int, tab: AnimatedBottomBar.Tab) {
-                // Bạn có thể scroll lên đầu hoặc refresh nếu cần
-            }
-        })
-
-        // Xử lý back: nếu không phải HOME thì về HOME, ngược lại thoát app
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                if (currentTabId != R.id.home) {
-                    // Quay lại tab HOME
-                    bottomBar.selectTabById(R.id.home, true)
-                } else {
-                    // Cho phép hệ thống xử lý (thoát)
-                    isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
-                }
-            }
-        })
+        // 3) Sau cùng show tab Home overlay
+        selectTab(currentIndex)
     }
+
+    private fun setupBottomNav() {
+        // lấy các default icon và overlay container
+        val defaults = listOf<ImageView>(
+            binding.ivMessageDefault,
+            binding.ivNoteDefault,
+            binding.ivHomeDefault,
+            binding.ivCoupleDefault,
+            binding.ivSettingDefault
+        )
+        val overlays = listOf<FrameLayout>(
+            binding.flMessageOverlay,
+            binding.flNoteOverlay,
+            binding.flHomeOverlay,
+            binding.flCoupleOverlay,
+            binding.flSettingOverlay
+        )
+
+        // gắn click cho từng default icon
+        defaults.forEachIndexed { idx, iv ->
+            iv.setOnClickListener {
+                selectTab(idx)
+            }
+        }
+    }
+
+    private fun selectTab(idx: Int) {
+        // 1) Reset: hiện tất cả icon mặc định, ẩn tất cả overlay
+        val defaults = listOf(
+            binding.ivMessageDefault,
+            binding.ivNoteDefault,
+            binding.ivHomeDefault,
+            binding.ivCoupleDefault,
+            binding.ivSettingDefault
+        )
+        val overlays = listOf(
+            binding.flMessageOverlay,
+            binding.flNoteOverlay,
+            binding.flHomeOverlay,
+            binding.flCoupleOverlay,
+            binding.flSettingOverlay
+        )
+        defaults.forEach  { it.visibility = View.VISIBLE }
+        overlays.forEach  { it.visibility = View.GONE    }
+
+        // 2) Luôn show overlay cho tab được chọn + ẩn icon default
+        defaults[idx].visibility = View.GONE
+        overlays[idx].visibility = View.VISIBLE
+
+        // 3) Chỉ chạy fragment transaction khi thực sự đổi tab
+        if (idx != currentIndex) {
+            supportFragmentManager.beginTransaction().apply {
+                hide(fragments[currentIndex])
+                show(fragments[idx])
+            }.commit()
+            currentIndex = idx
+        }
+    }
+
 }
