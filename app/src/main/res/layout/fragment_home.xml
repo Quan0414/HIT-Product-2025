@@ -301,7 +301,7 @@
         android:id="@+id/btnFeed"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="12dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_feed"
         app:layout_constraintBottom_toTopOf="@+id/btnMission"
@@ -313,18 +313,17 @@
         android:id="@+id/btnQuestion"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
-        android:layout_marginTop="20dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_have_question"
         app:layout_constraintEnd_toEndOf="@id/catState"
         app:layout_constraintStart_toEndOf="@+id/btnFeed"
-        app:layout_constraintTop_toBottomOf="@+id/catState" />
+        app:layout_constraintTop_toTopOf="@+id/btnFeed" />
 
     <ImageView
         android:id="@+id/btnMission"
         android:layout_width="0dp"
         android:layout_height="48dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         android:src="@drawable/btn_mission"
