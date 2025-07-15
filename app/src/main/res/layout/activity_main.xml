@@ -88,7 +88,7 @@
                         android:layout_height="80dp"
                         android:src="@drawable/ic_mess_selected" />
 
-                    <com.example.hitproduct.custom.OutlinedTextView
+                    <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
@@ -134,7 +134,7 @@
                         android:layout_height="80dp"
                         android:src="@drawable/ic_note_selected" />
 
-                    <com.example.hitproduct.custom.OutlinedTextView
+                    <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
@@ -180,7 +180,7 @@
                         android:layout_height="80dp"
                         android:src="@drawable/ic_home_selected" />
 
-                    <com.example.hitproduct.custom.OutlinedTextView
+                    <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
@@ -226,7 +226,7 @@
                         android:layout_height="80dp"
                         android:src="@drawable/ic_couple_selected" />
 
-                    <com.example.hitproduct.custom.OutlinedTextView
+                    <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
@@ -273,7 +273,7 @@
                         android:layout_height="80dp"
                         android:src="@drawable/ic_setting_selected" />
 
-                    <com.example.hitproduct.custom.OutlinedTextView
+                    <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"

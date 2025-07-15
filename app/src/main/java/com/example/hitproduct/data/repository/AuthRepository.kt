@@ -13,6 +13,7 @@ import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.pet.Pet
 import com.example.hitproduct.data.model.user_profile.User
@@ -162,6 +163,27 @@ class AuthRepository(
             is DataResult.Error -> res
         }
     }
+
+    suspend fun getAllFoods(): DataResult<List<Food>> {
+        val all = mutableListOf<Food>()
+        var page = 1
+        var totalPages = 1  // khởi tạo tạm
+        while (page <= totalPages) {
+            when (val res = getResult { api.getFood(page) }) {
+                is DataResult.Success -> {
+                    val body = res.data.data
+                    all += body.foods                  // gom dữ liệu
+                    totalPages = body.totalPages       // cập nhật tổng số trang
+                    page++                             // chuyển trang
+                }
+                is DataResult.Error -> {
+                    return res
+                }
+            }
+        }
+        return DataResult.Success(all)
+    }
+
 
 
     /**

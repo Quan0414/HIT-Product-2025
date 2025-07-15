@@ -150,6 +150,7 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                     binding.tvNickname1.text = user.nickname
                     binding.edtHo.setText(user.firstName)
                     binding.edtTen.setText(user.lastName)
+                    binding.edtEmail.setText(user.email)
                     binding.edtNickname.setText(user.nickname)
                     binding.actvGender.setText(user.gender)
                     binding.edtBirthday.setText(user.dateOfBirth.toDisplayDate())

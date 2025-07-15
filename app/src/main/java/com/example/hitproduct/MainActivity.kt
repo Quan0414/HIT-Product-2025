@@ -26,6 +26,9 @@ class MainActivity : AppCompatActivity() {
     )
     private var currentIndex = 2   // mặc định show Home
 
+
+    var coin: Int = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -91,8 +94,8 @@ class MainActivity : AppCompatActivity() {
             binding.flCoupleOverlay,
             binding.flSettingOverlay
         )
-        defaults.forEach  { it.visibility = View.VISIBLE }
-        overlays.forEach  { it.visibility = View.GONE    }
+        defaults.forEach { it.visibility = View.VISIBLE }
+        overlays.forEach { it.visibility = View.GONE }
 
         // 2) Luôn show overlay cho tab được chọn + ẩn icon default
         defaults[idx].visibility = View.GONE

@@ -15,7 +15,7 @@
         android:layout_width="140dp"
         android:layout_height="36dp"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="40dp"
         android:src="@drawable/ic_money"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
@@ -45,7 +45,7 @@
         android:id="@+id/imageView2"
         android:layout_width="202dp"
         android:layout_height="28dp"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="70dp"
         android:src="@drawable/ic_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -229,18 +229,19 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/gifCat"
-        android:layout_width="270dp"
-        android:layout_height="270dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.58"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/catState"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
+        android:paddingHorizontal="12dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="@id/gifCat"
         app:layout_constraintStart_toStartOf="@+id/gifCat"
@@ -299,9 +300,8 @@
     <ImageView
         android:id="@+id/btnFeed"
         android:layout_width="wrap_content"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="20dp"
-        android:layout_marginEnd="12dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_feed"
         app:layout_constraintBottom_toTopOf="@+id/btnMission"
@@ -312,7 +312,7 @@
     <ImageView
         android:id="@+id/btnQuestion"
         android:layout_width="wrap_content"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="20dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_have_question"
@@ -323,7 +323,7 @@
     <ImageView
         android:id="@+id/btnMission"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="12dp"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"

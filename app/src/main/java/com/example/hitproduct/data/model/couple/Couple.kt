@@ -2,7 +2,7 @@ package com.example.hitproduct.data.model
 
 import com.google.gson.annotations.SerializedName
 
-data class CoupleResponse(
+data class CoupleData(
     @SerializedName("couple") val couple: CoupleProfile
 )
 

@@ -1,7 +1,7 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
-import com.example.hitproduct.data.model.CoupleResponse
+import com.example.hitproduct.data.model.CoupleData
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
@@ -10,8 +10,9 @@ import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
-import com.example.hitproduct.data.model.pet.PetResponse
+import com.example.hitproduct.data.model.pet.PetData
 import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
@@ -25,6 +26,7 @@ import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.PartMap
+import retrofit2.http.Query
 
 interface ApiService {
     @POST(ApiConstants.AUTH_LOGIN)
@@ -79,10 +81,15 @@ interface ApiService {
 
     @GET(ApiConstants.GET_COUPLE)
     suspend fun getCouple(
-    ): Response<ApiResponse<CoupleResponse>>
+    ): Response<ApiResponse<CoupleData>>
 
     @GET(ApiConstants.GET_PET)
     suspend fun getPet(
-    ): Response<ApiResponse<PetResponse>>
+    ): Response<ApiResponse<PetData>>
+
+    @GET(ApiConstants.GET_FOOD)
+    suspend fun getFood(
+        @Query("page") page: Int
+    ): Response<ApiResponse<FoodData>>
 
 }

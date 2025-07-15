@@ -1,6 +1,9 @@
 package com.example.hitproduct.screen.home_page.home
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
+import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -18,17 +21,19 @@ import androidx.annotation.LayoutRes
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
-import androidx.core.view.doOnLayout
 import androidx.fragment.app.activityViewModels
-import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.RenderMode
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
+import com.example.hitproduct.screen.dialog.shop.FoodAdapter
+import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
@@ -74,15 +79,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private var currentCatList: List<Int> = normalCat
     private var currentCat: Int? = null
 
+    private val shopDialog by lazy { ShopDialogFragment() }
+
     override fun initView() {
 
         binding.gifCat.visibility = View.GONE
         binding.gifCat.apply {
             speed = 1.0f
-            repeatCount = LottieDrawable.INFINITE
+            repeatCount = 0
             renderMode = RenderMode.HARDWARE
 
+            addAnimatorListener(object : AnimatorListenerAdapter() {
+                override fun onAnimationEnd(animation: Animator) {
+                    // dùng view.postDelayed để đảm bảo chạy trên UI thread
+                    postDelayed({ playAnimation() }, 0)
+                }
+            })
+
+
+            // lần đầu tiên khởi animation
             setOnClickListener {
+                // đổi cat nếu muốn
                 val next = currentCatList
                     .filter { it != currentCat }
                     .randomOrNull() ?: currentCatList.random()
@@ -91,6 +108,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 playAnimation()
             }
         }
+
 
     }
 
@@ -110,6 +128,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 R.layout.tooltip2,   // layout mới cho state2
                 R.id.popup_state2         // id TextView trong tooltip_happy.xml
             )
+        }
+
+        binding.btnFeed.setOnClickListener {
+            if (!shopDialog.isAdded) {
+                shopDialog.show(childFragmentManager, "shop")
+            } else {
+                shopDialog.dialog?.show()
+            }
         }
     }
 
@@ -132,7 +158,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    binding.tvMoney.text = state.data.coin.toString()
+                    binding.tvMoney.text = state.data.coin.toThousandComma()
+                    (activity as MainActivity).coin = state.data.coin
 
                     // 1. Parse startDate (ISO string) thành OffsetDateTime
                     val startDateStr =
@@ -170,14 +197,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    val hunger = 50
+                    val hunger = 56
                     val happiness = state.data.happiness
 
                     updateStateBar(binding.state1, binding.icon1, hunger)
                     updateStateBar(binding.state2, binding.icon2, happiness)
 
                     currentCatList = when {
-                        hunger < 30 -> hungryCat
+                        hunger < 35 -> hungryCat
                         hunger < 70 -> normalCat
                         else -> happyCat
                     }

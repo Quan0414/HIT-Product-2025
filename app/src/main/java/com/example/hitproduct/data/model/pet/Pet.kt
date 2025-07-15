@@ -1,7 +1,7 @@
 package com.example.hitproduct.data.model.pet
 import com.google.gson.annotations.SerializedName
 
-data class PetResponse(
+data class PetData(
     @SerializedName("pet")
     val pet: Pet
 )

@@ -1,4 +1,4 @@
-package com.example.hitproduct.custom
+package com.example.hitproduct.common.util
 
 import android.content.Context
 import android.graphics.Canvas
