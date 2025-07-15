@@ -15,13 +15,14 @@ object ApiConstants {
     // User
     const val EDIT_PROFILE = "api/v1/auth/profile"
     const val USER_PROFILE = "api/v1/auth/profile"
-    const val USER_UPDATE = "api/user/update"
     const val CHECK_INVITE = "api/v1/couple/connect"
+    const val DISCONNECT_COUPLE = "api/v1/couple/disconnect"
 
-    // Events / Countdown
-    const val EVENTS_LIST = "api/events"
-    const val EVENT_CREATE = "api/events/create"
-    const val EVENT_UPDATE = "api/events/update"
+
+    // HOME
+    const val GET_COUPLE = "api/v1/couple"
+    const val GET_PET = "api/v1/pets"
+    const val GET_FOOD = "api/v1/foods"
     const val EVENT_DELETE = "api/events/delete"
 
     // Share

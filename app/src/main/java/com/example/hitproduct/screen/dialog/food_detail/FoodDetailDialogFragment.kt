@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog
+package com.example.hitproduct.screen.dialog.food_detail
 
 import androidx.fragment.app.Fragment
 

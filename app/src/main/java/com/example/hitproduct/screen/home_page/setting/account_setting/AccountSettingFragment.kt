@@ -1,12 +1,16 @@
 package com.example.hitproduct.screen.home_page.setting.account_setting
 
 import android.content.Context
+import android.net.Uri
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import com.bumptech.glide.Glide
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -40,15 +44,24 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
 
     private var isEditMode = false
 
+    private var selectedAvatarUri: Uri? = null
+
+    private val pickImageLauncher = registerForActivityResult(
+        ActivityResultContracts.GetContent()
+    ) { uri ->
+        uri?.let {
+            selectedAvatarUri = it
+            binding.imgAvatar.setImageURI(it)    // preview
+        }
+    }
+
     override fun initView() {
 // Khởi đầu: disable tất cả, ẩn icon
         toggleFields(enabled = false)
 
-        //chọn giới tính
-        // 1. Data
+
         val genders = listOf("Nam", "Nữ", "Khác")
 
-        // 2. Adapter
         val adapter = ArrayAdapter(
             requireContext(),
             R.layout.dropdown_gender,
@@ -57,12 +70,10 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         binding.actvGender.setAdapter(adapter)
         binding.actvGender.threshold = 0
 
-        // 3. Show dropdown khi click icon
         binding.tilGender.setEndIconOnClickListener {
             binding.actvGender.showDropDown()
         }
 
-        // 4. Đẩy text vào ô sau khi chọn
         binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
             val selected = parent.getItemAtPosition(position) as String
             binding.actvGender.setText(selected, false)
@@ -90,7 +101,7 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 val nickname = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
                 val gender = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
                 val birthday = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
-                val avatarUri = null  // hoặc lấy Uri nếu bạn cho chọn ảnh trước đó
+                val avatarUri = selectedAvatarUri
 
                 viewModel.updateProfile(
                     firstName, lastName, nickname,
@@ -98,6 +109,11 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 )
             }
         }
+
+        binding.btnEditAvatar.setOnClickListener {
+            pickImageLauncher.launch("image/*")
+        }
+
 
         binding.btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
@@ -124,26 +140,38 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 }
 
                 UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
-                    // Cập nhật giao diện với dữ liệu người dùng
                     val user = state.data
                     // đổ data lên form
                     binding.tvName.text = user.username
                     binding.tvNickname1.text = user.nickname
                     binding.edtHo.setText(user.firstName)
                     binding.edtTen.setText(user.lastName)
+                    binding.edtEmail.setText(user.email)
                     binding.edtNickname.setText(user.nickname)
                     binding.actvGender.setText(user.gender)
                     binding.edtBirthday.setText(user.dateOfBirth.toDisplayDate())
+
+                    user.avatar?.takeIf { it.isNotBlank() }?.let { url ->
+                        val secureUrl = url.replaceFirst("http://", "https://")
+                        // dùng Glide / Coil / Picasso tuỳ thích
+                        Glide.with(this)
+                            .load(secureUrl)
+                            .placeholder(R.drawable.avatar_default)
+                            .error(R.drawable.avatar_default)
+                            .into(binding.imgAvatar)
+                    }
+                    binding.loadingProgressBar.visibility = View.GONE
                 }
             }
         }
         viewModel.updateState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
-
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
@@ -152,6 +180,10 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                         "Cập nhật thông tin thành công",
                         Toast.LENGTH_SHORT
                     ).show()
+                    selectedAvatarUri = null
+
+                    binding.loadingProgressBar.visibility = View.GONE
+
                 }
 
                 is UiState.Error -> {
@@ -166,6 +198,9 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
     }
 
     private fun toggleFields(enabled: Boolean) {
+
+        binding.btnEditAvatar.visibility = if (enabled) View.VISIBLE else View.INVISIBLE
+
         val fields = listOf(
             binding.edtHo,
             binding.edtTen,
@@ -189,7 +224,17 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
             // hoặc: binding.tilGender.isEndIconVisible = false
         }
 
-        binding.btnEditAvatar.visibility = if (enabled) View.VISIBLE else View.INVISIBLE
+        val editIconRes = if (enabled) R.drawable.ic_edit_text else 0
+        listOf(binding.edtHo, binding.edtTen, binding.edtNickname, binding.edtEmail, binding.edtBirthday).forEach { et ->
+            // clear và set lại drawable: left, top, right, bottom
+            et.setCompoundDrawablesRelativeWithIntrinsicBounds(
+                /* start */ 0,
+                /* top   */ 0,
+                /* end   */ editIconRes,
+                /* bottom*/ 0
+            )
+        }
+
     }
 
     override fun inflateLayout(
@@ -199,14 +244,15 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         return FragmentAccountSettingBinding.inflate(inflater, container, false)
     }
 
-    fun String.toDisplayDate(): String {
+    fun String?.toDisplayDate(): String {
+        if (this.isNullOrBlank()) return ""
         return try {
-            // parser cho chuỗi từ backend (UTC)
+            // parser chuỗi UTC
             val parser = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS'Z'", Locale.getDefault())
             parser.timeZone = TimeZone.getTimeZone("UTC")
             val date = parser.parse(this)!!
 
-            // formatter cho UI (local timezone)
+            // formatter local
             val formatter = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             formatter.format(date)
         } catch (e: Exception) {

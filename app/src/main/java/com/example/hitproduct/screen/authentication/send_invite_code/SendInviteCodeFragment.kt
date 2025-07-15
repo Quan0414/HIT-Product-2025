@@ -96,6 +96,8 @@ class SendInviteCodeFragment : Fragment() {
         token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
         SocketManager.connect(token)
 
+        binding.tvInviteCode.text = prefs.getString(AuthPrefersConstants.COUPLE_CODE, "")
+
         // 1. Tạo dialog + adapter sẵn, nhưng chưa show
         setupInviteDialog()
 
@@ -103,6 +105,14 @@ class SendInviteCodeFragment : Fragment() {
         viewModel.checkInvite(token)
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             if (result is DataResult.Success) {
+                val hasUnread = result.data.acceptFriends.isNotEmpty()
+                // Cập nhật icon
+                val iconRes = if (hasUnread)
+                    R.drawable.ic_have_request
+                else
+                    R.drawable.ic_no_request
+                binding.btnNotification.setImageResource(iconRes)
+
                 currentItems.clear()
                 // Received
                 result.data.acceptFriends.forEach {
@@ -117,27 +127,10 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
-        viewModel.fetchUserProfile()
-        viewModel.inviteCode.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Error -> {
-                    Log.d("SendInvite", "Error: ${state.error}")
-                }
-                UiState.Idle -> {}
-                UiState.Loading -> {}
-                is UiState.Success -> {
-                    // Hiển thị mã mời
-                    val user = state.data
-                    binding.tvInviteCode.text = user.coupleCode
-                    Log.d("SendInvite", "User invite code: ${user.coupleCode}")
-                }
-            }
-        }
-
         registerSocketListeners()
 
         setupInviteInput()
-        setupBackButton()
+//        setupBackButton()
         setupCopyInviteCode()
         setupNotificationButton()
         setupSendInviteButton()
@@ -162,20 +155,20 @@ class SendInviteCodeFragment : Fragment() {
         updateButtonState()
     }
 
-    private fun setupBackButton() {
-        binding.backIcon.setOnClickListener {
-            Log.d("SendInvite", "Back button clicked")
-            Log.d("SendInvite", "BackStack count: ${parentFragmentManager.backStackEntryCount}")
-
-            if (parentFragmentManager.backStackEntryCount > 0) {
-                Log.d("SendInvite", "Popping backstack")
-                parentFragmentManager.popBackStack()
-            } else {
-                Log.d("SendInvite", "No backstack, finishing activity")
-                requireActivity().finish()
-            }
-        }
-    }
+//    private fun setupBackButton() {
+//        binding.backIcon.setOnClickListener {
+//            Log.d("SendInvite", "Back button clicked")
+//            Log.d("SendInvite", "BackStack count: ${parentFragmentManager.backStackEntryCount}")
+//
+//            if (parentFragmentManager.backStackEntryCount > 0) {
+//                Log.d("SendInvite", "Popping backstack")
+//                parentFragmentManager.popBackStack()
+//            } else {
+//                Log.d("SendInvite", "No backstack, finishing activity")
+//                requireActivity().finish()
+//            }
+//        }
+//    }
 
     @SuppressLint("ClickableViewAccessibility")
     private fun setupCopyInviteCode() {
@@ -203,6 +196,7 @@ class SendInviteCodeFragment : Fragment() {
         binding.btnNotification.setOnClickListener {
             // Mở dialog chỉ dựa trên dữ liệu socket
             showInviteDialog()
+            binding.btnNotification.setImageResource(R.drawable.ic_no_request)
         }
     }
 
@@ -213,10 +207,6 @@ class SendInviteCodeFragment : Fragment() {
 
             SocketManager.sendFriendRequest(code)
             Log.d("SendInvite", "Sent friend request with code=$code")
-            // Mở dialog nếu chưa mở
-//            if (inviteDialog == null || inviteDialog?.isShowing == false) {
-//                showInviteDialog()
-//            }
         }
     }
 

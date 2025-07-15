@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <ImageView
+        android:id="@+id/imgShop"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:adjustViewBounds="true"
+        android:src="@drawable/shop"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <ImageView
+        android:id="@+id/imgMoney"
+        android:layout_width="140dp"
+        android:layout_height="36dp"
+        android:layout_marginTop="28dp"
+        android:layout_marginStart="40dp"
+        android:src="@drawable/ic_money"
+        app:layout_constraintStart_toStartOf="@id/imgShop"
+        app:layout_constraintTop_toTopOf="@id/imgShop" />
+
+    <TextView
+        android:id="@+id/tvMoney"
+        android:layout_width="140dp"
+        android:layout_height="36dp"
+        android:layout_margin="3dp"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:textColor="@color/textBrown"
+        android:textSize="14dp"
+        app:layout_constraintStart_toStartOf="@id/imgMoney"
+        app:layout_constraintTop_toTopOf="@id/imgMoney" />
+
+    <ImageView
+        android:id="@+id/btnClose"
+        android:layout_width="36dp"
+        android:layout_marginEnd="40dp"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_close_window"
+        app:layout_constraintBottom_toBottomOf="@+id/imgMoney"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imgMoney" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFood"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="@+id/imgShop"
+        app:layout_constraintEnd_toEndOf="@+id/btnClose"
+        app:layout_constraintStart_toStartOf="@+id/tvMoney"
+        app:layout_constraintTop_toBottomOf="@+id/btnClose" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

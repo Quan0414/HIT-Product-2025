@@ -1,4 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:id="@+id/message"
+        android:icon="@drawable/inbox1"
+        android:title="Tương tác" />
+    <item
+        android:id="@+id/note"
+        android:icon="@drawable/note1"
+        android:title="Ghi chú" />
+    <item
+        android:id="@+id/home"
+        android:icon="@drawable/home1"
+        android:title="Trang chủ" />
+    <item
+        android:id="@+id/game"
+        android:icon="@drawable/game1"
+        android:title="Cặp đôi" />
+    <item
+        android:id="@+id/setting"
+        android:icon="@drawable/setting1"
+        android:title="Cài đặt" />
 
 </menu>

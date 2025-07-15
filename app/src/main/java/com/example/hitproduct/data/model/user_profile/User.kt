@@ -1,4 +1,4 @@
-package com.example.hitproduct.data.model
+package com.example.hitproduct.data.model.user_profile
 
 import com.google.gson.annotations.SerializedName
 

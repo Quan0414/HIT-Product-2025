@@ -7,6 +7,7 @@
     android:background="@drawable/bg_home"
     android:clipChildren="false"
     android:clipToPadding="false"
+    android:paddingBottom="100dp"
     tools:context=".screen.home_page.home.HomeFragment">
 
     <ImageView
@@ -44,8 +45,8 @@
         android:id="@+id/imageView2"
         android:layout_width="202dp"
         android:layout_height="28dp"
-        android:layout_marginTop="80dp"
-        android:src="@drawable/abc"
+        android:layout_marginTop="70dp"
+        android:src="@drawable/ic_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imgMoney" />
@@ -228,37 +229,70 @@
 
     <com.airbnb.lottie.LottieAnimationView
         android:id="@+id/gifCat"
-        android:layout_width="270dp"
-        android:layout_height="270dp"
+        android:layout_width="300dp"
+        android:layout_height="300dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintVertical_bias="0.58"
         app:layout_constraintTop_toTopOf="parent" />
 
     <LinearLayout
         android:id="@+id/catState"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginLeft="6dp"
-        android:layout_marginTop="-12dp"
-        android:layout_marginRight="6dp"
+        android:paddingHorizontal="12dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="@id/gifCat"
         app:layout_constraintStart_toStartOf="@+id/gifCat"
         app:layout_constraintTop_toBottomOf="@id/gifCat">
 
-        <ImageView
-            android:id="@+id/bgState1"
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:src="@drawable/bg_state_1" />
+            android:layout_height="wrap_content">
 
-        <ImageView
-            android:id="@+id/bgState2"
+            <ProgressBar
+                android:id="@+id/state1"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/bg_status_bar1" />
+
+            <ImageView
+                android:id="@+id/icon1"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="0dp"
+                android:layout_marginTop="2dp"
+                android:src="@drawable/ic_chicken" />
+        </FrameLayout>
+
+        <FrameLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="12dp"
-            android:src="@drawable/bg_state_2" />
+            android:layout_marginTop="8dp">
+
+            <ProgressBar
+                android:id="@+id/state2"
+                style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+                android:layout_width="match_parent"
+                android:layout_height="16dp"
+                android:max="1000"
+                android:layout_gravity="center_vertical"
+                android:indeterminate="false"
+                android:progressDrawable="@drawable/bg_status_bar2" />
+
+            <ImageView
+                android:id="@+id/icon2"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_vertical"
+                android:layout_marginStart="0dp"
+                android:src="@drawable/ic_heart" />
+        </FrameLayout>
 
     </LinearLayout>
 
@@ -266,9 +300,8 @@
     <ImageView
         android:id="@+id/btnFeed"
         android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:layout_marginTop="14dp"
-        android:layout_marginEnd="12dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="12dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_feed"
         app:layout_constraintBottom_toTopOf="@+id/btnMission"
@@ -279,19 +312,18 @@
     <ImageView
         android:id="@+id/btnQuestion"
         android:layout_width="wrap_content"
-        android:layout_height="44dp"
-        android:layout_marginTop="14dp"
+        android:layout_height="48dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_have_question"
         app:layout_constraintEnd_toEndOf="@id/catState"
         app:layout_constraintStart_toEndOf="@+id/btnFeed"
-        app:layout_constraintTop_toBottomOf="@+id/catState" />
+        app:layout_constraintTop_toTopOf="@+id/btnFeed" />
 
     <ImageView
         android:id="@+id/btnMission"
         android:layout_width="0dp"
-        android:layout_height="44dp"
-        android:layout_marginTop="12dp"
+        android:layout_height="48dp"
+        android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
         android:scaleType="fitXY"
         android:src="@drawable/btn_mission"

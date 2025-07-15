@@ -1,7 +1,7 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
-import com.example.hitproduct.data.model.User
+import com.example.hitproduct.data.model.CoupleData
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
@@ -10,18 +10,23 @@ import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.pet.PetData
+import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
 import retrofit2.http.Part
 import retrofit2.http.PartMap
+import retrofit2.http.Query
 
 interface ApiService {
     @POST(ApiConstants.AUTH_LOGIN)
@@ -69,5 +74,22 @@ interface ApiService {
     suspend fun getProfile(
         @Header("Authorization") bearerToken: String
     ): Response<ApiResponse<User>>
+
+    @DELETE(ApiConstants.DISCONNECT_COUPLE)
+    suspend fun disconnectCouple(
+    ): Response<ApiResponse<String>>
+
+    @GET(ApiConstants.GET_COUPLE)
+    suspend fun getCouple(
+    ): Response<ApiResponse<CoupleData>>
+
+    @GET(ApiConstants.GET_PET)
+    suspend fun getPet(
+    ): Response<ApiResponse<PetData>>
+
+    @GET(ApiConstants.GET_FOOD)
+    suspend fun getFood(
+        @Query("page") page: Int
+    ): Response<ApiResponse<FoodData>>
 
 }
