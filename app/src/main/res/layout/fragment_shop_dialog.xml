@@ -46,114 +46,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imgMoney" />
 
-    <GridLayout
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvFood"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         android:layout_marginTop="16dp"
-        android:alignmentMode="alignBounds"
-        android:columnCount="4"
-        android:rowCount="4"
-        android:useDefaultMargins="true"
         app:layout_constraintBottom_toBottomOf="@+id/imgShop"
         app:layout_constraintEnd_toEndOf="@+id/imageView3"
         app:layout_constraintStart_toStartOf="@+id/imgMoney"
-        app:layout_constraintTop_toBottomOf="@+id/imageView3" >
-
-        <!-- hàng 1 -->
-        <ImageView
-            android:id="@+id/food1"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food1"/>
-        <ImageView
-            android:id="@+id/food2"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food2"/>
-        <ImageView
-            android:id="@+id/food3"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food3"/>
-        <ImageView
-            android:id="@+id/food4"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food4"/>
-
-        <ImageView
-            android:id="@+id/food5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food5"/>
-        <ImageView
-            android:id="@+id/food6"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food6"/>
-        <ImageView
-            android:id="@+id/food7"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food7"/>
-        <ImageView
-            android:id="@+id/food8"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food8"/>
-
-        <ImageView
-            android:id="@+id/food9"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food9"/>
-        <ImageView
-            android:id="@+id/food10"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food10"/>
-        <ImageView
-            android:id="@+id/food11"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food11"/>
-        <ImageView
-            android:id="@+id/food12"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food12"/>
-
-        <ImageView
-            android:id="@+id/food13"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food13"/>
-        <ImageView
-            android:id="@+id/food14"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food14"/>
-        <ImageView
-            android:id="@+id/food15"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_columnWeight="1"
-            android:src="@drawable/ic_food15"/>
-    </GridLayout>
+        app:layout_constraintTop_toBottomOf="@+id/imageView3" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

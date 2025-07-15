@@ -1,6 +1,0 @@
-<selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <!-- active -->
-    <item android:color="@color/nav_text_active" android:state_checked="true" />
-    <!-- default (unchecked, unselected, disabled…) -->
-    <item android:color="@color/nav_text_inactive" />
-</selector>

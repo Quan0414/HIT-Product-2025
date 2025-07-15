@@ -46,12 +46,12 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:layout_marginBottom="24dp"
-            android:paddingLeft="6dp"
-            android:paddingRight="6dp"
             android:clipChildren="false"
             android:clipToPadding="false"
             android:gravity="center"
             android:orientation="horizontal"
+            android:paddingLeft="6dp"
+            android:paddingRight="6dp"
             android:weightSum="5">
 
             <!-- Tab 1: Message -->
@@ -88,15 +88,18 @@
                         android:layout_height="80dp"
                         android:src="@drawable/ic_mess_selected" />
 
-                    <TextView
+                    <com.example.hitproduct.custom.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
                         android:layout_marginTop="36dp"
                         android:fontFamily="@font/f700"
+                        android:padding="2dp"
                         android:text="Tương tác"
                         android:textColor="@color/white"
-                        android:textSize="12dp" />
+                        android:textSize="12dp"
+                        app:strokeColor="@color/borderBrown"
+                        app:strokeWidth="2dp" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -124,22 +127,25 @@
                     android:clipToPadding="false"
                     android:elevation="8dp"
                     android:translationY="-18dp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="80dp"
                         android:src="@drawable/ic_note_selected" />
 
-                    <TextView
+                    <com.example.hitproduct.custom.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
                         android:layout_marginTop="36dp"
                         android:fontFamily="@font/f700"
+                        android:padding="2dp"
                         android:text="Ghi chú"
                         android:textColor="@color/white"
-                        android:textSize="12dp" />
+                        android:textSize="12dp"
+                        app:strokeColor="@color/borderBrown"
+                        app:strokeWidth="2dp" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -167,22 +173,25 @@
                     android:clipToPadding="false"
                     android:elevation="8dp"
                     android:translationY="-18dp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="80dp"
                         android:src="@drawable/ic_home_selected" />
 
-                    <TextView
+                    <com.example.hitproduct.custom.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
                         android:layout_marginTop="36dp"
                         android:fontFamily="@font/f700"
+                        android:padding="2dp"
                         android:text="Trang chủ"
                         android:textColor="@color/white"
-                        android:textSize="12dp" />
+                        android:textSize="12dp"
+                        app:strokeColor="@color/borderBrown"
+                        app:strokeWidth="2dp" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -210,22 +219,25 @@
                     android:clipToPadding="false"
                     android:elevation="8dp"
                     android:translationY="-18dp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="80dp"
                         android:src="@drawable/ic_couple_selected" />
 
-                    <TextView
+                    <com.example.hitproduct.custom.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
                         android:layout_marginTop="36dp"
                         android:fontFamily="@font/f700"
+                        android:padding="2dp"
                         android:text="Cặp đôi"
                         android:textColor="@color/white"
-                        android:textSize="12dp" />
+                        android:textSize="12dp"
+                        app:strokeColor="@color/borderBrown"
+                        app:strokeWidth="2dp" />
                 </FrameLayout>
             </FrameLayout>
 
@@ -254,22 +266,25 @@
                     android:clipToPadding="false"
                     android:elevation="8dp"
                     android:translationY="-18dp"
-                    android:visibility="gone">
+                    android:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="80dp"
                         android:src="@drawable/ic_setting_selected" />
 
-                    <TextView
+                    <com.example.hitproduct.custom.OutlinedTextView
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_horizontal|bottom"
                         android:layout_marginTop="36dp"
                         android:fontFamily="@font/f700"
+                        android:padding="2dp"
                         android:text="Cài đặt"
                         android:textColor="@color/white"
-                        android:textSize="12dp" />
+                        android:textSize="12dp"
+                        app:strokeColor="@color/borderBrown"
+                        app:strokeWidth="2dp" />
                 </FrameLayout>
             </FrameLayout>
 

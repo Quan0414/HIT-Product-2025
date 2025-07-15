@@ -9,5 +9,8 @@
     <string name="notification_invite_sent">Bạn đã gửi 1 yêu cầu đến %1$s</string>
     <string name="notification_invite_received">%1$s đã gửi cho bạn 1 yêu cầu kết nối</string>
 
+    <string name="hunger_index_of_food">+%1$d</string>
+    <string name="happy_index_of_food">+%1$d</string>
+
 
 </resources>
