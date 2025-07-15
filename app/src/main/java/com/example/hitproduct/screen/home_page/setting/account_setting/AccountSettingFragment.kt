@@ -140,10 +140,10 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 }
 
                 UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
-                    // Cập nhật giao diện với dữ liệu người dùng
                     val user = state.data
                     // đổ data lên form
                     binding.tvName.text = user.username
@@ -163,13 +163,14 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                             .error(R.drawable.avatar_default)
                             .into(binding.imgAvatar)
                     }
+                    binding.loadingProgressBar.visibility = View.GONE
                 }
             }
         }
         viewModel.updateState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
-
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
@@ -179,6 +180,9 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                         Toast.LENGTH_SHORT
                     ).show()
                     selectedAvatarUri = null
+
+                    binding.loadingProgressBar.visibility = View.GONE
+
                 }
 
                 is UiState.Error -> {

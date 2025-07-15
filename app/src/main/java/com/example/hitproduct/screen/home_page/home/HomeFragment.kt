@@ -5,6 +5,7 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
+import android.os.Build
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,8 +15,10 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.view.doOnLayout
 import androidx.fragment.app.activityViewModels
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.RenderMode
@@ -75,7 +78,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
         binding.gifCat.visibility = View.GONE
         binding.gifCat.apply {
-            speed = 3.0f
+            speed = 1.0f
             repeatCount = LottieDrawable.INFINITE
             renderMode = RenderMode.HARDWARE
 
@@ -120,6 +123,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     override fun bindData() {
         viewModel.coupleProfile.observe(viewLifecycleOwner) { state ->
@@ -166,11 +170,11 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    val hunger = state.data.hunger
+                    val hunger = 50
                     val happiness = state.data.happiness
 
-                    updateStateBar(binding.state1, binding.icon1, 20)
-                    updateStateBar(binding.state2, binding.icon2, 100)
+                    updateStateBar(binding.state1, binding.icon1, hunger)
+                    updateStateBar(binding.state2, binding.icon2, happiness)
 
                     currentCatList = when {
                         hunger < 30 -> hungryCat
@@ -197,30 +201,31 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         return FragmentHomeBinding.inflate(inflater, container, false)
     }
 
-    // Hàm helper tính vị trí X cho icon
     private fun moveIcon(bar: ProgressBar, icon: View) {
-        // tỉ lệ fill (0..1)
-        val ratio = bar.progress.toFloat() / bar.max
+        // nếu width chưa đo xong thì defer lại
+        if (bar.width == 0 || icon.width == 0) {
+            bar.post { moveIcon(bar, icon) }
+            return
+        }
 
-        // chiều rộng thực của track
+        // phần track fill (bỏ padding)
         val trackWidth = bar.width - bar.paddingLeft - bar.paddingRight
-
-        // vị trí tâm của fill (tính từ trái FrameLayout)
+        // tỉ lệ (0f..1f)
+        val ratio = bar.progress.toFloat() / bar.max
+        // vị trí center tính từ bar.paddingLeft
         val centerX = bar.paddingLeft + ratio * trackWidth
+        // muốn icon center trùng centerX
+        val halfIcon = icon.width / 2f
+        val desired = centerX - halfIcon
 
-        // vị trí left của icon (để center icon = centerX)
-        val desiredLeft = centerX - icon.width / 2f
+        // clamp trong [0 .. trackWidth - icon.width]
+        val maxTrans = (trackWidth - icon.width).toFloat().coerceAtLeast(0f)
+        val tx = desired.coerceIn(0f, maxTrans)
 
-        // clamp left sao cho icon luôn nằm trong khung:
-        // min = 0 (góc trái), max = bar.width - icon.width (góc phải)
-        val clampedLeft = desiredLeft.coerceIn(
-            0f,
-            (bar.width - icon.width).toFloat()
-        )
-
-        // gán toạ độ
-        icon.x = clampedLeft
+        // dịch chuyển tương đối
+        icon.translationX = tx
     }
+
 
     private fun tintOnlyFill(bar: ProgressBar, @ColorRes fillColorRes: Int) {
         val color = ContextCompat.getColor(requireContext(), fillColorRes)
@@ -256,7 +261,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             tintOnlyFill(bar, colorRes)
         }
 
-        bar.post { moveIcon(bar, icon) }
+        moveIcon(bar, icon)
     }
 
 

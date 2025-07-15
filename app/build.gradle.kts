@@ -98,6 +98,7 @@ dependencies {
 
     implementation ("nl.joery.animatedbottombar:library:1.1.0")
 
+    implementation ("com.mikhaellopez:circularprogressbar:3.1.0")
 
     //banh xe lich
 //    implementation ("cn.aigestudio.wheelpicker:wheelpicker:2.1.4")

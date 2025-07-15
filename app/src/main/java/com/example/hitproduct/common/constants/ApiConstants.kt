@@ -21,7 +21,7 @@ object ApiConstants {
 
     // HOME
     const val GET_COUPLE = "api/v1/couple"
-    const val GET_PET = "api/v1/pet"
+    const val GET_PET = "api/v1/pets"
     const val EVENT_UPDATE = "api/events/update"
     const val EVENT_DELETE = "api/events/delete"
 
