@@ -23,13 +23,7 @@ object ApiConstants {
     const val GET_COUPLE = "api/v1/couple"
     const val GET_PET = "api/v1/pets"
     const val GET_FOOD = "api/v1/foods"
-    const val EVENT_DELETE = "api/events/delete"
+    const val FEED_PET = "api/v1/pets"
 
-    // Share
-    const val SHARE_GENERATE = "api/share/generate"
-
-    // Headers
-    const val HEADER_AUTH = "Authorization"
-    const val HEADER_CONTENT_JSON = "Content-Type: application/json"
 
 }

@@ -1,6 +1,7 @@
 package com.example.hitproduct.data.model.food
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class FoodData(
     val foods: List<Food>,
@@ -19,4 +20,4 @@ data class Food(
     val createdAt: String? = null,
     val updatedAt: String? = null,
     @SerializedName("__v") val v: Int? = null
-)
+) : Serializable

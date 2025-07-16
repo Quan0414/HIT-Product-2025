@@ -210,6 +210,17 @@ object SocketManager {
         }
     }
 
+    //=====================================================
+    // Nuoi pet
+
+    fun onFeedPetSuccess(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_FEED_PET_SUCCESS") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     /**
      * Kiểm tra trạng thái kết nối hiện tại
      */

@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -53,7 +54,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
         }
 
         binding.btnBack.setOnClickListener {
-            requireActivity().onBackPressedDispatcher.onBackPressed()
+            (requireActivity() as? MainActivity)?.goToHomeTab()
         }
 
         binding.btnDisconnect.setOnClickListener {

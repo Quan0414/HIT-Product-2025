@@ -7,4 +7,7 @@ object Constant {
     var languageDefault = Resources.getSystem().configuration.locales[0].language!!
     const val READ_TIME_OUT    = 30L  // thời gian chờ đọc 30 giây
     const val CONNECT_TIME_OUT = 30L  // thời gian chờ kết nối 30 giây
+
+    const val HUNGER_LOW = 35
+    const val HUNGER_MEDIUM = 70
 }

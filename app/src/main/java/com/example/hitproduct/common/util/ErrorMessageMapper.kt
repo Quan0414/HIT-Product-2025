@@ -31,6 +31,9 @@ object ErrorMessageMapper {
         val otpExprired =
             raw.contains("OTP hết hạn.", ignoreCase = true)
 
+        val petFullHUngry =
+            raw.contains("Pet của bạn đã no.", ignoreCase = true)
+
         val message = when {
 
             unauthorized ->
@@ -56,6 +59,9 @@ object ErrorMessageMapper {
 
             otpExprired ->
                 "Mã OTP hết hạn!"
+
+            petFullHUngry ->
+                "Pet của bạn đã no, không thể ăn nữa!"
 
             else ->
                 "Lỗi chưa xác định, bật logcat lên!"

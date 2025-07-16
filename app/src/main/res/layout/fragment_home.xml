@@ -54,7 +54,7 @@
     <ImageView
         android:id="@+id/bgYear"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/bg_display_days"
         app:layout_constraintEnd_toStartOf="@+id/bgMonth"
@@ -99,7 +99,7 @@
     <ImageView
         android:id="@+id/bgMonth"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/bg_display_days"
         app:layout_constraintEnd_toStartOf="@+id/bgWeek"
@@ -143,7 +143,7 @@
     <ImageView
         android:id="@+id/bgWeek"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/bg_display_days"
         app:layout_constraintEnd_toStartOf="@+id/bgDay"
@@ -186,7 +186,7 @@
     <ImageView
         android:id="@+id/bgDay"
         android:layout_width="0dp"
-        android:layout_height="44dp"
+        android:layout_height="48dp"
         android:layout_marginTop="8dp"
 
         android:src="@drawable/bg_display_days"

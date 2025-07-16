@@ -15,6 +15,8 @@ import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.pet.FeedPetData
+import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.Pet
 import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
@@ -182,6 +184,15 @@ class AuthRepository(
             }
         }
         return DataResult.Success(all)
+    }
+
+    suspend fun feedPet(foodId: String): DataResult<ApiResponse<FeedPetData>> {
+        return when (val result = getResult {
+            api.feedPet(FeedPetRequest(foodId))
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
     }
 
 

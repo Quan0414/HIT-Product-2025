@@ -11,6 +11,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -195,6 +196,16 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 else -> Unit
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as? MainActivity)?.hideBottomNav()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        (requireActivity() as? MainActivity)?.showBottomNav()
     }
 
     private fun toggleFields(enabled: Boolean) {
