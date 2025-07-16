@@ -114,6 +114,7 @@ class ShopDialogFragment : DialogFragment() {
                 is UiState.Error -> {
                     Toast.makeText(requireContext(), result.error.message, Toast.LENGTH_SHORT)
                         .show()
+                    viewModel.clearFeedPetState()
                 }
 
                 UiState.Idle -> {}
@@ -129,7 +130,6 @@ class ShopDialogFragment : DialogFragment() {
                 }
             }
         }
-
 
         viewModel.fetchFoodList()
     }

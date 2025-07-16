@@ -25,6 +25,7 @@ class ShopAdapter(
     inner class FoodViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         private val foodImg: ImageView = view.findViewById(R.id.imgFood)
         private val foodPrice: TextView = view.findViewById(R.id.tvMoney)
+        private val buyFood: ImageView = view.findViewById(R.id.iv2)
 
         fun bind(food: Food) {
             val secureUrl = food.image.replace("http://", "https://")
@@ -35,7 +36,7 @@ class ShopAdapter(
                 onImgClick(food)
             }
 
-            foodPrice.setOnClickListener {
+            buyFood.setOnClickListener {
                 onMoneyClick(food)
             }
         }

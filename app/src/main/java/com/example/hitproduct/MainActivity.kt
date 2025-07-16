@@ -7,7 +7,6 @@ import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.databinding.ActivityMainBinding
 import com.example.hitproduct.screen.home_page.game.GameFragment
@@ -46,11 +45,6 @@ class MainActivity : AppCompatActivity() {
 
         token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
         SocketManager.connect(token)
-        Toast.makeText(
-            this,
-            "Kết nối socket thành công",
-            Toast.LENGTH_SHORT
-        ).show()
 
         // Hide nav-bar + status-bar, bật immersive sticky
         window.decorView.systemUiVisibility =
@@ -139,6 +133,7 @@ class MainActivity : AppCompatActivity() {
     fun switchToTab(idx: Int) {
         selectTab(idx)
     }
+
     fun goToHomeTab() = switchToTab(2)
 
     fun hideBottomNav() {

@@ -8,6 +8,7 @@ import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
+import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -86,8 +87,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val shopDialog by lazy { ShopDialogFragment() }
 
     override fun initView() {
-
-        registerSocketListeners()
 
         binding.gifCat.visibility = View.GONE
         binding.gifCat.apply {
@@ -224,6 +223,13 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        registerSocketListeners()
+        Log.d("HomeFragment", "Socket listeners registered")
+    }
+
+
     override fun inflateLayout(
         inflater: LayoutInflater,
         container: ViewGroup?
@@ -329,7 +335,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun registerSocketListeners() {
         SocketManager.onFeedPetSuccess { data ->
-            Log.d("HomeFragment","onFeedPetSuccess fired with $data")
+            Log.d("HomeFragment", "onFeedPetSuccess fired with $data")
             val newHunger = data.optInt("hunger")
             val newHappiness = data.optInt("happiness")
             val newCoin = data.optInt("coin")
@@ -348,7 +354,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 binding.gifCat.apply {
                     removeAllAnimatorListeners()
                     setAnimation(eattingCat)
-                    repeatCount = 0
+                    repeatCount = 1
                     playAnimation()
 
                     // khi kết thúc ăn, tự chuyển sang random cat
