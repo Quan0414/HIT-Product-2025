@@ -340,40 +340,38 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val newHappiness = data.optInt("happiness")
             val newCoin = data.optInt("coin")
 
-            requireActivity().runOnUiThread {
-                updateStateBar(binding.state1, binding.icon1, newHunger)
-                updateStateBar(binding.state2, binding.icon2, newHappiness)
-                binding.tvMoney.text = newCoin.toThousandComma()
-                (activity as MainActivity).coin = newCoin
+            updateStateBar(binding.state1, binding.icon1, newHunger)
+            updateStateBar(binding.state2, binding.icon2, newHappiness)
+            binding.tvMoney.text = newCoin.toThousandComma()
+            (activity as MainActivity).coin = newCoin
 
-                currentCatList = when {
-                    newHunger < Constant.HUNGER_LOW -> hungryCat
-                    newHunger < Constant.HUNGER_MEDIUM -> normalCat
-                    else -> happyCat
-                }
-                binding.gifCat.apply {
-                    removeAllAnimatorListeners()
-                    setAnimation(eattingCat)
-                    repeatCount = 1
-                    playAnimation()
+            currentCatList = when {
+                newHunger < Constant.HUNGER_LOW -> hungryCat
+                newHunger < Constant.HUNGER_MEDIUM -> normalCat
+                else -> happyCat
+            }
+            binding.gifCat.apply {
+                removeAllAnimatorListeners()
+                setAnimation(eattingCat)
+                repeatCount = 1
+                playAnimation()
 
-                    // khi kết thúc ăn, tự chuyển sang random cat
-                    addAnimatorListener(object : AnimatorListenerAdapter() {
-                        override fun onAnimationEnd(animation: Animator) {
-                            // gỡ listener này để không lặp lại
-                            removeAnimatorListener(this)
+                // khi kết thúc ăn, tự chuyển sang random cat
+                addAnimatorListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        // gỡ listener này để không lặp lại
+                        removeAnimatorListener(this)
 
-                            // chọn 1 GIF random từ currentCatList
-                            val next = currentCatList.random()
-                            currentCat = next
+                        // chọn 1 GIF random từ currentCatList
+                        val next = currentCatList.random()
+                        currentCat = next
 
-                            // play bình thường
-                            setAnimation(next)
-                            repeatCount = LottieDrawable.INFINITE
-                            playAnimation()
-                        }
-                    })
-                }
+                        // play bình thường
+                        setAnimation(next)
+                        repeatCount = LottieDrawable.INFINITE
+                        playAnimation()
+                    }
+                })
             }
         }
     }
