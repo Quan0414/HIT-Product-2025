@@ -12,6 +12,8 @@ import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.pet.FeedPetData
+import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.PetData
 import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
@@ -91,5 +93,10 @@ interface ApiService {
     suspend fun getFood(
         @Query("page") page: Int
     ): Response<ApiResponse<FoodData>>
+
+    @POST(ApiConstants.FEED_PET)
+    suspend fun feedPet(
+        @Body request: FeedPetRequest
+    ): Response<ApiResponse<FeedPetData>>
 
 }

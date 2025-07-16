@@ -19,13 +19,14 @@ import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogShopBinding
+import com.example.hitproduct.screen.dialog.food_detail.FoodDetailDialogFragment
 
 
 class ShopDialogFragment : DialogFragment() {
     private var _binding: DialogShopBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var adapter: FoodAdapter
+    private lateinit var adapter: ShopAdapter
 
     private val prefs by lazy {
         requireContext()
@@ -71,7 +72,19 @@ class ShopDialogFragment : DialogFragment() {
         // lay coin tu home fragment
         binding.tvMoney.text = (activity as MainActivity).coin.toThousandComma()
 
-        adapter = FoodAdapter()
+        adapter = ShopAdapter(
+            mutableListOf(),
+            onImgClick = { food ->
+                FoodDetailDialogFragment.newInstance(food)
+                    .show(parentFragmentManager, "food_detail_bs")
+            },
+            onMoneyClick = { food ->
+                // khi bấm vào giá thì feed pet
+                viewModel.feedPet(food.id)
+            }
+        )
+        binding.rvFood.adapter = adapter
+
         binding.rvFood.apply {
             layoutManager = GridLayoutManager(requireContext(), 4)
             this.adapter = this@ShopDialogFragment.adapter
@@ -95,6 +108,28 @@ class ShopDialogFragment : DialogFragment() {
                 }
             }
         }
+
+        viewModel.feedPet.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is UiState.Error -> {
+                    Toast.makeText(requireContext(), result.error.message, Toast.LENGTH_SHORT)
+                        .show()
+                }
+
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    Toast.makeText(
+                        requireContext(),
+                        "Đã cho pet ăn thành công",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    viewModel.clearFeedPetState()
+                    dismiss()
+                }
+            }
+        }
+
 
         viewModel.fetchFoodList()
     }

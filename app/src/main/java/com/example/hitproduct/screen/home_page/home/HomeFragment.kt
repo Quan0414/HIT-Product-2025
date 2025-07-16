@@ -3,18 +3,19 @@ package com.example.hitproduct.screen.home_page.home
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.annotation.SuppressLint
-import android.app.AlertDialog
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
 import android.os.Build
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.ProgressBar
 import android.widget.TextView
+import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
@@ -22,6 +23,7 @@ import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
 import androidx.fragment.app.activityViewModels
+import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.RenderMode
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
@@ -32,8 +34,9 @@ import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
-import com.example.hitproduct.screen.dialog.shop.FoodAdapter
 import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
+import com.example.hitproduct.socket.SocketManager
+import com.example.hitproduct.util.Constant
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
@@ -56,6 +59,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val viewModel by activityViewModels<HomeViewModel> {
         HomeViewModelFactory(authRepo)
     }
+
 
     private val hungryCat = listOf(
         R.raw.angry_cat,
@@ -83,6 +87,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun initView() {
 
+        registerSocketListeners()
+
         binding.gifCat.visibility = View.GONE
         binding.gifCat.apply {
             speed = 1.0f
@@ -96,10 +102,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 }
             })
 
-
-            // lần đầu tiên khởi animation
             setOnClickListener {
-                // đổi cat nếu muốn
                 val next = currentCatList
                     .filter { it != currentCat }
                     .randomOrNull() ?: currentCatList.random()
@@ -197,7 +200,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    val hunger = 56
+                    val hunger = state.data.hunger
                     val happiness = state.data.happiness
 
                     updateStateBar(binding.state1, binding.icon1, hunger)
@@ -324,5 +327,49 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         popup.showAsDropDown(anchor, xOffset, yOffset)
     }
 
+    private fun registerSocketListeners() {
+        SocketManager.onFeedPetSuccess { data ->
+            Log.d("HomeFragment","onFeedPetSuccess fired with $data")
+            val newHunger = data.optInt("hunger")
+            val newHappiness = data.optInt("happiness")
+            val newCoin = data.optInt("coin")
+
+            requireActivity().runOnUiThread {
+                updateStateBar(binding.state1, binding.icon1, newHunger)
+                updateStateBar(binding.state2, binding.icon2, newHappiness)
+                binding.tvMoney.text = newCoin.toThousandComma()
+                (activity as MainActivity).coin = newCoin
+
+                currentCatList = when {
+                    newHunger < Constant.HUNGER_LOW -> hungryCat
+                    newHunger < Constant.HUNGER_MEDIUM -> normalCat
+                    else -> happyCat
+                }
+                binding.gifCat.apply {
+                    removeAllAnimatorListeners()
+                    setAnimation(eattingCat)
+                    repeatCount = 0
+                    playAnimation()
+
+                    // khi kết thúc ăn, tự chuyển sang random cat
+                    addAnimatorListener(object : AnimatorListenerAdapter() {
+                        override fun onAnimationEnd(animation: Animator) {
+                            // gỡ listener này để không lặp lại
+                            removeAnimatorListener(this)
+
+                            // chọn 1 GIF random từ currentCatList
+                            val next = currentCatList.random()
+                            currentCat = next
+
+                            // play bình thường
+                            setAnimation(next)
+                            repeatCount = LottieDrawable.INFINITE
+                            playAnimation()
+                        }
+                    })
+                }
+            }
+        }
+    }
 
 }

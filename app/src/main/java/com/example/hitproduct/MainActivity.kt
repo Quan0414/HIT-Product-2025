@@ -1,20 +1,30 @@
 package com.example.hitproduct
 
+import android.content.Context
 import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
+import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.databinding.ActivityMainBinding
 import com.example.hitproduct.screen.home_page.game.GameFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
 import com.example.hitproduct.screen.home_page.note.NoteFragment
 import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
+import com.example.hitproduct.socket.SocketManager
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val prefs by lazy {
+        getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+    private lateinit var token: String
 
     // index 0..4 tương đương Message, Note, Home, Couple(Game), Setting
     private val fragments = listOf(
@@ -33,6 +43,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+
+        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+        SocketManager.connect(token)
+        Toast.makeText(
+            this,
+            "Kết nối socket thành công",
+            Toast.LENGTH_SHORT
+        ).show()
+
+        // Hide nav-bar + status-bar, bật immersive sticky
+        window.decorView.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+
 
         // 1) Pre-add all fragments, hide trừ Home (index 2)
         supportFragmentManager.beginTransaction().apply {
@@ -109,6 +134,19 @@ class MainActivity : AppCompatActivity() {
             }.commit()
             currentIndex = idx
         }
+    }
+
+    fun switchToTab(idx: Int) {
+        selectTab(idx)
+    }
+    fun goToHomeTab() = switchToTab(2)
+
+    fun hideBottomNav() {
+        binding.bottomNavigationContainer.visibility = View.GONE
+    }
+
+    fun showBottomNav() {
+        binding.bottomNavigationContainer.visibility = View.VISIBLE
     }
 
 }

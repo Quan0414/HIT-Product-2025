@@ -7,12 +7,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.model.CoupleProfile
+import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.pet.Pet
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
 class HomeViewModel(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
 ) : ViewModel() {
 
     private val _coupleProfile = MutableLiveData<UiState<CoupleProfile>>(UiState.Idle)
@@ -21,6 +22,8 @@ class HomeViewModel(
     private val _pet = MutableLiveData<UiState<Pet>>(UiState.Idle)
     val pet: LiveData<UiState<Pet>> = _pet
 
+
+
     fun getCoupleProfile() {
         _coupleProfile.value = UiState.Loading
         viewModelScope.launch {
@@ -28,6 +31,7 @@ class HomeViewModel(
                 is DataResult.Success -> {
                     _coupleProfile.value = UiState.Success(result.data)
                 }
+
                 is DataResult.Error -> {
                     _coupleProfile.value = UiState.Error(result.error)
                 }
@@ -42,10 +46,13 @@ class HomeViewModel(
                 is DataResult.Success -> {
                     _pet.value = UiState.Success(result.data)
                 }
+
                 is DataResult.Error -> {
                     _pet.value = UiState.Error(result.error)
                 }
             }
         }
     }
+
+
 }

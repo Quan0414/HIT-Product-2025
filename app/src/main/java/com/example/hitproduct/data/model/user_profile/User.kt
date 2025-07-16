@@ -1,6 +1,7 @@
 package com.example.hitproduct.data.model.user_profile
 
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
 data class User(
     @SerializedName("_id")       val id: String,
@@ -22,8 +23,8 @@ data class User(
     val lastName: String,
     val nickname: String,
     @SerializedName("coupleId")
-    val couple: Couple?          // null nếu chưa ghép đôi, hoặc object khi đã ghép
-)
+    val couple: Couple?
+): Serializable
 
 data class Couple(
     @SerializedName("_id")     val id: String,

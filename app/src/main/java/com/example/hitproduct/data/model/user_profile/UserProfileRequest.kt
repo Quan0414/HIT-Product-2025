@@ -1,4 +1,4 @@
-package com.example.hitproduct.common.util
+package com.example.hitproduct.data.model.user_profile
 
 import android.content.Context
 import android.net.Uri

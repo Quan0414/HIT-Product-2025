@@ -9,9 +9,12 @@ import com.bumptech.glide.Glide
 import com.example.hitproduct.R
 import com.example.hitproduct.data.model.food.Food
 
-class FoodAdapter(
-    private val items: MutableList<Food> = mutableListOf()
-) : RecyclerView.Adapter<FoodAdapter.FoodViewHolder>() {
+class ShopAdapter(
+    private val items: MutableList<Food> = mutableListOf(),
+    private val onImgClick: (Food) -> Unit,
+    private val onMoneyClick: (Food) -> Unit
+
+) : RecyclerView.Adapter<ShopAdapter.FoodViewHolder>() {
 
     fun submitList(list: List<Food>) {
         items.clear()
@@ -29,11 +32,11 @@ class FoodAdapter(
             foodPrice.text = food.price.toString()
 
             foodImg.setOnClickListener {
-                // Handle food item click if needed
+                onImgClick(food)
             }
 
             foodPrice.setOnClickListener {
-                // Handle food price click if needed
+                onMoneyClick(food)
             }
         }
 
