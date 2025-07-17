@@ -53,9 +53,9 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                 .commit()
         }
 
-        binding.btnBack.setOnClickListener {
-            (requireActivity() as? MainActivity)?.goToHomeTab()
-        }
+//        binding.btnBack.setOnClickListener {
+//            (requireActivity() as? MainActivity)?.goToHomeTab()
+//        }
 
         binding.btnDisconnect.setOnClickListener {
             DialogDisconnectFragment {

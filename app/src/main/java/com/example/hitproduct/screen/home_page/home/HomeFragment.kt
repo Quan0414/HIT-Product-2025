@@ -2,6 +2,7 @@ package com.example.hitproduct.screen.home_page.home
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
@@ -340,8 +341,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val newHappiness = data.optInt("happiness")
             val newCoin = data.optInt("coin")
 
-            updateStateBar(binding.state1, binding.icon1, newHunger)
-            updateStateBar(binding.state2, binding.icon2, newHappiness)
+            animateStateChange(binding.state1, binding.icon1, newHunger)
+            animateStateChange(binding.state2, binding.icon2, newHappiness)
             binding.tvMoney.text = newCoin.toThousandComma()
             (activity as MainActivity).coin = newCoin
 
@@ -351,6 +352,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 else -> happyCat
             }
             binding.gifCat.apply {
+                isClickable = false
                 removeAllAnimatorListeners()
                 setAnimation(eattingCat)
                 repeatCount = 1
@@ -361,6 +363,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     override fun onAnimationEnd(animation: Animator) {
                         // gỡ listener này để không lặp lại
                         removeAnimatorListener(this)
+                        isClickable = true
 
                         // chọn 1 GIF random từ currentCatList
                         val next = currentCatList.random()
@@ -375,5 +378,26 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
         }
     }
+
+    // Trong HomeFragment thêm hàm này:
+    private fun animateStateChange(
+        bar: ProgressBar,
+        icon: View,
+        newValue: Int,
+        duration: Long = 800L    // thời gian animation (ms)
+    ) {
+        val oldValue = bar.progress
+        ValueAnimator.ofInt(oldValue, newValue).apply {
+            this.duration = duration
+            addUpdateListener { anim ->
+                val v = anim.animatedValue as Int
+                bar.progress = v
+                // di chuyển icon theo progress
+                moveIcon(bar, icon)
+            }
+            start()
+        }
+    }
+
 
 }
