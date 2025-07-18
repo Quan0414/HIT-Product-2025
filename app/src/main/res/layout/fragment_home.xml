@@ -258,6 +258,7 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center_vertical"
                 android:indeterminate="false"
+                android:max="1000"
                 android:progressDrawable="@drawable/bg_status_bar1" />
 
             <ImageView

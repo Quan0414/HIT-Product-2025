@@ -37,6 +37,7 @@ class MainActivity : AppCompatActivity() {
 
 
     var coin: Int = 0
+    var question: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

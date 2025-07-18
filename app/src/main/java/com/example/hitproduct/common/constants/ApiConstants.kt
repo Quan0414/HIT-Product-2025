@@ -24,6 +24,9 @@ object ApiConstants {
     const val GET_PET = "api/v1/pets"
     const val GET_FOOD = "api/v1/foods"
     const val FEED_PET = "api/v1/pets"
+    const val GET_DAILY_QUESTION = "api/v1/question/daily"
+    const val SAVE_ANSWER_DAILY_QUESTION = "api/v1/question/daily"
+    const val GET_YOUR_LOVE_DAILY_QUESTION = "api/v1/question/daily/feedback"
 
 
 }

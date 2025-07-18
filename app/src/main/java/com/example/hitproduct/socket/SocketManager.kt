@@ -213,8 +213,17 @@ object SocketManager {
     //=====================================================
     // Nuoi pet
 
+    //Listener
     fun onFeedPetSuccess(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_FEED_PET_SUCCESS") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    fun onDecreaseHunger(listener: (data: JSONObject) -> Unit) {
+        socket.on("PET_DECREASE_HUNGER") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
                 Handler(Looper.getMainLooper()).post { listener(data) }
             }

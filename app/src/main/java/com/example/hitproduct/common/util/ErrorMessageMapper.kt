@@ -34,6 +34,11 @@ object ErrorMessageMapper {
         val petFullHUngry =
             raw.contains("Pet của bạn đã no.", ignoreCase = true)
 
+        val answer_question_error1 =
+            raw.contains("Câu trả lời không được để trống.", ignoreCase = true)
+        val answer_question_error2 =
+            raw.contains("Bạn đã trả lời rồi.", ignoreCase = true)
+
         val message = when {
 
             unauthorized ->
@@ -62,6 +67,12 @@ object ErrorMessageMapper {
 
             petFullHUngry ->
                 "Pet của bạn đã no, không thể ăn nữa!"
+
+            answer_question_error1 ->
+                "Câu trả lời không được để trống!"
+
+            answer_question_error2 ->
+                "Bút sa gà chết!"
 
             else ->
                 "Lỗi chưa xác định, bật logcat lên!"
