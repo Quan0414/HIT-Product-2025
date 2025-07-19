@@ -38,6 +38,9 @@ object ErrorMessageMapper {
             raw.contains("Câu trả lời không được để trống.", ignoreCase = true)
         val answer_question_error2 =
             raw.contains("Bạn đã trả lời rồi.", ignoreCase = true)
+        val answer_question_error3 =
+            raw.contains("Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy.", ignoreCase = true)
+
 
         val message = when {
 
@@ -72,7 +75,10 @@ object ErrorMessageMapper {
                 "Câu trả lời không được để trống!"
 
             answer_question_error2 ->
-                "Bút sa gà chết!"
+                "Bạn đã trả lời rồi."
+
+            answer_question_error3 ->
+                "Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy!"
 
             else ->
                 "Lỗi chưa xác định, bật logcat lên!"

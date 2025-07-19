@@ -92,6 +92,8 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                     Toast.makeText(
                         requireContext(), state.error.message, Toast.LENGTH_SHORT
                     ).show()
+                    viewModel.resetSaveQuestionState()
+
                 }
 
                 UiState.Idle -> {}
@@ -106,7 +108,36 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
             }
         }
 
-        viewModel.resetSaveQuestionState()
+        viewModel.yourLoveAnswer.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    if (state.data.partnerAnswer == null) {
+                        Toast.makeText(
+                            requireContext(),
+                            "Cậu ấy chưa trả lời câu hỏi này!",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        return@observe
+                    }
+                    val answer = state.data.partnerAnswer ?: "(Trống)"
+                    (activity as MainActivity).yourLoveAnswer = answer
+                    val dialog = YourLoveAnswerDialogFragment()
+                    dialog.show(parentFragmentManager, "YourLoveAnswerDialogFragment")
+//                    viewModel.resetYourLoveAnswerState()
+                }
+            }
+        }
+
 
         binding.btnSaveAnswer.setOnClickListener {
             val answer = binding.outlinedEditText.text.toString().trim()
@@ -115,8 +146,7 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
         }
 
         binding.btnCheckQuestion.setOnClickListener {
-            val dialog = YourLoveAnswerDialogFragment()
-            dialog.show(parentFragmentManager, "YourLoveAnswerDialogFragment")
+            viewModel.fetchYourLoveAnswer()
         }
 
         binding.btnClose.setOnClickListener {

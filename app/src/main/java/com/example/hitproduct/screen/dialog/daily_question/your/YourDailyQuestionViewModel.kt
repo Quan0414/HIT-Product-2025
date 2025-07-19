@@ -9,6 +9,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerResponse
+import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
@@ -22,7 +23,8 @@ class YourDailyQuestionViewModel(
     private val _saveDailyQuestion = MutableLiveData<UiState<ApiResponse<SaveAnswerResponse>>>(UiState.Idle)
     val saveDailyQuestion: LiveData<UiState<ApiResponse<SaveAnswerResponse>>> = _saveDailyQuestion
 
-
+    private val _yourLoveAnswer = MutableLiveData<UiState<GetYourLoveAnswerResponse>>(UiState.Idle)
+    val yourLoveAnswer: LiveData<UiState<GetYourLoveAnswerResponse>> = _yourLoveAnswer
 
     fun fetchDailyQuestion() {
         viewModelScope.launch {
@@ -57,5 +59,23 @@ class YourDailyQuestionViewModel(
 
     fun resetSaveQuestionState() {
         _saveDailyQuestion.value = UiState.Idle
+    }
+
+    fun fetchYourLoveAnswer() {
+        _yourLoveAnswer.value = UiState.Loading
+        viewModelScope.launch {
+            when (val result = authRepository.getYourLoveAnswer()) {
+                is DataResult.Error -> {
+                    _yourLoveAnswer.value = UiState.Error(result.error)
+                }
+
+                is DataResult.Success -> {
+                    _yourLoveAnswer.value = UiState.Success(result.data.data)
+                }
+            }
+        }
+    }
+    fun resetYourLoveAnswerState() {
+        _yourLoveAnswer.value = UiState.Idle
     }
 }
