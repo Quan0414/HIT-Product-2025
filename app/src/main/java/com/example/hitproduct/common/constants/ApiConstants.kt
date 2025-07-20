@@ -28,5 +28,8 @@ object ApiConstants {
     const val SAVE_ANSWER_DAILY_QUESTION = "api/v1/question/daily"
     const val GET_YOUR_LOVE_DAILY_QUESTION = "api/v1/question/daily/feedback"
 
+    //NOTE
+    const val GET_NOTES = "api/v1/notes"
+    const val CREATE_NOTE = "api/v1/notes"
 
 }

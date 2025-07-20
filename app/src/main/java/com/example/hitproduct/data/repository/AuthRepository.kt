@@ -19,6 +19,7 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.note.NoteResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.Pet
@@ -224,6 +225,13 @@ class AuthRepository(
         return when (val result = getResult {
             api.getYourLoveDailyQuestion()
         }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun fetchNote(): DataResult<ApiResponse<NoteResponse>> {
+        return when (val result = getResult { api.getNotes() }) {
             is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }

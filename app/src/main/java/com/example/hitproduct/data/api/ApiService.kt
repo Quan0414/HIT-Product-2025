@@ -16,6 +16,7 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.note.NoteResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.PetData
@@ -70,7 +71,6 @@ interface ApiService {
         @Part avatar: MultipartBody.Part?
     ): Response<ApiResponse<UserProfileResponse>>
 
-
     @GET(ApiConstants.CHECK_INVITE)
     suspend fun checkInvite(
         @Header("Authorization") token: String
@@ -116,4 +116,7 @@ interface ApiService {
     suspend fun getYourLoveDailyQuestion(
     ): Response<ApiResponse<GetYourLoveAnswerResponse>>
 
+    @GET(ApiConstants.GET_NOTES)
+    suspend fun getNotes(
+    ): Response<ApiResponse<NoteResponse>>
 }

@@ -1,14 +1,23 @@
-package com.example.hitproduct.screen.home_page.note
+package com.example.hitproduct.screen.home_page.calendar
 
+import android.content.Context
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.fragment.app.activityViewModels
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.OutlinedTextView
+import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.data.model.note.Note
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentNoteBinding
+import com.example.hitproduct.screen.dialog.note.DialogNote
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -17,19 +26,40 @@ import com.kizitonwose.calendar.view.MonthDayBinder
 import com.kizitonwose.calendar.view.MonthHeaderFooterBinder
 import com.kizitonwose.calendar.view.ViewContainer
 import java.time.DayOfWeek
+import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
 
 class NoteFragment : BaseFragment<FragmentNoteBinding>() {
 
+    private val prefs by lazy {
+        requireContext().getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val authRepo by lazy {
+        AuthRepository(
+            NetworkClient.provideApiService(requireContext()),
+            prefs
+        )
+    }
+
+    private val viewModel by activityViewModels<NoteViewModel> {
+        NoteViewModelFactory(authRepo)
+    }
+
+    private var allNotes: List<Note> = emptyList()
+
+    private var noteDates: Set<LocalDate> = emptySet()
     private var selectedDate: LocalDate? = null
+    private val today = LocalDate.now()
 
     override fun initView() {
         setupCalendar()
+        viewModel.fetchNotes()
     }
 
     private fun setupCalendar() {
-        // Setup calendar range
         val currentMonth = YearMonth.now()
         val startMonth = currentMonth.minusMonths(100)
         val endMonth = currentMonth.plusMonths(100)
@@ -46,6 +76,11 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 container.day = data
                 container.tvDay.text = String.format("%02d", data.date.dayOfMonth)
 
+                container.ivNote.visibility = if (
+                    data.position == DayPosition.MonthDate
+                    && noteDates.contains(data.date)
+                ) View.VISIBLE else View.INVISIBLE
+
                 // Set callback for date clicks
                 container.onDateClickListener = { date ->
                     onDateClicked(date)
@@ -54,19 +89,21 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 when (data.position) {
                     DayPosition.MonthDate -> {
                         // Ngày trong tháng hiện tại
-                        container.tvDay.visibility = View.VISIBLE
-
-                        // Hiển thị selection nếu là ngày được chọn
-//                        if (data.date == selectedDate) {
-//                            container.ivCalendarIcon.setBackgroundResource(R.drawable.bg_item_day_selector)
-//                        } else {
-//                            container.ivCalendarIcon.setBackgroundResource(R.drawable.bg_item_day)
-//                        }
+                        container.tvDay.apply {
+                            visibility = View.VISIBLE
+                            val bgRes = when {
+                                data.date == selectedDate -> R.drawable.bg_item_day_selector
+                                data.date == today -> R.drawable.bg_item_day_selector
+                                else -> R.drawable.bg_item_day
+                            }
+                            setBackgroundResource(bgRes)
+                        }
                     }
 
                     DayPosition.InDate -> {
                         container.itemDay.visibility = View.INVISIBLE
                     }
+
                     DayPosition.OutDate -> {
                         container.itemDay.visibility = View.INVISIBLE
                     }
@@ -127,27 +164,21 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
     }
 
     private fun onDateClicked(date: LocalDate) {
-        // Cập nhật selected date
-        val currentSelection = selectedDate
-        if (currentSelection == date) {
-            // Nếu click vào ngày đã chọn thì bỏ chọn
-            selectedDate = null
-            binding.cvCalendar.notifyDateChanged(currentSelection)
-        } else {
-            selectedDate = date
-            binding.cvCalendar.notifyDateChanged(date)
-            if (currentSelection != null) {
-                binding.cvCalendar.notifyDateChanged(currentSelection)
-            }
+        val notesForDate = allNotes.filter { note ->
+            Instant.parse(note.date)
+                .atZone(ZoneId.systemDefault())
+                .toLocalDate() == date
         }
+        // Show dialog với list đã filter
+        DialogNote.newInstance(notesForDate)
+            .show(childFragmentManager, "dialog_note")
 
         // Handle date selection
         handleDateSelection(date)
     }
 
     private fun handleDateSelection(date: LocalDate) {
-        // Implement logic khi user chọn một ngày
-        // Ví dụ: hiển thị notes cho ngày đó, mở editor, etc.
+        //mo dialog
     }
 
     override fun initListener() {
@@ -163,7 +194,25 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
     }
 
     override fun bindData() {
-        // Bind data nếu cần
+        viewModel.notes.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {
+                    Log.e("NoteFragment", "Error fetching notes: ${state.error}")
+                }
+
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    allNotes = state.data
+                    noteDates = state.data.map { note ->
+                        Instant.parse(note.date)
+                            .atZone(ZoneId.systemDefault())
+                            .toLocalDate()
+                    }.toSet()
+                    binding.cvCalendar.notifyCalendarChanged()
+                }
+            }
+        }
     }
 
     override fun inflateLayout(

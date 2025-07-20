@@ -6,13 +6,13 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_login"
     android:paddingHorizontal="16dp"
-    tools:context=".screen.home_page.note.NoteFragment">
+    tools:context=".screen.home_page.calendar.NoteFragment">
 
     <ImageView
         android:id="@+id/ivCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="60dp"
+        android:layout_marginTop="80dp"
         android:adjustViewBounds="true"
         android:src="@drawable/tv_calendar"
         app:layout_constraintEnd_toEndOf="parent"
@@ -23,7 +23,7 @@
         android:id="@+id/bgCalendar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="28dp"
         android:adjustViewBounds="true"
         android:src="@drawable/bg_calendar"
         app:layout_constraintEnd_toEndOf="parent"
