@@ -2,6 +2,7 @@ package com.example.hitproduct.common.util
 
 data class MappedError(
     val message: String,
+    val tokenExpired: Boolean = false,
     val accountExits: Boolean = false,
     val emailError: Boolean = false,
     val passwordError: Boolean = false,
@@ -12,6 +13,7 @@ data class MappedError(
 object ErrorMessageMapper {
     fun fromBackend(raw: String): MappedError {
 
+        val tokenExpired = raw.contains("token hết hạn!", ignoreCase = true)
 
         val emailError = raw.contains("must be a valid email", ignoreCase = true)
         val passwordError = raw.contains(
@@ -89,6 +91,7 @@ object ErrorMessageMapper {
         val otpFlag = otpError || otpExprired
 
         return MappedError(
+            tokenExpired = tokenExpired,
             accountExits = accountExits,
             message = message,
             emailError = emailErrorFlag,

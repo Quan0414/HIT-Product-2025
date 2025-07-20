@@ -12,11 +12,11 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.lifecycleScope
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
+import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
-import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import kotlinx.coroutines.launch
 
@@ -75,11 +75,26 @@ class SplashActivity : AppCompatActivity() {
                         }
                         finish()
                     }
+
                     is DataResult.Error -> {
                         // Lỗi (hết session, mạng…) → xoá token, về Login
-                        prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
-                        startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
-                        finish()
+                        if (res.error.tokenExpired) {
+                            prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
+                            startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                            finish()
+                            Toast.makeText(
+                                this@SplashActivity,
+                                "Phiên đã hết hạn, vui lòng đăng nhập lại.",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            // Lỗi khác, có thể do mạng, thông báo lỗi
+                            Toast.makeText(
+                                this@SplashActivity,
+                                "Lỗi: ${res.error.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }

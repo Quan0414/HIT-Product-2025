@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="AppTheme" parent="Theme.MaterialComponents.Light.NoActionBar">
+        <!-- nếu bạn muốn tắt luôn Force Dark trên Android 10+ -->
+        <item name="android:forceDarkAllowed">false</item>
+    </style>
+</resources>

@@ -57,11 +57,11 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                         container.tvDay.visibility = View.VISIBLE
 
                         // Hiển thị selection nếu là ngày được chọn
-                        if (data.date == selectedDate) {
-                            container.tvDay.setBackgroundResource(R.drawable.bg_btn_option2)
-                        } else {
-                            container.tvDay.background = null
-                        }
+//                        if (data.date == selectedDate) {
+//                            container.ivCalendarIcon.setBackgroundResource(R.drawable.bg_item_day_selector)
+//                        } else {
+//                            container.ivCalendarIcon.setBackgroundResource(R.drawable.bg_item_day)
+//                        }
                     }
 
                     DayPosition.InDate -> {
@@ -107,7 +107,6 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
 
     class DayContainer(view: View) : ViewContainer(view) {
         val itemDay = view.findViewById<View>(R.id.itemCalendarDay)
-        val ivCalendarIcon = view.findViewById<ImageView>(R.id.ivCalendarIcon)
         val tvDay = view.findViewById<OutlinedTextView>(R.id.tvDay)
         val ivNote = view.findViewById<ImageView>(R.id.ivNote)
 

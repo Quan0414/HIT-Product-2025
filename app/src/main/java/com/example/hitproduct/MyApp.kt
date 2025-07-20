@@ -1,12 +1,12 @@
 package com.example.hitproduct
 
 import android.app.Application
-import android.widget.Toast
-import com.example.hitproduct.socket.SocketManager
+import androidx.appcompat.app.AppCompatDelegate
 
 class MyApp : Application() {
     private lateinit var token: String
     override fun onCreate() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate()
 
 //        // 1) Kết nối socket
