@@ -9,7 +9,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.hitproduct"
-        minSdk = 24
+        minSdk = 26
         targetSdk = 35
         versionCode = 1
         versionName = "1.0"
@@ -100,6 +100,9 @@ dependencies {
 
     implementation ("com.mikhaellopez:circularprogressbar:3.1.0")
 
+    implementation("com.github.kizitonwose:CalendarView:2.2.0")
+
+//    implementation ("com.github.santaevpavel:OutlineSpan:0.1.1")
     //banh xe lich
 //    implementation ("cn.aigestudio.wheelpicker:wheelpicker:2.1.4")
 

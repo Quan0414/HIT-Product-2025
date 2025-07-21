@@ -1,7 +1,6 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
-import com.example.hitproduct.data.model.CoupleData
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
@@ -10,8 +9,14 @@ import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.CoupleData
+import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
+import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
+import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerResponse
+import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.note.NoteResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.PetData
@@ -66,7 +71,6 @@ interface ApiService {
         @Part avatar: MultipartBody.Part?
     ): Response<ApiResponse<UserProfileResponse>>
 
-
     @GET(ApiConstants.CHECK_INVITE)
     suspend fun checkInvite(
         @Header("Authorization") token: String
@@ -99,4 +103,20 @@ interface ApiService {
         @Body request: FeedPetRequest
     ): Response<ApiResponse<FeedPetData>>
 
+    @GET(ApiConstants.GET_DAILY_QUESTION)
+    suspend fun getDailyQuestion(
+    ): Response<ApiResponse<DailyQuestionResponse>>
+
+    @POST(ApiConstants.SAVE_ANSWER_DAILY_QUESTION)
+    suspend fun saveAnswerDailyQuestion(
+        @Body request: SaveAnswerRequest
+    ): Response<ApiResponse<SaveAnswerResponse>>
+
+    @GET(ApiConstants.GET_YOUR_LOVE_DAILY_QUESTION)
+    suspend fun getYourLoveDailyQuestion(
+    ): Response<ApiResponse<GetYourLoveAnswerResponse>>
+
+    @GET(ApiConstants.GET_NOTES)
+    suspend fun getNotes(
+    ): Response<ApiResponse<NoteResponse>>
 }

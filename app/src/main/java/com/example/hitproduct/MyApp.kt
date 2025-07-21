@@ -1,15 +1,20 @@
 package com.example.hitproduct
 
 import android.app.Application
-import android.widget.Toast
-import com.example.hitproduct.socket.SocketManager
+import androidx.appcompat.app.AppCompatDelegate
 
 class MyApp : Application() {
+    private lateinit var token: String
     override fun onCreate() {
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         super.onCreate()
 
 //        // 1) Kết nối socket
-//        SocketManager.connect()
+//        token = getSharedPreferences(
+//            "auth_prefs",
+//            MODE_PRIVATE
+//        ).getString("access_token", "").orEmpty()
+//        SocketManager.connect(token)
 //
 //        // 2) Đăng ký lắng nghe connect thành công, và show Toast ở đây
 //        SocketManager.onConnected {

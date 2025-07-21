@@ -2,6 +2,7 @@ package com.example.hitproduct.screen.home_page.home
 
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
@@ -16,7 +17,6 @@ import android.view.ViewGroup
 import android.widget.PopupWindow
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
@@ -35,6 +35,7 @@ import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
+import com.example.hitproduct.screen.dialog.daily_question.your.YourDailyQuestionDialogFragment
 import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
 import com.example.hitproduct.socket.SocketManager
 import com.example.hitproduct.util.Constant
@@ -85,6 +86,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private var currentCat: Int? = null
 
     private val shopDialog by lazy { ShopDialogFragment() }
+    private val questionDialog by lazy { YourDailyQuestionDialogFragment() }
 
     override fun initView() {
 
@@ -116,19 +118,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun initListener() {
         binding.icon1.setOnClickListener {
-            val value = "${binding.state1.progress}/${binding.state1.max}"
+            val value = "${binding.state1.progress / 10}/${binding.state1.max / 10}"
             showTooltip(
                 it, value,
-                R.layout.tooltip,         // layout cũ của state1
-                R.id.popup_state1         // id TextView trong tooltip.xml
+                R.layout.tooltip,
+                R.id.popup_state1
             )
         }
         binding.icon2.setOnClickListener {
             val value = "${binding.state2.progress}/${binding.state2.max}"
             showTooltip(
                 it, value,
-                R.layout.tooltip2,   // layout mới cho state2
-                R.id.popup_state2         // id TextView trong tooltip_happy.xml
+                R.layout.tooltip2,
+                R.id.popup_state2
             )
         }
 
@@ -137,6 +139,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 shopDialog.show(childFragmentManager, "shop")
             } else {
                 shopDialog.dialog?.show()
+            }
+        }
+
+        binding.btnQuestion.setOnClickListener {
+            if (!questionDialog.isAdded) {
+                questionDialog.show(childFragmentManager, "question")
+            } else {
+                questionDialog.dialog?.show()
             }
         }
     }
@@ -202,12 +212,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     val hunger = state.data.hunger
                     val happiness = state.data.happiness
 
-                    updateStateBar(binding.state1, binding.icon1, hunger)
+                    updateStateBar(binding.state1, binding.icon1, hunger * 10)
                     updateStateBar(binding.state2, binding.icon2, happiness)
 
                     currentCatList = when {
-                        hunger < 35 -> hungryCat
-                        hunger < 70 -> normalCat
+                        hunger < Constant.HUNGER_LOW -> hungryCat
+                        hunger < Constant.HUNGER_MEDIUM -> normalCat
                         else -> happyCat
                     }
 
@@ -221,6 +231,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 }
             }
         }
+
+
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -340,8 +352,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             val newHappiness = data.optInt("happiness")
             val newCoin = data.optInt("coin")
 
-            updateStateBar(binding.state1, binding.icon1, newHunger)
-            updateStateBar(binding.state2, binding.icon2, newHappiness)
+            animateStateChange(binding.state1, binding.icon1, newHunger * 10)
+            animateStateChange(binding.state2, binding.icon2, newHappiness)
             binding.tvMoney.text = newCoin.toThousandComma()
             (activity as MainActivity).coin = newCoin
 
@@ -351,6 +363,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 else -> happyCat
             }
             binding.gifCat.apply {
+                isClickable = false
                 removeAllAnimatorListeners()
                 setAnimation(eattingCat)
                 repeatCount = 1
@@ -361,6 +374,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     override fun onAnimationEnd(animation: Animator) {
                         // gỡ listener này để không lặp lại
                         removeAnimatorListener(this)
+                        isClickable = true
 
                         // chọn 1 GIF random từ currentCatList
                         val next = currentCatList.random()
@@ -374,6 +388,37 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 })
             }
         }
+
+        SocketManager.onDecreaseHunger { data ->
+            Log.d("HomeFragment", "onDecreaseHunger fired with $data")
+            val newHunger = data.optInt("hunger")
+            animateStateChange(binding.state1, binding.icon1, newHunger * 10)
+            currentCatList = when {
+                newHunger < Constant.HUNGER_LOW -> hungryCat
+                newHunger < Constant.HUNGER_MEDIUM -> normalCat
+                else -> happyCat
+            }
+        }
     }
+
+    private fun animateStateChange(
+        bar: ProgressBar,
+        icon: View,
+        newValue: Int,
+        duration: Long = 800L    // thời gian animation (ms)
+    ) {
+        val oldValue = bar.progress
+        ValueAnimator.ofInt(oldValue, newValue).apply {
+            this.duration = duration
+            addUpdateListener { anim ->
+                val v = anim.animatedValue as Int
+                bar.progress = v
+                // di chuyển icon theo progress
+                moveIcon(bar, icon)
+            }
+            start()
+        }
+    }
+
 
 }

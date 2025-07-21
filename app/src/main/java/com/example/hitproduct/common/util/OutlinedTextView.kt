@@ -15,45 +15,51 @@ class OutlinedTextView @JvmOverloads constructor(
     defStyleAttr: Int = 0
 ) : AppCompatTextView(context, attrs, defStyleAttr) {
 
-    private val strokePaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.STROKE
-    }
-    private val fillPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
-        style = Paint.Style.FILL
-    }
+    private var strokeColor: Int = Color.BLACK
+    private var strokeWidth: Float = 4f
+    private var fillColor: Int = currentTextColor
 
     init {
         attrs?.let {
             val a = context.obtainStyledAttributes(it, R.styleable.OutlinedTextView)
-            strokePaint.color = a.getColor(
+            strokeColor = a.getColor(
                 R.styleable.OutlinedTextView_strokeColor,
-                Color.BLACK
+                strokeColor
             )
-            strokePaint.strokeWidth = a.getDimension(
+            strokeWidth = a.getDimension(
                 R.styleable.OutlinedTextView_strokeWidth,
-                4f
+                strokeWidth
             )
-            fillPaint.color = a.getColor(
+            fillColor = a.getColor(
                 R.styleable.OutlinedTextView_fillColor,
-                currentTextColor
+                fillColor
             )
             a.recycle()
         }
     }
 
     override fun onDraw(canvas: Canvas) {
-        val x = compoundPaddingLeft.toFloat()
-        val y = baseline.toFloat()
+        // lưu lại trạng thái paint và color gốc
+        val originalPaint = paint
+        val originalStyle = originalPaint.style
+        val originalStrokeWidth = originalPaint.strokeWidth
+        val originalTextColor = currentTextColor
 
-        strokePaint.textSize = textSize
-        strokePaint.typeface = typeface
-        strokePaint.letterSpacing = letterSpacing
+        // Vẽ outline
+        originalPaint.style = Paint.Style.STROKE
+        originalPaint.strokeWidth = strokeWidth
+        setTextColor(strokeColor)
+        super.onDraw(canvas)
 
-        fillPaint.textSize = textSize
-        fillPaint.typeface = typeface
-        fillPaint.letterSpacing = letterSpacing
+        // Vẽ fill
+        originalPaint.style = Paint.Style.FILL
+        originalPaint.strokeWidth = originalStrokeWidth
+        setTextColor(fillColor)
+        super.onDraw(canvas)
 
-        canvas.drawText(text.toString(), x, y, strokePaint)
-        canvas.drawText(text.toString(), x, y, fillPaint)
+        // Khôi phục paint và color ban đầu
+//        originalPaint.style = originalStyle
+//        originalPaint.strokeWidth = originalStrokeWidth
+        setTextColor(originalTextColor)
     }
 }

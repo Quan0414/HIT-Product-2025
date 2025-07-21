@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.model.CoupleProfile
-import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.CoupleProfile
+import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
 import com.example.hitproduct.data.model.pet.Pet
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -21,8 +21,6 @@ class HomeViewModel(
 
     private val _pet = MutableLiveData<UiState<Pet>>(UiState.Idle)
     val pet: LiveData<UiState<Pet>> = _pet
-
-
 
     fun getCoupleProfile() {
         _coupleProfile.value = UiState.Loading
@@ -53,6 +51,5 @@ class HomeViewModel(
             }
         }
     }
-
 
 }

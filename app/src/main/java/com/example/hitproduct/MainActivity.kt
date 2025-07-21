@@ -5,14 +5,13 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.databinding.ActivityMainBinding
 import com.example.hitproduct.screen.home_page.game.GameFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
-import com.example.hitproduct.screen.home_page.note.NoteFragment
+import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
 import com.example.hitproduct.socket.SocketManager
 
@@ -37,6 +36,9 @@ class MainActivity : AppCompatActivity() {
 
 
     var coin: Int = 0
+    var question: String = ""
+    var yourAnswer: String = ""
+    var yourLoveAnswer: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

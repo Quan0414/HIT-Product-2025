@@ -5,7 +5,6 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.model.CoupleProfile
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
@@ -13,8 +12,14 @@ import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.CoupleProfile
+import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
+import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
+import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerResponse
+import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.note.NoteResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.Pet
@@ -178,6 +183,7 @@ class AuthRepository(
                     totalPages = body.totalPages       // cập nhật tổng số trang
                     page++                             // chuyển trang
                 }
+
                 is DataResult.Error -> {
                     return res
                 }
@@ -195,6 +201,41 @@ class AuthRepository(
         }
     }
 
+    suspend fun getDailyQuestion(): DataResult<ApiResponse<DailyQuestionResponse>> {
+        return when (val result = getResult { api.getDailyQuestion() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun saveDailyQuestion(
+        answer: String
+    ): DataResult<ApiResponse<SaveAnswerResponse>> {
+        return when (val result = getResult {
+            api.saveAnswerDailyQuestion(
+                SaveAnswerRequest(answer)
+            )
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getYourLoveAnswer(): DataResult<ApiResponse<GetYourLoveAnswerResponse>> {
+        return when (val result = getResult {
+            api.getYourLoveDailyQuestion()
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun fetchNote(): DataResult<ApiResponse<NoteResponse>> {
+        return when (val result = getResult { api.getNotes() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
 
 
     /**
@@ -209,6 +250,12 @@ class AuthRepository(
     fun clearAccessToken() {
         prefs.edit()
             .remove(AuthPrefersConstants.ACCESS_TOKEN)
+            .apply()
+    }
+
+    fun saveUserId(userId: String) {
+        prefs.edit()
+            .putString(AuthPrefersConstants.USER_ID, userId)
             .apply()
     }
 }
