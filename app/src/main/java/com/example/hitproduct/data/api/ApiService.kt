@@ -16,12 +16,16 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
-import com.example.hitproduct.data.model.note.NoteResponse
+import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
+import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
+import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.PetData
 import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
+import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
+import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -31,8 +35,10 @@ import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.POST
+import retrofit2.http.PUT
 import retrofit2.http.Part
 import retrofit2.http.PartMap
+import retrofit2.http.Path
 import retrofit2.http.Query
 
 interface ApiService {
@@ -118,5 +124,21 @@ interface ApiService {
 
     @GET(ApiConstants.GET_NOTES)
     suspend fun getNotes(
-    ): Response<ApiResponse<NoteResponse>>
+    ): Response<ApiResponse<GetNoteResponse>>
+
+    @POST(ApiConstants.CREATE_NOTE)
+    suspend fun createNote(
+        @Body request: NewNoteRequest
+    ): Response<ApiResponse<NewNoteResponse>>
+
+    @DELETE(ApiConstants.DELETE_NOTE)
+    suspend fun deleteNote(
+        @Path("id") noteId: String
+    ): Response<ApiResponse<String>>
+
+    @PUT(ApiConstants.EDIT_NOTE)
+    suspend fun editNote(
+        @Path("id") noteId: String,
+        @Body request: EditNoteRequest
+    ): Response<ApiResponse<EditNoteResponse>>
 }

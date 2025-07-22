@@ -78,13 +78,13 @@ class SplashActivity : AppCompatActivity() {
 
                     is DataResult.Error -> {
                         // Lỗi (hết session, mạng…) → xoá token, về Login
-                        if (res.error.tokenExpired) {
+                        if (res.error.message == "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!") {
                             prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
                             startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
                             finish()
                             Toast.makeText(
                                 this@SplashActivity,
-                                "Phiên đã hết hạn, vui lòng đăng nhập lại.",
+                                "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!",
                                 Toast.LENGTH_SHORT
                             ).show()
                         } else {

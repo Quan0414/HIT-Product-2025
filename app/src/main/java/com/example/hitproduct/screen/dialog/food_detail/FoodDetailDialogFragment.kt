@@ -21,6 +21,7 @@ import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogFoodDetailBinding
 import com.example.hitproduct.screen.dialog.shop.ShopViewModel
 import com.example.hitproduct.screen.dialog.shop.ShopViewModelFactory
+import com.example.hitproduct.util.Constant
 
 class FoodDetailDialogFragment : DialogFragment() {
     private var _binding: DialogFoodDetailBinding? = null
@@ -43,10 +44,9 @@ class FoodDetailDialogFragment : DialogFragment() {
     }
 
     companion object {
-        private const val ARG_FOOD = "arg_food"
         fun newInstance(food: Food) = FoodDetailDialogFragment().apply {
             arguments = Bundle().apply {
-                putSerializable(ARG_FOOD, food)
+                putSerializable(Constant.ARG_FOOD, food)
             }
         }
     }
@@ -75,7 +75,7 @@ class FoodDetailDialogFragment : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val food = requireArguments().getSerializable(ARG_FOOD) as? Food
+        val food = requireArguments().getSerializable(Constant.ARG_FOOD) as? Food
         food?.let {
             binding.tvName.text = it.name
             binding.tvMoney.text = it.price.toThousandComma()
@@ -101,7 +101,6 @@ class FoodDetailDialogFragment : DialogFragment() {
                         "Đã cho pet ăn thành công",
                         Toast.LENGTH_SHORT
                     ).show()
-
                     dismiss()
                     viewModel.clearFeedPetState()
                 }
@@ -112,7 +111,8 @@ class FoodDetailDialogFragment : DialogFragment() {
 
         binding.imgMoneyFoodDetail.setOnClickListener {
             viewModel.feedPet(foodId = food?.id ?: return@setOnClickListener)
-//            dismiss()
+            dismiss()
+            (parentFragment as? DialogFragment)?.dismiss()
         }
 
     }

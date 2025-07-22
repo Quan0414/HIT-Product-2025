@@ -21,9 +21,9 @@ object ApiConstants {
 
     // HOME
     const val GET_COUPLE = "api/v1/couple"
-    const val GET_PET = "api/v1/pets"
-    const val GET_FOOD = "api/v1/foods"
-    const val FEED_PET = "api/v1/pets"
+    const val GET_PET = "api/v1/pet"
+    const val GET_FOOD = "api/v1/food"
+    const val FEED_PET = "api/v1/pet"
     const val GET_DAILY_QUESTION = "api/v1/question/daily"
     const val SAVE_ANSWER_DAILY_QUESTION = "api/v1/question/daily"
     const val GET_YOUR_LOVE_DAILY_QUESTION = "api/v1/question/daily/feedback"
@@ -31,5 +31,7 @@ object ApiConstants {
     //NOTE
     const val GET_NOTES = "api/v1/notes"
     const val CREATE_NOTE = "api/v1/notes"
+    const val DELETE_NOTE = "api/v1/notes/{id}"
+    const val EDIT_NOTE = "api/v1/notes/{id}"
 
 }

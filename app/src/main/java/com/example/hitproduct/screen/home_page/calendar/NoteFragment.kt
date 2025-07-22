@@ -14,10 +14,11 @@ import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.OutlinedTextView
 import com.example.hitproduct.data.api.NetworkClient
-import com.example.hitproduct.data.model.note.Note
+import com.example.hitproduct.data.model.calendar.Note
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentNoteBinding
-import com.example.hitproduct.screen.dialog.note.DialogNote
+import com.example.hitproduct.screen.dialog.note.create.DialogCreateNote
+import com.example.hitproduct.screen.dialog.note.get.DialogNote
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -54,8 +55,23 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
     private var selectedDate: LocalDate? = null
     private val today = LocalDate.now()
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchNotes()
+        }
+    }
+
     override fun initView() {
         setupCalendar()
+        requireActivity().supportFragmentManager.setFragmentResultListener(
+            "refresh_notes",
+            viewLifecycleOwner
+        ) { _, _ ->
+            Log.d("NoteFragment", "🔔 refresh_notes received — reloading notes")
+            viewModel.fetchNotes()
+        }
+
         viewModel.fetchNotes()
     }
 
@@ -169,9 +185,15 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate() == date
         }
-        // Show dialog với list đã filter
-        DialogNote.newInstance(notesForDate)
-            .show(childFragmentManager, "dialog_note")
+        if (notesForDate.isEmpty()) {
+            DialogCreateNote
+                .newInstance(date.toString())
+                .show(requireActivity().supportFragmentManager, "dialog_create_note")
+
+        } else {
+            DialogNote.newInstance(notesForDate)
+                .show(requireActivity().supportFragmentManager, "dialog_note")
+        }
 
         // Handle date selection
         handleDateSelection(date)
@@ -213,6 +235,8 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 }
             }
         }
+
+
     }
 
     override fun inflateLayout(
