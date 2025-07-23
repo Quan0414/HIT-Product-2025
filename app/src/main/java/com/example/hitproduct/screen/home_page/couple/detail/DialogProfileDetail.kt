@@ -1,4 +1,4 @@
-package com.example.hitproduct
+package com.example.hitproduct.screen.home_page.couple.detail
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

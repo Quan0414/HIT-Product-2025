@@ -12,6 +12,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCoupleBinding
+import com.example.hitproduct.screen.home_page.couple.detail.DialogProfileDetail
 import com.example.hitproduct.screen.home_page.home.HomeViewModel
 import com.example.hitproduct.screen.home_page.home.HomeViewModelFactory
 import io.getstream.avatarview.glide.loadImage
@@ -46,7 +47,14 @@ class CoupleFragment : BaseFragment<FragmentCoupleBinding>() {
     }
 
     override fun initListener() {
-
+        binding.imgAvatar1.setOnClickListener {
+            val dialog = DialogProfileDetail()
+            dialog.show(childFragmentManager, "DialogProfileDetail")
+        }
+        binding.imgAvatar2.setOnClickListener {
+            val dialog = DialogProfileDetail()
+            dialog.show(childFragmentManager, "DialogProfileDetail")
+        }
     }
 
     override fun initData() {

@@ -12,16 +12,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.DialogFragment
-import androidx.fragment.app.setFragmentResult
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogStartDateBinding
+import com.example.hitproduct.socket.SocketManager
 import java.text.SimpleDateFormat
 import java.util.Calendar
-import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 
@@ -29,6 +28,8 @@ import java.util.TimeZone
 class DialogStartDate : DialogFragment() {
     private var _binding: DialogStartDateBinding? = null
     private val binding get() = _binding!!
+
+    private lateinit var token: String
 
     private val prefs by lazy {
         requireContext().getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
@@ -76,6 +77,11 @@ class DialogStartDate : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+        SocketManager.connect(token)
+
+        registerSocketListeners()
+
         val editText = binding.etStartDate
         editText.addTextChangedListener(object : TextWatcher {
             private var isUpdating = false
@@ -117,7 +123,8 @@ class DialogStartDate : DialogFragment() {
             // Validate ngày trước khi gửi
             val validationResult = validateDate(inputDate)
             if (!validationResult.isValid) {
-                Toast.makeText(requireContext(), validationResult.errorMessage, Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), validationResult.errorMessage, Toast.LENGTH_SHORT)
+                    .show()
                 return@setOnClickListener
             }
 
@@ -137,6 +144,7 @@ class DialogStartDate : DialogFragment() {
                 UiState.Loading -> {
                     binding.btnContinue.isEnabled = false
                 }
+
                 is UiState.Success -> {
                     Toast.makeText(
                         requireContext(),
@@ -157,7 +165,10 @@ class DialogStartDate : DialogFragment() {
 
     private fun validateDate(dateString: String): ValidationResult {
         if (dateString.isBlank()) {
-            return ValidationResult(false, "Ê ê! Nhập ngày đi bạn ơi,  bộ bạn không nhớ ngày bắt đầu yêu nhau hả :)))")
+            return ValidationResult(
+                false,
+                "Ê ê! Nhập ngày đi bạn ơi,  bộ bạn không nhớ ngày bắt đầu yêu nhau hả :)))"
+            )
         }
 
         if (dateString.length != 10) {
@@ -169,7 +180,8 @@ class DialogStartDate : DialogFragment() {
             inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
-            val inputDate = inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
+            val inputDate =
+                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
 
             // Tính toán ngày giới hạn (200 năm trước)
             val calendar = Calendar.getInstance()
@@ -181,15 +193,23 @@ class DialogStartDate : DialogFragment() {
 
             when {
                 inputDate.before(minDate) -> {
-                    ValidationResult(false, "Ôi dồi ôi! Bạn sinh ra từ thời khủng long à? Chọn ngày gần đây hơn đi!")
+                    ValidationResult(
+                        false,
+                        "Ôi dồi ôi! Bạn sinh ra từ thời khủng long à? Chọn ngày gần đây hơn đi!"
+                    )
                 }
+
                 inputDate.after(today) -> {
                     ValidationResult(false, "Chưa đến ngày đó mà! Chọn lại đi bạn ơi~")
                 }
+
                 else -> ValidationResult(true)
             }
         } catch (e: Exception) {
-            ValidationResult(false, "Định dạng ngày không đúng. Vui lòng nhập theo định dạng dd/MM/yyyy")
+            ValidationResult(
+                false,
+                "Định dạng ngày không đúng. Vui lòng nhập theo định dạng dd/MM/yyyy"
+            )
         }
     }
 
@@ -209,6 +229,12 @@ class DialogStartDate : DialogFragment() {
             outputFormat.format(date)
         } catch (e: Exception) {
             this
+        }
+    }
+
+    private fun registerSocketListeners() {
+        SocketManager.onCheckStartDate {
+            dismiss()
         }
     }
 }

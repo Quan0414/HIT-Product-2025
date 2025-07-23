@@ -105,8 +105,7 @@ dependencies {
 
     implementation("com.github.kizitonwose:CalendarView:2.2.0")
 
-//    implementation ("com.github.santaevpavel:OutlineSpan:0.1.1")
-    //banh xe lich
-//    implementation ("cn.aigestudio.wheelpicker:wheelpicker:2.1.4")
+    implementation ("com.github.zyyoona7.WheelPicker:wheelview:2.0.7")
+    implementation ("com.google.android.material:material:1.10.0")
 
 }
