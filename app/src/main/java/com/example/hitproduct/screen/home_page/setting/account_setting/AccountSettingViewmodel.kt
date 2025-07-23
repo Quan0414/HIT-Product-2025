@@ -59,7 +59,7 @@ class AccountSettingViewmodel(
 
     fun fetchUserProfile() = viewModelScope.launch {
         _userProfileState.value = UiState.Loading
-        when (val result = authRepository.fetchProfile(token = authRepository.getAccessToken() ?: "")) {
+        when (val result = authRepository.fetchProfile()) {
             is DataResult.Success ->
                 _userProfileState.value = UiState.Success(result.data)
             is DataResult.Error   ->

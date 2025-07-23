@@ -23,6 +23,7 @@ import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
@@ -42,7 +43,7 @@ class LoginFragment : Fragment() {
 
     private val authRepo by lazy {
         AuthRepository(
-            RetrofitClient.getInstance().create(ApiService::class.java),
+            NetworkClient.provideApiService(requireContext()),
             prefs
         )
     }
@@ -66,11 +67,6 @@ class LoginFragment : Fragment() {
         viewModel.coupleState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
-                    // Lưu coupleCode
-                    prefs.edit()
-                        .putString(AuthPrefersConstants.COUPLE_CODE, state.data.coupleCode)
-                        .apply()
-
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment
                         parentFragmentManager.beginTransaction()
@@ -118,7 +114,7 @@ class LoginFragment : Fragment() {
 
                     // Sau khi login thành công, check tiếp couple
                     val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
-                    viewModel.checkCouple(token)
+                    viewModel.checkCouple()
 
                     // Reset loginState để tránh lặp lại
                     viewModel.clearLoginState()

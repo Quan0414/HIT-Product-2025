@@ -161,10 +161,4 @@ class DialogNote : DialogFragment() {
             .show(requireActivity().supportFragmentManager, "dialog_create_note")
     }
 
-    /** Gọi từ NoteFragment khi có note mới **/
-    fun insertNewNote(newNote: Note) {
-        // 1) Cập nhật data source
-        adapter.addAtTop(newNote)
-        binding.rvNote.scrollToPosition(0)
-    }
 }

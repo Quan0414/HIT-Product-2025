@@ -26,6 +26,7 @@ import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
 import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
+import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -34,6 +35,7 @@ import retrofit2.http.DELETE
 import retrofit2.http.GET
 import retrofit2.http.Header
 import retrofit2.http.Multipart
+import retrofit2.http.PATCH
 import retrofit2.http.POST
 import retrofit2.http.PUT
 import retrofit2.http.Part
@@ -79,17 +81,21 @@ interface ApiService {
 
     @GET(ApiConstants.CHECK_INVITE)
     suspend fun checkInvite(
-        @Header("Authorization") token: String
     ): Response<ApiResponse<InviteData>>
 
     @GET(ApiConstants.USER_PROFILE)
     suspend fun getProfile(
-        @Header("Authorization") bearerToken: String
+//        @Header("Authorization") bearerToken: String
     ): Response<ApiResponse<User>>
 
     @DELETE(ApiConstants.DISCONNECT_COUPLE)
     suspend fun disconnectCouple(
     ): Response<ApiResponse<String>>
+
+    @PATCH(ApiConstants.CHOOSE_START_DATE)
+    suspend fun chooseStartDate(
+        @Body request: ChooseStartDateRequest
+    ): Response<ApiResponse<CoupleData>>
 
     @GET(ApiConstants.GET_COUPLE)
     suspend fun getCouple(

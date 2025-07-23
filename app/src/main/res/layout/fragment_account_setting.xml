@@ -53,15 +53,20 @@
                 android:orientation="vertical">
 
                 <FrameLayout
-                    android:layout_width="80dp"
-                    android:layout_height="80dp">
+                    android:layout_width="84dp"
+                    android:layout_height="84dp"
+                    android:clipChildren="false">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
+                    <io.getstream.avatarview.AvatarView
                         android:id="@+id/imgAvatar"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_gravity="center"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/avatar_default" />
+                        android:src="@drawable/avatar_default"
+                        app:avatarViewBorderRadius="32dp"
+                        app:avatarViewBorderWidth="0dp"
+                        app:avatarViewShape="rounded_rect" />
 
                     <ImageButton
                         android:id="@+id/btnEditAvatar"

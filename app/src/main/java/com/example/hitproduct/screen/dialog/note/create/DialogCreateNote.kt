@@ -70,6 +70,7 @@ class DialogCreateNote : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.btnSaveAnswer.setOnClickListener {
+            binding.btnSaveAnswer.isEnabled = false
             val date = requireArguments().getString(Constant.ARG_DATE)
                 ?: LocalDate.now().toString()
             val content = binding.outlinedEditText.text.toString().trim()
@@ -84,6 +85,7 @@ class DialogCreateNote : DialogFragment() {
                         state.error.message,
                         Toast.LENGTH_SHORT
                     ).show()
+                    binding.btnSaveAnswer.isEnabled = true
                     viewModel.resetCreateNoteState()
                 }
 
@@ -106,5 +108,10 @@ class DialogCreateNote : DialogFragment() {
         binding.btnClose.setOnClickListener {
             dismiss()
         }
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 }

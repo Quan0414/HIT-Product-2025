@@ -100,4 +100,9 @@ class DialogDeleteNote : DialogFragment() {
             }
         }
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
+    }
 }

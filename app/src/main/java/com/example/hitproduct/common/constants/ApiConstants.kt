@@ -20,6 +20,7 @@ object ApiConstants {
 
 
     // HOME
+    const val CHOOSE_START_DATE = "api/v1/couple"
     const val GET_COUPLE = "api/v1/couple"
     const val GET_PET = "api/v1/pet"
     const val GET_FOOD = "api/v1/food"

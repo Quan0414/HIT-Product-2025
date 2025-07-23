@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.dialog.food_detail
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -73,6 +74,7 @@ class FoodDetailDialogFragment : DialogFragment() {
         return binding.root
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val food = requireArguments().getSerializable(Constant.ARG_FOOD) as? Food

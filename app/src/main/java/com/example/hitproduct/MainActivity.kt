@@ -8,7 +8,7 @@ import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.databinding.ActivityMainBinding
-import com.example.hitproduct.screen.home_page.game.GameFragment
+import com.example.hitproduct.screen.home_page.couple.CoupleFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
 import com.example.hitproduct.screen.home_page.calendar.NoteFragment
@@ -29,7 +29,7 @@ class MainActivity : AppCompatActivity() {
         MessageFragment(),
         NoteFragment(),
         HomeFragment(),
-        GameFragment(),
+        CoupleFragment(),
         SettingFragment()
     )
     private var currentIndex = 2   // mặc định show Home
@@ -49,10 +49,10 @@ class MainActivity : AppCompatActivity() {
         SocketManager.connect(token)
 
         // Hide nav-bar + status-bar, bật immersive sticky
-        window.decorView.systemUiVisibility =
-            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-                    View.SYSTEM_UI_FLAG_FULLSCREEN or
-                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+//        window.decorView.systemUiVisibility =
+//            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+//                    View.SYSTEM_UI_FLAG_FULLSCREEN or
+//                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
 
 
         // 1) Pre-add all fragments, hide trừ Home (index 2)

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/scroll_account_settings"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -20,27 +20,27 @@
             android:layout_height="wrap_content"
             android:paddingBottom="26dp">
 
-<!--            <ImageView-->
-<!--                android:id="@+id/btnBack"-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:src="@drawable/ic_back_2"-->
-<!--                android:layout_marginStart="30dp"-->
-<!--                app:layout_constraintStart_toStartOf="parent"-->
-<!--                app:layout_constraintTop_toTopOf="parent"-->
-<!--                app:layout_constraintBottom_toBottomOf="parent"/>-->
+            <!--            <ImageView-->
+            <!--                android:id="@+id/btnBack"-->
+            <!--                android:layout_width="wrap_content"-->
+            <!--                android:layout_height="wrap_content"-->
+            <!--                android:src="@drawable/ic_back_2"-->
+            <!--                android:layout_marginStart="30dp"-->
+            <!--                app:layout_constraintStart_toStartOf="parent"-->
+            <!--                app:layout_constraintTop_toTopOf="parent"-->
+            <!--                app:layout_constraintBottom_toBottomOf="parent"/>-->
 
             <TextView
                 android:id="@+id/tvTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Cài đặt"
                 android:fontFamily="@font/f800"
+                android:text="Cài đặt"
                 android:textSize="16sp"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintBottom_toBottomOf="parent"/>
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
 
@@ -55,12 +55,15 @@
                 android:layout_width="80dp"
                 android:layout_height="80dp">
 
-                <de.hdodenhof.circleimageview.CircleImageView
+                <io.getstream.avatarview.AvatarView
                     android:id="@+id/imgAvatar"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:scaleType="centerCrop"
-                    android:src="@drawable/avatar_default" />
+                    android:src="@drawable/avatar_default"
+                    app:avatarViewBorderRadius="32dp"
+                    app:avatarViewBorderWidth="0dp"
+                    app:avatarViewShape="rounded_rect" />
 
             </FrameLayout>
 
@@ -98,10 +101,10 @@
                 android:layout_width="0dp"
                 android:layout_height="0dp"
                 android:orientation="vertical"
-                app:layout_constraintTop_toTopOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintBottom_toTopOf="@+id/buttons_container"
                 app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintBottom_toTopOf="@+id/buttons_container">
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
 
                 <TextView
                     android:id="@+id/tvAccountManagement"
@@ -111,12 +114,12 @@
                     android:fontFamily="@font/f700"
                     android:padding="16dp"
                     android:text="Quản lý tài khoản"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/grayUnderline"/>
+                    android:background="@color/grayUnderline" />
 
                 <TextView
                     android:id="@+id/tvThongKe"
@@ -126,12 +129,12 @@
                     android:fontFamily="@font/f700"
                     android:padding="16dp"
                     android:text="Thống kê"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <View
                     android:layout_width="match_parent"
                     android:layout_height="1dp"
-                    android:background="@color/grayUnderline"/>
+                    android:background="@color/grayUnderline" />
 
                 <TextView
                     android:id="@+id/tvSecurity"
@@ -141,7 +144,7 @@
                     android:fontFamily="@font/f700"
                     android:padding="16dp"
                     android:text="Quyền riêng tư và Bảo mật"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
             </LinearLayout>
 
@@ -150,11 +153,11 @@
                 android:id="@+id/buttons_container"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
                 android:gravity="center_vertical"
+                android:orientation="horizontal"
                 app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintEnd_toEndOf="parent">
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent">
 
                 <TextView
                     android:id="@+id/btnDisconnect"
@@ -167,12 +170,12 @@
                     android:padding="12dp"
                     android:text="Hủy kết nối"
                     android:textColor="@color/orange"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
                 <Space
                     android:layout_width="16dp"
-                    android:layout_weight="0.2"
-                    android:layout_height="wrap_content"/>
+                    android:layout_height="wrap_content"
+                    android:layout_weight="0.2" />
 
                 <TextView
                     android:id="@+id/btnLogout"
@@ -185,7 +188,7 @@
                     android:padding="12dp"
                     android:text="Đăng xuất"
                     android:textColor="@color/white"
-                    android:textSize="16sp"/>
+                    android:textSize="16sp" />
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

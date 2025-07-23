@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.home_page.calendar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -59,9 +61,11 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
         super.onHiddenChanged(hidden)
         if (!hidden) {
             viewModel.fetchNotes()
+            binding.cvCalendar.scrollToMonth(YearMonth.now())
         }
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun initView() {
         setupCalendar()
         requireActivity().supportFragmentManager.setFragmentResultListener(
@@ -73,6 +77,17 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
         }
 
         viewModel.fetchNotes()
+
+        // Disable horizontal swipe on the calendar
+        binding.cvCalendar.apply {
+            // find the internal RecyclerView
+            val rv = (this as ViewGroup)
+                .findViewById<RecyclerView>(R.id.cvCalendar)
+            rv?.setOnTouchListener { _, _ ->
+                // Trả về true để consume mọi touch, chặn swipe
+                true
+            }
+        }
     }
 
     private fun setupCalendar() {
@@ -88,6 +103,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
         binding.cvCalendar.dayBinder = object : MonthDayBinder<DayContainer> {
             override fun create(view: View) = DayContainer(view)
 
+            @SuppressLint("DefaultLocale")
             override fun bind(container: DayContainer, data: CalendarDay) {
                 container.day = data
                 container.tvDay.text = String.format("%02d", data.date.dayOfMonth)
@@ -105,6 +121,9 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 when (data.position) {
                     DayPosition.MonthDate -> {
                         // Ngày trong tháng hiện tại
+                        container.itemDay.visibility = View.VISIBLE
+                        container.ivNote.visibility =
+                            if (noteDates.contains(data.date)) View.VISIBLE else View.INVISIBLE
                         container.tvDay.apply {
                             visibility = View.VISIBLE
                             val bgRes = when {

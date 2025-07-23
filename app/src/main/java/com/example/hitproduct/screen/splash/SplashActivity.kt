@@ -14,8 +14,7 @@ import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
-import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
 
     private val authRepo by lazy {
         AuthRepository(
-            RetrofitClient.getInstance().create(ApiService::class.java),
+            NetworkClient.provideApiService(this),
             prefs
         )
     }
@@ -57,7 +56,7 @@ class SplashActivity : AppCompatActivity() {
         } else {
             // Đã có token → check couple
             lifecycleScope.launch {
-                when (val res = authRepo.fetchProfile(token)) {
+                when (val res = authRepo.fetchProfile()) {
                     is DataResult.Success -> {
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {

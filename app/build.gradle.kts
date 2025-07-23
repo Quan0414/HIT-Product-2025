@@ -92,7 +92,10 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation ("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
+
+    //avatar
     implementation ("de.hdodenhof:circleimageview:3.1.0")
+    implementation ("io.getstream:avatarview-glide:1.0.7")
 
     implementation ("com.github.Kwasow:BottomNavigationCircles-Android:1.2")
 
