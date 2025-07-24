@@ -34,8 +34,7 @@
         android:background="@drawable/bg_start_date_picker"
         android:fontFamily="@font/f700"
         android:gravity="center"
-        android:hint="dd/mm/yyyy"
-        android:paddingHorizontal="10dp"
+        android:paddingHorizontal="14dp"
         android:paddingVertical="8dp"
         android:textColor="@color/white"
         android:textSize="16dp"
@@ -45,6 +44,17 @@
         app:layout_constraintTop_toBottomOf="@+id/tvPickDate"
         app:strokeColor="@color/borderBrown"
         app:strokeWidth="2dp" />
+
+    <ImageView
+        android:id="@+id/btnArrowDown"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="10dp"
+        android:padding="4dp"
+        android:src="@drawable/ic_arrow_down_border"
+        app:layout_constraintBottom_toBottomOf="@+id/etStartDate"
+        app:layout_constraintEnd_toEndOf="@+id/etStartDate"
+        app:layout_constraintTop_toTopOf="@+id/etStartDate" />
 
     <ImageView
         android:id="@+id/btnContinue"

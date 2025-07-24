@@ -128,6 +128,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     override fun initListener() {
+
+        binding.imageView.setOnClickListener {
+            val dialog = DialogStartDate()
+            dialog.show(
+                childFragmentManager,
+                DialogStartDate::class.java.simpleName
+            )
+        }
+
         binding.icon1.setOnClickListener {
             val value = "${binding.state1.progress / 10}/${binding.state1.max / 10}"
             showTooltip(

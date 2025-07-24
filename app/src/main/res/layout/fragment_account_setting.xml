@@ -260,7 +260,7 @@
                     android:text="Ngày xinh"
                     android:textSize="16dp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/edtBirthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -271,6 +271,12 @@
                     android:fontFamily="@font/f500"
                     android:inputType="date"
                     android:textSize="14dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="-12dp"
+                    android:background="@color/grayUnderline" />
 
                 <!-- Buttons -->
                 <LinearLayout
