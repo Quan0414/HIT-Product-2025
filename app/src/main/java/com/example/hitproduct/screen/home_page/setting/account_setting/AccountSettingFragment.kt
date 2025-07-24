@@ -241,7 +241,6 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
             binding.edtHo,
             binding.edtTen,
             binding.edtNickname,
-            binding.edtEmail,
             binding.edtBirthday
         ).forEach { et ->
             // clear và set lại drawable: left, top, right, bottom

@@ -99,7 +99,7 @@ class SetUpInformationFragment : Fragment() {
             }
         }
 
-        binding.tvBirthday.setOnTouchListener { _, _ ->
+        binding.tvBirthday.setOnClickListener {
 
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
@@ -117,7 +117,6 @@ class SetUpInformationFragment : Fragment() {
                 val formatted = String.format("%02d/%02d/%04d", day, month, year)
                 binding.tvBirthday.text = formatted
             }
-            return@setOnTouchListener true
 
         }
 
