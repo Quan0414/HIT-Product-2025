@@ -5,15 +5,32 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.model.UserData
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
-import com.example.hitproduct.data.model.auth.response.EditProfileResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
+import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
+import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
+import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
+import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
+import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
+import com.example.hitproduct.data.model.couple.CoupleData
+import com.example.hitproduct.data.model.couple.CoupleProfile
+import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
+import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
+import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerResponse
+import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
+import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.pet.FeedPetData
+import com.example.hitproduct.data.model.pet.FeedPetRequest
+import com.example.hitproduct.data.model.pet.Pet
+import com.example.hitproduct.data.model.user_profile.User
+import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 
@@ -86,18 +103,14 @@ class AuthRepository(
      * @param fields là Map<String, RequestBody> chứa các trường cần chỉnh sửa
      * @param avatar là MultipartBody.Part? chứa ảnh đại diện (có thể null)
      */
-    suspend fun editProfile(
-        token: String,
+    suspend fun setupProfile(
         fields: Map<String, RequestBody>,
-        avatar: MultipartBody.Part?
-    ): DataResult<EditProfileResponse> {
+    ): DataResult<SetupProfileResponse> {
         // getResult ở đây trả về DataResult<ApiResponse<EditProfileResponse>>
-        val result = getResult { api.editProfile("Bearer $token", fields, avatar) }
+        val result = getResult { api.setupProfile(fields) }
 
         return when (result) {
             is DataResult.Success -> {
-                // result.data là ApiResponse<EditProfileResponse>
-                // result.data.data là payload EditProfileResponse
                 DataResult.Success(result.data.data)
             }
 
@@ -105,9 +118,10 @@ class AuthRepository(
         }
     }
 
-    suspend fun checkInvite(token: String): DataResult<InviteData> {
+    // AuthRepository.kt
+    suspend fun checkInvite(): DataResult<InviteData> {
         return when (val result = getResult {
-            api.checkInvite("Bearer $token")
+            api.checkInvite()
         }) {
             is DataResult.Success -> {
                 // result.data: ApiResponse<InviteData>
@@ -119,19 +133,151 @@ class AuthRepository(
     }
 
 
-    suspend fun checkCouple(token: String): DataResult<UserData> {
+    suspend fun fetchProfile(): DataResult<User> {
         return when (val result = getResult {
-            api.checkCouple("Bearer $token")
+            api.getProfile()
         }) {
-            is DataResult.Success -> {
-                val profileResp = result.data.data
-                DataResult.Success(profileResp.data)
-            }
+            is DataResult.Success ->
+                DataResult.Success(result.data.data)
 
             is DataResult.Error -> result
         }
     }
 
+
+    suspend fun editProfile(
+        fields: Map<String, RequestBody>,
+        avatar: MultipartBody.Part?
+    ): DataResult<UserProfileResponse> {
+        val result = getResult { api.editProfile(fields, avatar) }
+        return when (result) {
+            is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun disconnect(): DataResult<ApiResponse<String>> {
+        return when (val result = getResult { api.disconnectCouple() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun chooseStartDate(loveStartedAt: String): DataResult<ApiResponse<CoupleData>> {
+        return when (val result = getResult {
+            api.chooseStartDate(ChooseStartDateRequest(loveStartedAt))
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getCouple(): DataResult<CoupleProfile> {
+        return when (val res = getResult { api.getCouple() }) {
+            is DataResult.Success -> DataResult.Success(res.data.data.couple)
+            is DataResult.Error -> res
+        }
+    }
+
+    suspend fun getPet(): DataResult<Pet> {
+        return when (val res = getResult { api.getPet() }) {
+            is DataResult.Success -> DataResult.Success(res.data.data.pet)
+            is DataResult.Error -> res
+        }
+    }
+
+    suspend fun getAllFoods(): DataResult<List<Food>> {
+        val all = mutableListOf<Food>()
+        var page = 1
+        var totalPages = 1  // khởi tạo tạm
+        while (page <= totalPages) {
+            when (val res = getResult { api.getFood(page) }) {
+                is DataResult.Success -> {
+                    val body = res.data.data
+                    all += body.foods                  // gom dữ liệu
+                    totalPages = body.totalPages       // cập nhật tổng số trang
+                    page++                             // chuyển trang
+                }
+
+                is DataResult.Error -> {
+                    return res
+                }
+            }
+        }
+        return DataResult.Success(all)
+    }
+
+    suspend fun feedPet(foodId: String): DataResult<ApiResponse<FeedPetData>> {
+        return when (val result = getResult {
+            api.feedPet(FeedPetRequest(foodId))
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getDailyQuestion(): DataResult<ApiResponse<DailyQuestionResponse>> {
+        return when (val result = getResult { api.getDailyQuestion() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun saveDailyQuestion(
+        answer: String
+    ): DataResult<ApiResponse<SaveAnswerResponse>> {
+        return when (val result = getResult {
+            api.saveAnswerDailyQuestion(
+                SaveAnswerRequest(answer)
+            )
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getYourLoveAnswer(): DataResult<ApiResponse<GetYourLoveAnswerResponse>> {
+        return when (val result = getResult {
+            api.getYourLoveDailyQuestion()
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun fetchNote(): DataResult<ApiResponse<GetNoteResponse>> {
+        return when (val result = getResult { api.getNotes() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun createNote(
+        content: String,
+        date: String
+    ): DataResult<ApiResponse<NewNoteResponse>> {
+        return when (val result = getResult { api.createNote(NewNoteRequest(content, date)) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun deleteNote(noteId: String): DataResult<ApiResponse<String>> {
+        return when (val result = getResult { api.deleteNote(noteId) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun editNote(
+        noteId: String,
+        content: String
+    ): DataResult<ApiResponse<EditNoteResponse>> {
+        return when (val result = getResult { api.editNote(noteId, EditNoteRequest(content)) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
 
 
     /**
@@ -148,4 +294,5 @@ class AuthRepository(
             .remove(AuthPrefersConstants.ACCESS_TOKEN)
             .apply()
     }
+
 }

@@ -7,7 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.ErrorMessageMapper
-import com.example.hitproduct.data.model.UserData
+import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.common.ApiResponse
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
@@ -19,8 +19,8 @@ class LoginViewModel(
     private val _loginState = MutableLiveData<UiState<ApiResponse<String>>>(UiState.Idle)
     val loginState: LiveData<UiState<ApiResponse<String>>> = _loginState
 
-    private val _coupleState = MutableLiveData<UiState<UserData>>(UiState.Idle)
-    val coupleState: LiveData<UiState<UserData>> = _coupleState
+    private val _coupleState = MutableLiveData<UiState<User>>(UiState.Idle)
+    val coupleState: LiveData<UiState<User>> = _coupleState
 
     fun clearLoginState() {
         _loginState.value = UiState.Idle
@@ -57,11 +57,12 @@ class LoginViewModel(
         }
     }
 
-    fun checkCouple(token: String) {
+    fun checkCouple() {
         viewModelScope.launch {
             _coupleState.value = UiState.Loading
-            when (val res = authRepository.checkCouple(token)) {
+            when (val res = authRepository.fetchProfile()) {
                 is DataResult.Success ->
+                    // res.data: UserProfile
                     _coupleState.value = UiState.Success(res.data)
 
                 is DataResult.Error ->

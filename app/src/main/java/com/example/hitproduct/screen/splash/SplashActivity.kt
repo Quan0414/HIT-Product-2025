@@ -14,8 +14,7 @@ import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
-import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import kotlinx.coroutines.launch
@@ -28,7 +27,7 @@ class SplashActivity : AppCompatActivity() {
 
     private val authRepo by lazy {
         AuthRepository(
-            RetrofitClient.getInstance().create(ApiService::class.java),
+            NetworkClient.provideApiService(this),
             prefs
         )
     }
@@ -57,11 +56,10 @@ class SplashActivity : AppCompatActivity() {
         } else {
             // Đã có token → check couple
             lifecycleScope.launch {
-                when (val res = authRepo.checkCouple(token)) {
+                when (val res = authRepo.fetchProfile()) {
                     is DataResult.Success -> {
-                        val userData = res.data
-                        val coupleId = userData?.coupleId
-                        if (coupleId != null) {
+                        val coupleOjb = res.data.couple
+                        if (coupleOjb != null) {
                             // Đã có đôi → vào Main
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                         } else {
@@ -79,9 +77,23 @@ class SplashActivity : AppCompatActivity() {
 
                     is DataResult.Error -> {
                         // Lỗi (hết session, mạng…) → xoá token, về Login
-                        prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
-                        startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
-                        finish()
+                        if (res.error.message == "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!") {
+                            prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
+                            startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                            finish()
+                            Toast.makeText(
+                                this@SplashActivity,
+                                "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        } else {
+                            // Lỗi khác, có thể do mạng, thông báo lỗi
+                            Toast.makeText(
+                                this@SplashActivity,
+                                "Lỗi: ${res.error.message}",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
                     }
                 }
             }

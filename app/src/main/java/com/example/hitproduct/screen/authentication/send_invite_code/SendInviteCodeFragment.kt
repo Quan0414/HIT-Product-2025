@@ -19,6 +19,7 @@ import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.OnBackPressedCallback
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -28,11 +29,12 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
+import com.example.hitproduct.screen.authentication.login.LoginViewModel
+import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.send_invite_code.adapter.InviteAdapter
 import com.example.hitproduct.socket.SocketManager
 
@@ -46,12 +48,16 @@ class SendInviteCodeFragment : Fragment() {
     }
     private val authRepo by lazy {
         AuthRepository(
-            RetrofitClient.getInstance().create(ApiService::class.java),
+            NetworkClient.provideApiService(requireContext()),
             prefs
         )
     }
     private val viewModel by viewModels<SendInviteCodeViewModel> {
         SendInviteCodeViewModelFactory(authRepo)
+    }
+
+    private val viewModel2 by viewModels<LoginViewModel> {
+        LoginViewModelFactory(authRepo)
     }
 
     private fun setupInviteDialog() {
@@ -96,13 +102,14 @@ class SendInviteCodeFragment : Fragment() {
         token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
         SocketManager.connect(token)
 
-        binding.tvInviteCode.text = prefs.getString(AuthPrefersConstants.COUPLE_CODE, "")
 
         // 1. Tạo dialog + adapter sẵn, nhưng chưa show
         setupInviteDialog()
 
         // 2. Fetch initial list từ API
-        viewModel.checkInvite(token)
+        viewModel.checkInvite()
+        viewModel2.checkCouple()
+
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             if (result is DataResult.Success) {
                 val hasUnread = result.data.acceptFriends.isNotEmpty()
@@ -127,7 +134,29 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
+        viewModel2.coupleState.observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    // Cập nhật mã mời
+                    val coupleCode = result.data.coupleCode
+                    binding.tvInviteCode.text = coupleCode
+                }
+            }
+        }
+
         registerSocketListeners()
+
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            object : OnBackPressedCallback(true) {
+                override fun handleOnBackPressed() {
+                    requireActivity().finish()
+                }
+            }
+        )
 
         setupInviteInput()
 //        setupBackButton()
@@ -252,7 +281,7 @@ class SendInviteCodeFragment : Fragment() {
         }
         SocketManager.onError { message ->
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(requireContext(), "Error: $message", Toast.LENGTH_SHORT).show()
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
             }
         }
         SocketManager.onRequestSent { data ->
@@ -331,7 +360,11 @@ class SendInviteCodeFragment : Fragment() {
         //A gui B, B chap nhan → remove Received, go HomeActivity
         SocketManager.onAccepted {
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(requireContext(), "Friend request accepted", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    "Bạn và người ấy đã trở thành một đôi!",
+                    Toast.LENGTH_SHORT
+                )
                     .show()
                 // Xoá khỏi danh sách Received
                 currentItems.removeAll { it is InviteItem.Received }
@@ -344,7 +377,11 @@ class SendInviteCodeFragment : Fragment() {
         // B nhận được A chấp nhận → remove Sent, go HomeActivity
         SocketManager.onTheyAccept {
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(requireContext(), "Friend request accepted", Toast.LENGTH_SHORT)
+                Toast.makeText(
+                    requireContext(),
+                    "Bạn và người ấy đã trở thành một đôi!",
+                    Toast.LENGTH_SHORT
+                )
                     .show()
                 // Xoá khỏi danh sách Sent
                 currentItems.removeAll { it is InviteItem.Sent }

@@ -8,7 +8,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.LayerDrawable
-import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -20,9 +19,9 @@ import android.widget.TextView
 import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
-import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.DrawableCompat
+import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import com.airbnb.lottie.LottieDrawable
 import com.airbnb.lottie.RenderMode
@@ -37,12 +36,14 @@ import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
 import com.example.hitproduct.screen.dialog.daily_question.your.YourDailyQuestionDialogFragment
 import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
+import com.example.hitproduct.screen.dialog.start_date.DialogStartDate
 import com.example.hitproduct.socket.SocketManager
 import com.example.hitproduct.util.Constant
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 
 
 class HomeFragment : BaseFragment<FragmentHomeBinding>() {
@@ -79,6 +80,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         R.raw.dance_cat3,
         R.raw.dance_cat4,
     )
+    private var hasShownStartDateDialog = false
 
     private var eattingCat = R.raw.cat_eat
 
@@ -89,6 +91,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val questionDialog by lazy { YourDailyQuestionDialogFragment() }
 
     override fun initView() {
+
+        childFragmentManager.setFragmentResultListener(
+            "update_start_date",
+            viewLifecycleOwner
+        ) { _, _ ->
+            hasShownStartDateDialog = true
+            viewModel.getCoupleProfile()
+            Log.d("HomeFragment", "Start date updated, fetching couple profile again")
+        }
 
         binding.gifCat.visibility = View.GONE
         binding.gifCat.apply {
@@ -117,6 +128,15 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     override fun initListener() {
+
+        binding.imageView.setOnClickListener {
+            val dialog = DialogStartDate()
+            dialog.show(
+                childFragmentManager,
+                DialogStartDate::class.java.simpleName
+            )
+        }
+
         binding.icon1.setOnClickListener {
             val value = "${binding.state1.progress / 10}/${binding.state1.max / 10}"
             showTooltip(
@@ -161,7 +181,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     }
 
-    @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("SetTextI18n")
     override fun bindData() {
         viewModel.coupleProfile.observe(viewLifecycleOwner) { state ->
@@ -170,6 +189,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
+
+                    if (!state.data.loveStartedAtEdited && !hasShownStartDateDialog) {
+                        hasShownStartDateDialog = true
+                        val dialog = DialogStartDate()
+                        dialog.show(
+                            childFragmentManager,
+                            DialogStartDate::class.java.simpleName
+                        )
+                    }
+
                     binding.tvMoney.text = state.data.coin.toThousandComma()
                     (activity as MainActivity).coin = state.data.coin
 
@@ -182,10 +211,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         .toLocalDate()
                     val nowDate = LocalDate.now(ZoneId.systemDefault())
 
+                    val totalDays = ChronoUnit.DAYS.between(startDate, nowDate).toInt()
+
                     val period = Period.between(startDate, nowDate)
                     val years = period.years
                     val months = period.months
                     val daysTotal = period.days
+                    requireActivity().supportFragmentManager.setFragmentResult(
+                        "total_date_updated",
+                        bundleOf("totalLoveDate" to totalDays)
+                    )
 
                     // 4. Chuyển days thành tuần + ngày
                     val weeks = daysTotal / 7
