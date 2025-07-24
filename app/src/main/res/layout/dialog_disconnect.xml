@@ -24,7 +24,7 @@
             android:layout_marginBottom="12dp"
             android:fontFamily="@font/f800"
             android:text="Hủy kết nối"
-            android:textSize="20dp" />
+            android:textSize="24dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -33,48 +33,47 @@
             android:gravity="center"
             android:text="Bạn chắc chắn muốn muốn hủy kết nối với người ấy?"
             android:textColor="@color/grayText"
-            android:textSize="12dp" />
+            android:textSize="14dp" />
 
     </LinearLayout>
 
     <TextView
         android:id="@+id/btn_close"
-        android:layout_width="130dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity=""
         android:background="@drawable/bg_btn_option1"
-        android:fontFamily="@font/f500"
+        android:fontFamily="@font/f800"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingTop='8dp'
-        android:paddingEnd="12dp"
-        android:paddingBottom="8dp"
-        android:layout_marginTop="16dp"
+        android:paddingHorizontal="0dp"
+        android:paddingVertical="8dp"
         android:text="Đóng"
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
         android:textColor="@color/orange"
-        android:textSize="16dp"
-
-        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_logout"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintHorizontal_weight="1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/title" />
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
         android:id="@+id/btn_logout"
-        android:layout_width="130dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity=""
         android:background="@drawable/bg_btn_option2"
-        android:fontFamily="@font/f500"
+        android:fontFamily="@font/f800"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingTop='8dp'
-        android:paddingEnd="12dp"
-        android:paddingBottom="8dp"
+        android:paddingHorizontal="0dp"
+        android:paddingVertical="8dp"
         android:text="Hủy kết nối"
         android:textColor="@color/white"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/btn_close"
+
+        app:layout_constraintTop_toTopOf="@+id/btn_close" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

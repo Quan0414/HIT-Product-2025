@@ -2,7 +2,6 @@ package com.example.hitproduct.common.util
 
 data class MappedError(
     val message: String,
-    val tokenExpired: Boolean = false,
     val accountExits: Boolean = false,
     val emailError: Boolean = false,
     val passwordError: Boolean = false,
@@ -33,8 +32,11 @@ object ErrorMessageMapper {
         val otpExprired =
             raw.contains("OTP hết hạn.", ignoreCase = true)
 
-        val petFullHUngry =
+        val petFullHungry =
             raw.contains("Pet của bạn đã no.", ignoreCase = true)
+
+        val notEnoughCoin =
+            raw.contains("Bạn không có đủ tiền.", ignoreCase = true)
 
         val answer_question_error1 =
             raw.contains("Câu trả lời không được để trống.", ignoreCase = true)
@@ -43,8 +45,13 @@ object ErrorMessageMapper {
         val answer_question_error3 =
             raw.contains("Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy.", ignoreCase = true)
 
+        val emtyNote = raw.contains("Nội dung ghi chú không được để trống.", ignoreCase = true)
+
 
         val message = when {
+
+            tokenExpired ->
+                "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!"
 
             unauthorized ->
                 "Tài khoản chưa được xác nhận!"
@@ -70,8 +77,11 @@ object ErrorMessageMapper {
             otpExprired ->
                 "Mã OTP hết hạn!"
 
-            petFullHUngry ->
+            petFullHungry ->
                 "Pet của bạn đã no, không thể ăn nữa!"
+
+            notEnoughCoin ->
+                "Bạn không có đủ tiền!"
 
             answer_question_error1 ->
                 "Câu trả lời không được để trống!"
@@ -82,8 +92,11 @@ object ErrorMessageMapper {
             answer_question_error3 ->
                 "Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy!"
 
+            emtyNote ->
+                "Nội dung ghi chú không được để trống!"
+
             else ->
-                "Lỗi chưa xác định, bật logcat lên!"
+                "Lỗi chưa xác định, bật logcat lên!!!"
         }
 
         val emailErrorFlag = emailError || wrongAccount
@@ -91,7 +104,6 @@ object ErrorMessageMapper {
         val otpFlag = otpError || otpExprired
 
         return MappedError(
-            tokenExpired = tokenExpired,
             accountExits = accountExits,
             message = message,
             emailError = emailErrorFlag,

@@ -23,21 +23,10 @@ class SendInviteCodeViewModel(
 //    private val _inviteMessage = MutableLiveData<String>()
 //    val inviteMessage: LiveData<String> = _inviteMessage
 
-    fun checkInvite(token: String) {
+    fun checkInvite() {
         viewModelScope.launch {
-            val result = authRepository.checkInvite(token)
+            val result = authRepository.checkInvite()
             _inviteResult.value = result
-        }
-    }
-
-    fun fetchUserProfile() = viewModelScope.launch {
-        when (val result =
-            authRepository.fetchProfile(token = authRepository.getAccessToken() ?: "")) {
-            is DataResult.Success ->
-                _inviteCode.value = UiState.Success(result.data)
-
-            is DataResult.Error ->
-                _inviteCode.value = UiState.Error(result.error)
         }
     }
 

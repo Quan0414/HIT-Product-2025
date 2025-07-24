@@ -104,6 +104,7 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                         "Đã lưu câu trả lời",
                         Toast.LENGTH_SHORT
                     ).show()
+                    viewModel.resetSaveQuestionState()
                 }
             }
         }
@@ -116,6 +117,7 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                         state.error.message,
                         Toast.LENGTH_SHORT
                     ).show()
+                    viewModel.resetYourLoveAnswerState()
                 }
 
                 UiState.Idle -> {}
@@ -131,9 +133,11 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                     }
                     val answer = state.data.partnerAnswer ?: "(Trống)"
                     (activity as MainActivity).yourLoveAnswer = answer
+
                     val dialog = YourLoveAnswerDialogFragment()
                     dialog.show(parentFragmentManager, "YourLoveAnswerDialogFragment")
-//                    viewModel.resetYourLoveAnswerState()
+                    dismiss()
+                    viewModel.resetYourLoveAnswerState()
                 }
             }
         }

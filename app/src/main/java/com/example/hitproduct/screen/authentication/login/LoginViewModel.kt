@@ -57,10 +57,10 @@ class LoginViewModel(
         }
     }
 
-    fun checkCouple(token: String) {
+    fun checkCouple() {
         viewModelScope.launch {
             _coupleState.value = UiState.Loading
-            when (val res = authRepository.fetchProfile(token)) {
+            when (val res = authRepository.fetchProfile()) {
                 is DataResult.Success ->
                     // res.data: UserProfile
                     _coupleState.value = UiState.Success(res.data)

@@ -40,7 +40,7 @@
         app:layout_constraintTop_toTopOf="@+id/tvTitle" />
 
     <EditText
-        android:id="@+id/outlinedEditText"
+        android:id="@+id/etContent"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginTop="14dp"
@@ -66,18 +66,18 @@
         android:adjustViewBounds="true"
         android:src="@drawable/btn_hint"
         app:layout_constraintBottom_toBottomOf="@id/iv1"
-        app:layout_constraintEnd_toStartOf="@+id/btnSaveAnswer"
+        app:layout_constraintEnd_toStartOf="@+id/btnSave"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="@+id/outlinedEditText" />
+        app:layout_constraintStart_toStartOf="@+id/etContent" />
 
     <ImageView
-        android:id="@+id/btnSaveAnswer"
+        android:id="@+id/btnSave"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_save_note"
         app:layout_constraintBottom_toBottomOf="@+id/btnCheckQuestion"
-        app:layout_constraintEnd_toEndOf="@+id/outlinedEditText"
+        app:layout_constraintEnd_toEndOf="@+id/etContent"
         app:layout_constraintStart_toEndOf="@id/btnCheckQuestion"
         app:layout_constraintTop_toTopOf="@+id/btnCheckQuestion" />
 

@@ -53,15 +53,20 @@
                 android:orientation="vertical">
 
                 <FrameLayout
-                    android:layout_width="80dp"
-                    android:layout_height="80dp">
+                    android:layout_width="84dp"
+                    android:layout_height="84dp"
+                    android:clipChildren="false">
 
-                    <de.hdodenhof.circleimageview.CircleImageView
+                    <io.getstream.avatarview.AvatarView
                         android:id="@+id/imgAvatar"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
+                        android:layout_width="80dp"
+                        android:layout_height="80dp"
+                        android:layout_gravity="center"
                         android:scaleType="centerCrop"
-                        android:src="@drawable/avatar_default" />
+                        android:src="@drawable/avatar_default"
+                        app:avatarViewBorderRadius="32dp"
+                        app:avatarViewBorderWidth="0dp"
+                        app:avatarViewShape="rounded_rect" />
 
                     <ImageButton
                         android:id="@+id/btnEditAvatar"
@@ -123,6 +128,7 @@
 
                         <EditText
                             android:id="@+id/edtHo"
+                            android:backgroundTint="@color/grayUnderline"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:drawableEnd="@drawable/ic_edit_text"
@@ -151,6 +157,7 @@
                         <EditText
                             android:id="@+id/edtTen"
                             android:layout_width="match_parent"
+                            android:backgroundTint="@color/grayUnderline"
                             android:layout_height="wrap_content"
                             android:drawableEnd="@drawable/ic_edit_text"
                             android:drawablePadding="8dp"
@@ -175,6 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:backgroundTint="@color/grayUnderline"
                     android:drawableEnd="@drawable/ic_edit_text"
                     android:drawablePadding="8dp"
                     android:enabled="false"
@@ -198,7 +206,7 @@
                     android:drawableEnd="@drawable/ic_edit_text"
                     android:drawablePadding="8dp"
                     android:enabled="false"
-
+                    android:backgroundTint="@color/grayUnderline"
                     android:fontFamily="@font/f500"
                     android:inputType="textEmailAddress"
                     android:textSize="14dp" />
@@ -255,7 +263,7 @@
                     android:text="Ngày xinh"
                     android:textSize="16dp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/edtBirthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -266,6 +274,12 @@
                     android:fontFamily="@font/f500"
                     android:inputType="date"
                     android:textSize="14dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="-12dp"
+                    android:background="@color/grayUnderline" />
 
                 <!-- Buttons -->
                 <LinearLayout

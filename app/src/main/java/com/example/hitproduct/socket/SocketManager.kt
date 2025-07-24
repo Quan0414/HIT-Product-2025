@@ -2,6 +2,7 @@ package com.example.hitproduct.socket
 
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import com.example.hitproduct.common.constants.ApiConstants
 import io.socket.client.IO
 import io.socket.client.IO.Options
@@ -44,6 +45,7 @@ object SocketManager {
         }
         socket = IO.socket(SERVER_URL, opts)
         socket.connect()
+        Log.d("SocketManager", "Connecting to socket with token: $token")
     }
 
     /**
@@ -211,6 +213,18 @@ object SocketManager {
     }
 
     //=====================================================
+    // Check start date
+    fun onCheckStartDate(listener: (data: JSONObject) -> Unit) {
+        Log.d("SocketManager", "onCheckStartDate called")
+        socket.on("LOVE_DATE_UPDATED_BY_PARTNER") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "abc$data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+
     // Nuoi pet
 
     //Listener

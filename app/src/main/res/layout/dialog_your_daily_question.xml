@@ -52,7 +52,7 @@
         app:layout_constraintStart_toStartOf="@+id/tvTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
 
-    <EditText
+    <com.example.hitproduct.common.util.OutlinedEditText
         android:id="@+id/outlinedEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
@@ -60,8 +60,10 @@
         android:background="@drawable/bg_orange_border"
         android:fontFamily="@font/f900"
         android:gravity="start"
+        app:strokeColor="@color/borderBrown"
+        app:strokeWidth="1dp"
         android:padding="12dp"
-        android:textColor="@color/textBrown"
+        android:textColor="@color/white"
         android:textSize="20dp"
         app:layout_constraintBottom_toTopOf="@id/btnCheckQuestion"
         app:layout_constraintEnd_toEndOf="@+id/tvTitle"
