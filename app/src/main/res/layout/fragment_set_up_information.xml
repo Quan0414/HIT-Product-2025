@@ -269,7 +269,6 @@
             </com.google.android.material.textfield.TextInputLayout>
 
             <TextView
-                android:id="@+id/tvBirthday"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="8dp"
@@ -277,12 +276,13 @@
                 android:text="Ngày xinh"
                 android:textSize="14dp" />
 
-            <EditText
-                android:id="@+id/edtBirthday"
+            <TextView
+                android:id="@+id/tvBirthday"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="16dp"
                 android:background="@drawable/bg_edit_text"
+                android:drawableEnd="@drawable/ic_arrow_down"
                 android:fontFamily="@font/f500"
                 android:hint="dd/mm/yyyy"
                 android:inputType="date"

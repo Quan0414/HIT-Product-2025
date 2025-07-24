@@ -6,6 +6,7 @@ import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +20,7 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogStartDateBinding
 import com.example.hitproduct.socket.SocketManager
+import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -83,38 +85,59 @@ class DialogStartDate : DialogFragment() {
         registerSocketListeners()
 
         val editText = binding.etStartDate
-        editText.addTextChangedListener(object : TextWatcher {
-            private var isUpdating = false
+//        editText.addTextChangedListener(object : TextWatcher {
+//            private var isUpdating = false
+//
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//            override fun afterTextChanged(s: Editable) {}
+//
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+//                if (isUpdating) {
+//                    isUpdating = false
+//                    return
+//                }
+//
+//                // Lọc chỉ giữ chữ số
+//                val digits = s.toString().filter { it.isDigit() }
+//                val sb = StringBuilder()
+//
+//                for ((index, char) in digits.withIndex()) {
+//                    sb.append(char)
+//                    // chèn "/" sau 2 và 4 chữ số
+//                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
+//                        sb.append('/')
+//                    }
+//                    // giới hạn max dd/MM/yyyy = 10 ký tự
+//                    if (sb.length >= 10) break
+//                }
+//
+//                isUpdating = true
+//                editText.setText(sb.toString())
+//                editText.setSelection(sb.length)
+//                isUpdating = false
+//            }
+//        })
 
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable) {}
+        binding.btnArrowDown.setOnClickListener{
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setTitleText("Ngày Bắt Đầu Tình Yêu")
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
 
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (isUpdating) {
-                    isUpdating = false
-                    return
+            datePicker.show(childFragmentManager, "love_date_picker")
+
+            datePicker.addOnPositiveButtonClickListener { selection: Long ->
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                    timeInMillis = selection
                 }
-
-                // Lọc chỉ giữ chữ số
-                val digits = s.toString().filter { it.isDigit() }
-                val sb = StringBuilder()
-
-                for ((index, char) in digits.withIndex()) {
-                    sb.append(char)
-                    // chèn "/" sau 2 và 4 chữ số
-                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
-                        sb.append('/')
-                    }
-                    // giới hạn max dd/MM/yyyy = 10 ký tự
-                    if (sb.length >= 10) break
-                }
-
-                isUpdating = true
-                editText.setText(sb.toString())
-                editText.setSelection(sb.length)
-                isUpdating = false
+                val day   = cal.get(Calendar.DAY_OF_MONTH)
+                val month = cal.get(Calendar.MONTH) + 1
+                val year  = cal.get(Calendar.YEAR)
+                val formatted = String.format("%02d/%02d/%04d", day, month, year)
+                binding.etStartDate.text = formatted
             }
-        })
+
+        }
 
         binding.btnContinue.setOnClickListener {
             if (!binding.btnContinue.isEnabled) return@setOnClickListener
@@ -171,9 +194,9 @@ class DialogStartDate : DialogFragment() {
             )
         }
 
-        if (dateString.length != 10) {
-            return ValidationResult(false, "Vui lòng nhập đầy đủ ngày theo định dạng dd/MM/yyyy")
-        }
+//        if (dateString.length != 10) {
+//            return ValidationResult(false, "Vui lòng nhập đầy đủ ngày theo định dạng dd/MM/yyyy")
+//        }
 
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

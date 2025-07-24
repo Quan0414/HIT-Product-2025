@@ -128,6 +128,7 @@
 
                         <EditText
                             android:id="@+id/edtHo"
+                            android:backgroundTint="@color/grayUnderline"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:drawableEnd="@drawable/ic_edit_text"
@@ -156,6 +157,7 @@
                         <EditText
                             android:id="@+id/edtTen"
                             android:layout_width="match_parent"
+                            android:backgroundTint="@color/grayUnderline"
                             android:layout_height="wrap_content"
                             android:drawableEnd="@drawable/ic_edit_text"
                             android:drawablePadding="8dp"
@@ -180,6 +182,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:backgroundTint="@color/grayUnderline"
                     android:drawableEnd="@drawable/ic_edit_text"
                     android:drawablePadding="8dp"
                     android:enabled="false"
@@ -203,7 +206,7 @@
                     android:drawableEnd="@drawable/ic_edit_text"
                     android:drawablePadding="8dp"
                     android:enabled="false"
-
+                    android:backgroundTint="@color/grayUnderline"
                     android:fontFamily="@font/f500"
                     android:inputType="textEmailAddress"
                     android:textSize="14dp" />
@@ -260,7 +263,7 @@
                     android:text="Ngày xinh"
                     android:textSize="16dp" />
 
-                <EditText
+                <TextView
                     android:id="@+id/edtBirthday"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
@@ -271,6 +274,12 @@
                     android:fontFamily="@font/f500"
                     android:inputType="date"
                     android:textSize="14dp" />
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="2dp"
+                    android:layout_marginTop="-12dp"
+                    android:background="@color/grayUnderline" />
 
                 <!-- Buttons -->
                 <LinearLayout
