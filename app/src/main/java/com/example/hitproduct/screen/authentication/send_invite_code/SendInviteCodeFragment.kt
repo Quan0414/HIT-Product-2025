@@ -256,6 +256,7 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
         SocketManager.onRequestSent { data ->
+            Log.d("SendInvite", "Request sent: $data")
             // Trên background thread của socket, nên post về main thread để cập nhật UI
             Handler(Looper.getMainLooper()).post {
                 // Lấy đúng userId và username của người nhận

@@ -57,10 +57,11 @@ class SplashActivity : AppCompatActivity() {
         } else {
             // Đã có token → check couple
             lifecycleScope.launch {
-                when (val res = authRepo.fetchProfile(token)) {
+                when (val res = authRepo.checkCouple(token)) {
                     is DataResult.Success -> {
-                        val coupleOjb = res.data.couple
-                        if (coupleOjb != null) {
+                        val userData = res.data
+                        val coupleId = userData?.coupleId
+                        if (coupleId != null) {
                             // Đã có đôi → vào Main
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                         } else {
@@ -78,23 +79,9 @@ class SplashActivity : AppCompatActivity() {
 
                     is DataResult.Error -> {
                         // Lỗi (hết session, mạng…) → xoá token, về Login
-                        if (res.error.tokenExpired) {
-                            prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
-                            startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
-                            finish()
-                            Toast.makeText(
-                                this@SplashActivity,
-                                "Phiên đã hết hạn, vui lòng đăng nhập lại.",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        } else {
-                            // Lỗi khác, có thể do mạng, thông báo lỗi
-                            Toast.makeText(
-                                this@SplashActivity,
-                                "Lỗi: ${res.error.message}",
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
+                        prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
+                        startActivity(Intent(this@SplashActivity, LoginActivity::class.java))
+                        finish()
                     }
                 }
             }

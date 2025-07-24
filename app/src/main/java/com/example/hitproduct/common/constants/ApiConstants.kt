@@ -10,23 +10,23 @@ object ApiConstants {
     const val AUTH_LOGIN = "api/v1/auth/login"
     const val AUTH_SEND_OTP = "api/v1/auth/send-otp"
     const val AUTH_VERIFY_CODE = "api/v1/auth/register/confirm-otp"
-    const val SETUP_PROFILE = "api/v1/auth/profile"
 
     // User
-    const val EDIT_PROFILE = "api/v1/auth/profile"
-    const val USER_PROFILE = "api/v1/auth/profile"
+    const val AUTH_EDIT_PROFILE = "api/v1/auth/profile"
+    const val CHECK_COUPLE = "api/v1/auth/profile"
     const val CHECK_INVITE = "api/v1/couple/connect"
-    const val DISCONNECT_COUPLE = "api/v1/couple/disconnect"
 
+    // Events / Countdown
+    const val EVENTS_LIST = "api/events"
+    const val EVENT_CREATE = "api/events/create"
+    const val EVENT_UPDATE = "api/events/update"
+    const val EVENT_DELETE = "api/events/delete"
 
-    // HOME
-    const val GET_COUPLE = "api/v1/couple"
-    const val GET_PET = "api/v1/pets"
-    const val GET_FOOD = "api/v1/foods"
-    const val FEED_PET = "api/v1/pets"
-    const val GET_DAILY_QUESTION = "api/v1/question/daily"
-    const val SAVE_ANSWER_DAILY_QUESTION = "api/v1/question/daily"
-    const val GET_YOUR_LOVE_DAILY_QUESTION = "api/v1/question/daily/feedback"
+    // Share
+    const val SHARE_GENERATE = "api/share/generate"
 
+    // Headers
+    const val HEADER_AUTH = "Authorization"
+    const val HEADER_CONTENT_JSON = "Content-Type: application/json"
 
 }
