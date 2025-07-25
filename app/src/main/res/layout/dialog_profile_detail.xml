@@ -3,235 +3,237 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".screen.home_page.couple.detail.DialogProfileDetail">
+    android:layout_height="wrap_content"
+    android:background="@drawable/bg_profile_detail"
+    tools:context=".screen.dialog.couple_detail.DialogProfileDetail">
 
-    <ImageView
+    <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bgProfileDetail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/bg_profile_detail"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent" >
+        <ImageView
+            android:id="@+id/imageView11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/a"
+            app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
+            app:layout_constraintStart_toStartOf="@+id/bgProfileDetail"
+            app:layout_constraintTop_toTopOf="@+id/bgProfileDetail" />
 
-    <ImageView
-        android:id="@+id/imageView11"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/a"
-        app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
-        app:layout_constraintStart_toStartOf="@+id/bgProfileDetail"
-        app:layout_constraintTop_toTopOf="@+id/bgProfileDetail" />
+        <ImageView
+            android:id="@+id/imageView12"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:src="@drawable/b"
+            app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
+            app:layout_constraintStart_toStartOf="@+id/bgProfileDetail"
+            app:layout_constraintTop_toTopOf="@+id/bgProfileDetail" />
 
-    <ImageView
-        android:id="@+id/imageView12"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="24dp"
-        android:src="@drawable/b"
-        app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
-        app:layout_constraintStart_toStartOf="@+id/bgProfileDetail"
-        app:layout_constraintTop_toTopOf="@+id/bgProfileDetail" />
-
-    <io.getstream.avatarview.AvatarView
-        android:id="@+id/avatarView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="10dp"
-        android:scaleType="centerCrop"
-        app:avatarViewBorderColor="@color/borderBrown"
-        app:avatarViewBorderWidth="2dp"
-        app:avatarViewShape="circle"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView12"
-        app:layout_constraintEnd_toEndOf="@+id/imageView12"
-        app:layout_constraintStart_toStartOf="@+id/imageView12"
-        app:layout_constraintTop_toTopOf="@+id/imageView12" />
+        <io.getstream.avatarview.AvatarView
+            android:id="@+id/avatarView"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_margin="10dp"
+            android:scaleType="centerCrop"
+            app:avatarViewBorderColor="@color/borderBrown"
+            app:avatarViewBorderWidth="2dp"
+            app:avatarViewShape="circle"
+            app:layout_constraintBottom_toBottomOf="@+id/imageView12"
+            app:layout_constraintEnd_toEndOf="@+id/imageView12"
+            app:layout_constraintStart_toStartOf="@+id/imageView12"
+            app:layout_constraintTop_toTopOf="@+id/imageView12" />
 
 
-    <ImageView
-        android:id="@+id/btnClose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:src="@drawable/btn_close_medium"
-        app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
-        app:layout_constraintTop_toTopOf="@+id/imageView11" />
-
-    <LinearLayout
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginBottom="32dp"
-        android:orientation="vertical"
-        app:layout_constraintBottom_toBottomOf="@+id/bgProfileDetail"
-        app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
-        app:layout_constraintStart_toStartOf="@id/bgProfileDetail"
-        app:layout_constraintTop_toBottomOf="@+id/imageView11">
+        <ImageView
+            android:id="@+id/btnClose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="20dp"
+            android:src="@drawable/btn_close_medium"
+            app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
+            app:layout_constraintTop_toTopOf="@+id/imageView11" />
 
         <LinearLayout
-            android:layout_width="match_parent"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
+            android:layout_marginHorizontal="24dp"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="32dp"
+            android:orientation="vertical"
+            app:layout_constraintBottom_toBottomOf="@+id/bgProfileDetail"
+            app:layout_constraintEnd_toEndOf="@+id/bgProfileDetail"
+            app:layout_constraintStart_toStartOf="@id/bgProfileDetail"
+            app:layout_constraintTop_toBottomOf="@+id/imageView11">
 
-            <TextView
-                android:layout_width="0dp"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f900"
-                android:text="Tên:"
-                android:textColor="@color/textBrown"
-                android:textSize="24dp" />
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/tvName"
-                android:layout_width="0dp"
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f900"
+                    android:text="Tên:"
+                    android:textColor="@color/textBrown"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:id="@+id/tvName"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f700"
+                    android:gravity="right"
+                    android:textColor="@color/textBrown"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@drawable/dashed_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f700"
-                android:gravity="right"
-                android:textColor="@color/textBrown"
-                android:textSize="20dp" />
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f900"
+                    android:text="Biệt danh:"
+                    android:textColor="@color/textBrown"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:id="@+id/tvNickname"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f700"
+                    android:gravity="right"
+                    android:textColor="@color/textBrown"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@drawable/dashed_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f900"
+                    android:text="Ngày sinh:"
+                    android:textColor="@color/textBrown"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:id="@+id/tvBirthday"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f700"
+                    android:gravity="right"
+                    android:textColor="@color/textBrown"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@drawable/dashed_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f900"
+                    android:text="Giới tính:"
+                    android:textColor="@color/textBrown"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:id="@+id/tvGender"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f700"
+                    android:gravity="right"
+                    android:textColor="@color/textBrown"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@drawable/dashed_line" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f900"
+                    android:text="Cung:"
+                    android:textColor="@color/textBrown"
+                    android:textSize="24dp" />
+
+                <TextView
+                    android:id="@+id/tvZodiac"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:fontFamily="@font/f700"
+                    android:gravity="right"
+                    android:textColor="@color/textBrown"
+                    android:textSize="20dp" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@drawable/dashed_line" />
 
         </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/dashed_line" />
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f900"
-                android:text="Biệt danh:"
-                android:textColor="@color/textBrown"
-                android:textSize="24dp" />
-
-            <TextView
-                android:id="@+id/tvNickname"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f700"
-                android:gravity="right"
-                android:textColor="@color/textBrown"
-                android:textSize="20dp" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/dashed_line" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f900"
-                android:text="Ngày sinh:"
-                android:textColor="@color/textBrown"
-                android:textSize="24dp" />
-
-            <TextView
-                android:id="@+id/tvBirthday"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f700"
-                android:gravity="right"
-                android:textColor="@color/textBrown"
-                android:textSize="20dp" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/dashed_line" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f900"
-                android:text="Giới tính:"
-                android:textColor="@color/textBrown"
-                android:textSize="24dp" />
-
-            <TextView
-                android:id="@+id/tvGender"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f700"
-                android:gravity="right"
-                android:textColor="@color/textBrown"
-                android:textSize="20dp" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/dashed_line" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:orientation="horizontal">
-
-            <TextView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f900"
-                android:text="Cung:"
-                android:textColor="@color/textBrown"
-                android:textSize="24dp" />
-
-            <TextView
-                android:id="@+id/tvZodiac"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:fontFamily="@font/f700"
-                android:gravity="right"
-                android:textColor="@color/textBrown"
-                android:textSize="20dp" />
-
-        </LinearLayout>
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:background="@drawable/dashed_line" />
-
-    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

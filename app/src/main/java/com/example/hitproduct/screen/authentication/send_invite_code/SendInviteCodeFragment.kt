@@ -140,6 +140,10 @@ class SendInviteCodeFragment : Fragment() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
+                    val myUserId = result.data.id
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
+                        .apply()
                     // Cập nhật mã mời
                     val coupleCode = result.data.coupleCode
                     binding.tvInviteCode.text = coupleCode

@@ -3,6 +3,7 @@ package com.example.hitproduct.socket
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.ApiConstants
 import io.socket.client.IO
 import io.socket.client.IO.Options
@@ -227,7 +228,27 @@ object SocketManager {
 
     // Nuoi pet
 
+
+    // Gửi trạng thái mèo qua Socket với key PET_ACTIVE
+    fun sendCatStateToSocket(state: String, myLoveId: String) {
+        val payLoad = JSONObject().apply {
+            put("active", state)
+            put("myLoveId", myLoveId)
+        }
+        socket.emit("USER_SEND_PET_ACTIVE", payLoad)
+        Log.d("SocketManager", "Sent cat state: $state, myLoveId: $myLoveId")
+    }
+
     //Listener
+    fun onListenForPetActive(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_SEND_PET_ACTIVE") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received pet active data: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     fun onFeedPetSuccess(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_FEED_PET_SUCCESS") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->

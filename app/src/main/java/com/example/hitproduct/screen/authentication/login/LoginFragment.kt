@@ -28,7 +28,6 @@ import com.example.hitproduct.databinding.FragmentLoginBinding
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
-import com.example.hitproduct.screen.authentication.verify_code.VerifyCodeFragment
 
 class LoginFragment : Fragment() {
 
@@ -66,6 +65,9 @@ class LoginFragment : Fragment() {
         viewModel.coupleState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
+                    val myUserId = state.data.id
+                    prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment
                         parentFragmentManager.beginTransaction()
@@ -108,7 +110,11 @@ class LoginFragment : Fragment() {
                         if (err.passwordError) R.drawable.bg_edit_text_error
                         else R.drawable.bg_edit_text
                     )
-                    Toast.makeText(requireContext(), "${err.message} Vui lòng nhập email để xác nhận tài khoản. ", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(
+                        requireContext(),
+                        "${err.message} Vui lòng nhập email để xác nhận tài khoản. ",
+                        Toast.LENGTH_SHORT
+                    ).show()
                     binding.tvLogin.isEnabled = true
 
                     if (err.message == "Tài khoản chưa được xác nhận!") {

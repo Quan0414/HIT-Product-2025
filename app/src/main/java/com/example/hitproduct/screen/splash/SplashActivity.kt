@@ -58,6 +58,9 @@ class SplashActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 when (val res = authRepo.fetchProfile()) {
                     is DataResult.Success -> {
+                        val myUserId = res.data.id
+                        prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {
                             // Đã có đôi → vào Main
@@ -76,7 +79,6 @@ class SplashActivity : AppCompatActivity() {
                     }
 
                     is DataResult.Error -> {
-                        // Lỗi (hết session, mạng…) → xoá token, về Login
                         if (res.error.message == "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!") {
                             prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
                             startActivity(Intent(this@SplashActivity, LoginActivity::class.java))

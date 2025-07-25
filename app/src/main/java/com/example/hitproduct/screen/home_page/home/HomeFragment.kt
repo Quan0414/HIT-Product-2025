@@ -80,17 +80,18 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         R.raw.meo_nhay3,
         R.raw.meo_nhay4,
     )
-    private var hasShownStartDateDialog = false
-
     private var eattingCat = R.raw.meo_an
 
     private var currentCatList: List<Int> = normalCat
     private var currentCat: Int? = null
 
+    private var hasShownStartDateDialog = false
     private val shopDialog by lazy { ShopDialogFragment() }
     private val questionDialog by lazy { YourDailyQuestionDialogFragment() }
 
     override fun initView() {
+
+        registerSocketListeners()
 
         childFragmentManager.setFragmentResultListener(
             "update_start_date",
@@ -119,6 +120,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     .filter { it != currentCat }
                     .randomOrNull() ?: currentCatList.random()
                 currentCat = next
+                val keyState = catStateGifMap.filterValues { it == currentCat }
+                    .keys
+                    .firstOrNull()
+                Log.d("HomeFragment", "Cat state key: $keyState")
+                if (keyState != null) {
+                    SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
+                    Log.d("HomeFragment", "Cat state sent to server")
+                }
                 setAnimation(next)
                 playAnimation()
             }
@@ -189,6 +198,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
+                    val userAID = state.data.userA.id
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.USER_A_ID, userAID)
+                        .apply()
+                    val userBID = state.data.userB.id
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.USER_B_ID, userBID)
+                        .apply()
 
                     if (!state.data.loveStartedAtEdited && !hasShownStartDateDialog) {
                         hasShownStartDateDialog = true
@@ -268,6 +285,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     }
 
                     val first = currentCatList.random()
+                    val keyState = catStateGifMap.filterValues { it == first }
+                        .keys
+                        .firstOrNull()
+                    Log.d("HomeFragment", "Cat state key: $keyState")
+                    if (keyState != null) {
+                        SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
+                        Log.d("HomeFragment", "Cat state sent to server")
+                    }
                     currentCat = first
                     binding.gifCat.apply {
                         visibility = View.VISIBLE
@@ -283,7 +308,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        registerSocketListeners()
+
         Log.d("HomeFragment", "Socket listeners registered")
     }
 
@@ -392,6 +417,16 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     }
 
     private fun registerSocketListeners() {
+
+        SocketManager.onListenForPetActive { data ->
+            Log.d("HomeFragment", "onListenForPetActive fired with $data")
+            val key = data.optString("active")
+            val gifRes = catStateGifMap[key] ?: R.raw.meo_cay
+            binding.gifCat.setAnimation(gifRes)
+            binding.gifCat.playAnimation()
+        }
+
+
         SocketManager.onFeedPetSuccess { data ->
             Log.d("HomeFragment", "onFeedPetSuccess fired with $data")
             val newHunger = data.optInt("hunger")
@@ -466,5 +501,27 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
     }
 
+    private val catStateGifMap = mapOf(
+        "hungry_key" to R.raw.meo_doi,
+        "normal_key" to R.raw.meo_ngu,
+        "happy_key" to R.raw.meo_nhay1,
+        "angry_key" to R.raw.meo_cay,
+        "sleepy_key" to R.raw.meo_ngu,
+        "excited_key" to R.raw.meo_nhay2,
+        "playful_key" to R.raw.meo_the_luoi,
+        "sad_key" to R.raw.meo_khoc,
+        "surprised_key" to R.raw.meo_nhay3,
+        "annoyed_key" to R.raw.meo_gio_tay,
+        "curious_key" to R.raw.meo_nhay4,
+        "eating_key" to R.raw.meo_an
+    )
 
+    private fun checkMyLoveId(): String? {
+        //so sanh my user id va user id
+        val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
+        if (myId == prefs.getString(AuthPrefersConstants.USER_A_ID, null)) {
+            return prefs.getString(AuthPrefersConstants.USER_B_ID, null)
+        }
+        return prefs.getString(AuthPrefersConstants.USER_A_ID, null)
+    }
 }

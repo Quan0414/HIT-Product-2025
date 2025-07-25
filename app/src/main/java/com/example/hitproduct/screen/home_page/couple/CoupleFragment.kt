@@ -20,7 +20,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCoupleBinding
-import com.example.hitproduct.screen.home_page.couple.detail.DialogProfileDetail
+import com.example.hitproduct.screen.dialog.couple_detail.DialogProfileDetail
 import com.example.hitproduct.screen.home_page.home.HomeViewModel
 import com.example.hitproduct.screen.home_page.home.HomeViewModelFactory
 import io.getstream.avatarview.glide.loadImage
