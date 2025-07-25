@@ -12,7 +12,7 @@
         android:id="@+id/ivCalendar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="76dp"
         android:adjustViewBounds="true"
         android:src="@drawable/tv_calendar"
         app:layout_constraintEnd_toEndOf="parent"

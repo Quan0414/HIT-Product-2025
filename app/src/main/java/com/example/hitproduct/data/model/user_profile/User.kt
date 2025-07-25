@@ -18,6 +18,7 @@ data class User(
     val firstName: String?,
     val lastName: String?,
     val nickname: String?,
+    val tokenOtp: String?,
     @SerializedName("coupleId")
     val couple: Couple?
 ): Serializable

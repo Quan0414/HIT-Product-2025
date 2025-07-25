@@ -65,24 +65,24 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
 
     private val hungryCat = listOf(
-        R.raw.angry_cat,
-        R.raw.cat_cry,
-        R.raw.cat_the_luoi
+        R.raw.meo_doi,
+        R.raw.meo_khoc,
+        R.raw.meo_the_luoi
     )
     private val normalCat = listOf(
-        R.raw.spicy_cat,
-        R.raw.cat_hands_up,
-        R.raw.sleep_cat,
+        R.raw.meo_cay,
+        R.raw.meo_gio_tay,
+        R.raw.meo_ngu,
     )
     private val happyCat = listOf(
-        R.raw.dance_cat,
-        R.raw.dance_cat2,
-        R.raw.dance_cat3,
-        R.raw.dance_cat4,
+        R.raw.meo_nhay1,
+        R.raw.meo_nhay2,
+        R.raw.meo_nhay3,
+        R.raw.meo_nhay4,
     )
     private var hasShownStartDateDialog = false
 
-    private var eattingCat = R.raw.cat_eat
+    private var eattingCat = R.raw.meo_an
 
     private var currentCatList: List<Int> = normalCat
     private var currentCat: Int? = null
@@ -217,14 +217,25 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     val years = period.years
                     val months = period.months
                     val daysTotal = period.days
+
+                    // 4. Chuyển days thành tuần + ngày
+                    val weeks = daysTotal / 7
+                    val days = daysTotal % 7
+
                     requireActivity().supportFragmentManager.setFragmentResult(
                         "total_date_updated",
                         bundleOf("totalLoveDate" to totalDays)
                     )
 
-                    // 4. Chuyển days thành tuần + ngày
-                    val weeks = daysTotal / 7
-                    val days = daysTotal % 7
+                    requireActivity().supportFragmentManager.setFragmentResult(
+                        "date_components",
+                        bundleOf(
+                            "year" to years,
+                            "month" to months,
+                            "week" to weeks,
+                            "day" to days
+                        )
+                    )
 
                     // 6. Cập nhật UI
                     binding.tvYearNumber.text = years.toString()

@@ -6,9 +6,9 @@
     <!-- Bo góc cho Button -->
     <corners android:radius="12dp"/>
 
-    <!-- Viền cho Button -->
-    <stroke
-        android:width="2dp"
-        android:color="@color/borderBrown"/> <!-- Màu viền có thể thay đổi -->
+<!--    &lt;!&ndash; Viền cho Button &ndash;&gt;-->
+<!--    <stroke-->
+<!--        android:width="2dp"-->
+<!--        android:color="@color/borderBrown"/> &lt;!&ndash; Màu viền có thể thay đổi &ndash;&gt;-->
 
 </shape>
