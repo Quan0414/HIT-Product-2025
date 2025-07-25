@@ -22,13 +22,13 @@ import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.api.ApiService
-import com.example.hitproduct.data.api.RetrofitClient
+import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
+import com.example.hitproduct.screen.authentication.verify_code.VerifyCodeFragment
 
 class LoginFragment : Fragment() {
 
@@ -42,7 +42,7 @@ class LoginFragment : Fragment() {
 
     private val authRepo by lazy {
         AuthRepository(
-            RetrofitClient.getInstance().create(ApiService::class.java),
+            NetworkClient.provideApiService(requireContext()),
             prefs
         )
     }
@@ -66,11 +66,6 @@ class LoginFragment : Fragment() {
         viewModel.coupleState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
-                    // Lưu coupleCode
-                    prefs.edit()
-                        .putString(AuthPrefersConstants.COUPLE_CODE, state.data.coupleCode)
-                        .apply()
-
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment
                         parentFragmentManager.beginTransaction()
@@ -83,9 +78,11 @@ class LoginFragment : Fragment() {
                         requireActivity().finish()
                     }
                 }
+
                 is UiState.Error -> {
                     // Nếu cần xử lý lỗi khi check couple
                 }
+
                 else -> {
                     // Idle/Loading bỏ qua
                 }
@@ -98,9 +95,11 @@ class LoginFragment : Fragment() {
                 is UiState.Loading -> {
                     binding.tvLogin.isEnabled = false
                 }
+
                 is UiState.Error -> {
                     // Reset background và show lỗi
                     val err = state.error
+
                     binding.edtEmail.setBackgroundResource(
                         if (err.emailError) R.drawable.bg_edit_text_error
                         else R.drawable.bg_edit_text
@@ -109,20 +108,37 @@ class LoginFragment : Fragment() {
                         if (err.passwordError) R.drawable.bg_edit_text_error
                         else R.drawable.bg_edit_text
                     )
-                    Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "${err.message} Vui lòng nhập email để xác nhận tài khoản. ", Toast.LENGTH_SHORT).show()
                     binding.tvLogin.isEnabled = true
+
+                    if (err.message == "Tài khoản chưa được xác nhận!") {
+                        //chuyen den verify code kem theo email da nhap trong text
+                        val email = binding.edtEmail.text.toString().trim()
+                        val bundle = Bundle().apply {
+                            putString("email", email)
+                        }
+                        val fragment = FindAccFragment().apply {
+                            arguments = bundle
+                        }
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentStart, fragment)
+                            .addToBackStack(null)
+                            .commit()
+                    }
                 }
+
                 is UiState.Success -> {
                     binding.tvLogin.isEnabled = true
-                    Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT).show()
+                    Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT)
+                        .show()
 
                     // Sau khi login thành công, check tiếp couple
-                    val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
-                    viewModel.checkCouple(token)
+                    viewModel.checkCouple()
 
                     // Reset loginState để tránh lặp lại
                     viewModel.clearLoginState()
                 }
+
                 else -> {
                     // Idle bỏ qua
                 }
@@ -161,6 +177,7 @@ class LoginFragment : Fragment() {
                     .addToBackStack(null)
                     .commit()
             }
+
             override fun updateDrawState(ds: TextPaint) {
                 ds.color = ContextCompat.getColor(requireContext(), R.color.orange)
                 ds.isUnderlineText = false
@@ -195,6 +212,7 @@ class LoginFragment : Fragment() {
                 binding.edtEmail.setBackgroundResource(R.drawable.bg_edit_text)
                 updateLoginButtonState()
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })
@@ -204,6 +222,7 @@ class LoginFragment : Fragment() {
                 binding.edtPassword.setBackgroundResource(R.drawable.bg_edit_text)
                 updateLoginButtonState()
             }
+
             override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
         })

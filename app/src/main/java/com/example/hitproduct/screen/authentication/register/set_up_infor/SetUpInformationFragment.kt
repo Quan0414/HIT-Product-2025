@@ -1,14 +1,17 @@
 package com.example.hitproduct.screen.authentication.register.set_up_infor
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
+import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
@@ -22,8 +25,12 @@ import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
 import com.example.hitproduct.screen.authentication.login.LoginViewModel
 import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
+import com.example.hitproduct.screen.dialog.start_date.DialogStartDate.ValidationResult
+import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Locale
+import java.util.TimeZone
 
 
 class SetUpInformationFragment : Fragment() {
@@ -57,6 +64,7 @@ class SetUpInformationFragment : Fragment() {
         return binding.root
     }
 
+    @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -91,26 +99,48 @@ class SetUpInformationFragment : Fragment() {
             }
         }
 
+        binding.tvBirthday.setOnClickListener {
+
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+
+            datePicker.show(childFragmentManager, "love_date_picker")
+
+            datePicker.addOnPositiveButtonClickListener { selection: Long ->
+                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                    timeInMillis = selection
+                }
+                val day = cal.get(Calendar.DAY_OF_MONTH)
+                val month = cal.get(Calendar.MONTH) + 1
+                val year = cal.get(Calendar.YEAR)
+                val formatted = String.format("%02d/%02d/%04d", day, month, year)
+                binding.tvBirthday.text = formatted
+            }
+
+        }
+
+
         binding.tvContinue.setOnClickListener {
-            val rawDob = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
-            val formattedDob = rawDob?.let {
-                try {
-                    val inputFmt  = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-                    val outputFmt = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-                    outputFmt.format(inputFmt.parse(it)!!)
-                } catch (e: Exception) {
-                    null
+            val inputDate = binding.tvBirthday.text.toString().takeIf { it.isNotBlank() }
+            val validationResult = inputDate?.let { it1 -> validateDate(it1) }
+            if (validationResult != null) {
+                if (!validationResult.isValid) {
+                    Toast.makeText(
+                        requireContext(),
+                        validationResult.errorMessage,
+                        Toast.LENGTH_SHORT
+                    )
+                        .show()
+                    return@setOnClickListener
                 }
             }
 
-            val firstName   = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
-            val lastName    = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
-            val nickName    = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
-            val gender      = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
-            // Chú ý: ở đây phải dùng formattedDob, không phải rawDob hay editText.text
-            val dateOfBirth = formattedDob
-
-            val avatarUri   = null
+            val firstName = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
+            val lastName = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
+            val nickName = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
+            val gender = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
+            val dateOfBirth = inputDate.toSendDate()
 
             // Gọi updateProfile trong ViewModel
             viewModel.updateProfile(
@@ -145,39 +175,38 @@ class SetUpInformationFragment : Fragment() {
 
 
         //ngày sinh
-        val editText = binding.edtBirthday
+        val editText = binding.tvBirthday
 
-        editText.addTextChangedListener(object : TextWatcher {
-            private var isUpdating = false
-
-            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-            override fun afterTextChanged(s: Editable) {}
-
-            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-                if (isUpdating) {
-                    isUpdating = false
-                    return
-                }
-
-                // Lọc chỉ giữ chữ số
-                val digits = s.toString().filter { it.isDigit() }
-                val sb = StringBuilder()
-
-                for ((index, char) in digits.withIndex()) {
-                    sb.append(char)
-                    // chèn "/" sau 2 và 4 chữ số
-                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
-                        sb.append('/')
-                    }
-                    // giới hạn max dd/MM/yyyy = 10 ký tự
-                    if (sb.length >= 10) break
-                }
-
-                isUpdating = true
-                editText.setText(sb)
-                editText.setSelection(sb.length)
-            }
-        })
+//        editText.addTextChangedListener(object : TextWatcher {
+//            private var isUpdating = false
+//
+//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
+//            override fun afterTextChanged(s: Editable) {}
+//
+//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
+//                if (isUpdating) {
+//                    isUpdating = false
+//                    return
+//                }
+//
+//                // Lọc chỉ giữ chữ số
+//                val digits = s.toString().filter { it.isDigit() }
+//                val sb = StringBuilder()
+//
+//                for ((index, char) in digits.withIndex()) {
+//                    sb.append(char)
+//                    // chèn "/" sau 2 và 4 chữ số
+//                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
+//                        sb.append('/')
+//                    }
+//                    // giới hạn max dd/MM/yyyy = 10 ký tự
+//                    if (sb.length >= 10) break
+//                }
+//
+//                isUpdating = true
+//                editText.setText(sb)
+//            }
+//        })
 
 
         //skip button
@@ -194,5 +223,69 @@ class SetUpInformationFragment : Fragment() {
         }
 
 
+    }
+
+    private fun validateDate(dateString: String): ValidationResult {
+//        if (dateString.isBlank()) {
+//            return ValidationResult(
+//                false,
+//                "Ê ê! Nhập ngày đi bạn ơi,  bộ bạn không nhớ ngày bắt đầu yêu nhau hả :)))"
+//            )
+//        }
+
+//        if (dateString.length != 10) {
+//            return ValidationResult(false, "Vui lòng nhập đầy đủ ngày theo định dạng dd/MM/yyyy")
+//        }
+
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
+            val inputDate =
+                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
+
+            // Tính toán ngày giới hạn (200 năm trước)
+            val calendar = Calendar.getInstance()
+            calendar.timeZone = TimeZone.getTimeZone("UTC")
+            val today = calendar.time
+
+            calendar.add(Calendar.YEAR, -200)
+            val minDate = calendar.time
+
+            when {
+                inputDate.before(minDate) -> {
+                    ValidationResult(
+                        false,
+                        "Ôi dồi ôi! Bạn sinh ra từ thời khủng long à? Chọn ngày gần đây hơn đi!"
+                    )
+                }
+
+                inputDate.after(today) -> {
+                    ValidationResult(false, "Chưa đến ngày đó mà! Chọn lại đi bạn ơi~")
+                }
+
+                else -> ValidationResult(true)
+            }
+        } catch (e: Exception) {
+            ValidationResult(
+                false,
+                "Định dạng ngày không đúng. Vui lòng nhập theo định dạng dd/MM/yyyy"
+            )
+        }
+    }
+
+    fun String?.toSendDate(): String {
+        if (this.isNullOrBlank()) return ""
+        return try {
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val date = inputFormat.parse(this) ?: return ""
+            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+            outputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            outputFormat.format(date)
+        } catch (e: Exception) {
+            this
+        }
     }
 }

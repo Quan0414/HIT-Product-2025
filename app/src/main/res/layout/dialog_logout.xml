@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="300dp"
-    android:layout_height="170dp"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
     android:background="@drawable/bg_rounded"
     android:orientation="vertical"
     android:padding="16dp">
 
     <LinearLayout
+        android:id="@+id/title"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:gravity="center"
@@ -23,7 +24,7 @@
             android:layout_marginBottom="4dp"
             android:fontFamily="@font/f800"
             android:text="Đăng xuất"
-            android:textSize="20dp" />
+            android:textSize="24dp" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -32,45 +33,46 @@
             android:gravity="center"
             android:text="Bạn chắc chắn muốn đăng xuất? Bạn cần đăng nhập lại để sử dụng ứng dụng."
             android:textColor="@color/grayText"
-            android:textSize="12dp" />
+            android:textSize="14dp" />
 
     </LinearLayout>
 
     <TextView
         android:id="@+id/btn_close"
-        android:layout_width="130dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity=""
+        android:layout_marginTop="12dp"
+        android:layout_marginEnd="32dp"
         android:background="@drawable/bg_btn_option1"
         android:fontFamily="@font/f500"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingTop='8dp'
-        android:paddingEnd="12dp"
-        android:paddingBottom="8dp"
+        android:paddingHorizontal="0dp"
+        android:paddingVertical="8dp"
         android:text="Đóng"
         android:textColor="@color/orange"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent" />
+        android:textSize="16sp"
+        app:layout_constraintEnd_toStartOf="@+id/btn_logout"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/title" />
 
     <TextView
         android:id="@+id/btn_logout"
-        android:layout_width="130dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_gravity=""
         android:background="@drawable/bg_btn_option2"
         android:fontFamily="@font/f500"
         android:gravity="center"
-        android:paddingStart="12dp"
-        android:paddingTop='8dp'
-        android:paddingEnd="12dp"
-        android:paddingBottom="8dp"
+        android:paddingHorizontal="0dp"
+        android:paddingVertical="8dp"
         android:text="Đăng xuất"
         android:textColor="@color/white"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        android:textSize="16sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintStart_toEndOf="@id/btn_close"
 
+        app:layout_constraintTop_toTopOf="@+id/btn_close" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

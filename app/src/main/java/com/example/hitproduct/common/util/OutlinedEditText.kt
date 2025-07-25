@@ -12,111 +12,136 @@ import com.example.hitproduct.R
 class OutlinedEditText @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
-    defStyleAttr: Int = 0
+    defStyleAttr: Int = android.R.attr.editTextStyle
 ) : AppCompatEditText(context, attrs, defStyleAttr) {
 
-    private val strokePaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val strokePaint = TextPaint(TextPaint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.STROKE
     }
-    private val fillPaint = TextPaint(Paint.ANTI_ALIAS_FLAG).apply {
+    private val fillPaint = TextPaint(TextPaint.ANTI_ALIAS_FLAG).apply {
         style = Paint.Style.FILL
     }
 
+    private var strokeColor  = currentTextColor
+    private var strokeWidth  = 4f
+    private var fillColor    = currentTextColor
+
     init {
+        // đọc custom attrs
         attrs?.let {
-            val a = context.obtainStyledAttributes(it, R.styleable.OutlinedTextView)
-            strokePaint.color = a.getColor(
+            val a = context.obtainStyledAttributes(
+                it, R.styleable.OutlinedTextView, defStyleAttr, 0
+            )
+            strokeColor = a.getColor(
                 R.styleable.OutlinedTextView_strokeColor,
-                Color.BLACK
+                strokeColor
             )
-            strokePaint.strokeWidth = a.getDimension(
+            strokeWidth = a.getDimension(
                 R.styleable.OutlinedTextView_strokeWidth,
-                4f
+                strokeWidth
             )
-            fillPaint.color = a.getColor(
+            fillColor = a.getColor(
                 R.styleable.OutlinedTextView_fillColor,
-                currentTextColor
+                fillColor
             )
             a.recycle()
         }
 
-        // Tắt background mặc định để tránh conflict với custom drawing
-        background = null
+        // thiết lập paint
+        strokePaint.color       = strokeColor
+        strokePaint.strokeWidth = strokeWidth
+        fillPaint.color         = fillColor
+
+        // Ẩn text gốc: ta tự vẽ fill bằng fillPaint
+        super.setTextColor(Color.TRANSPARENT)
     }
 
     override fun onDraw(canvas: Canvas) {
-        // Vẽ outline text trước
-        drawOutlinedText(canvas)
+        // 1) vẽ outline + fill
+        val content = if (text.isNullOrEmpty()) hint?.toString().orEmpty()
+        else text.toString()
+        val isHint = text.isNullOrEmpty()
 
-        // Tạm thời làm trong suốt text color để không vẽ đè lên outline
-        val originalColor = currentTextColor
-        setTextColor(Color.TRANSPARENT)
+        if (content.isNotEmpty()) {
+            drawOutlinedText(canvas, content, isHint)
+        }
 
-        // Vẽ EditText bình thường (cursor, selection, etc.)
+        // 2) rồi super vẽ background, cursor, selection chứ không vẽ text (vì transparent)
         super.onDraw(canvas)
-
-        // Khôi phục màu text
-        setTextColor(originalColor)
     }
 
-    private fun drawOutlinedText(canvas: Canvas) {
-        val text = text?.toString() ?: return
-        if (text.isEmpty()) return
+    private fun drawOutlinedText(canvas: Canvas, content: String, isHint: Boolean) {
+        val layout = layout ?: return
 
-        val x = compoundPaddingLeft.toFloat()
-        val y = baseline.toFloat()
+        // cập nhật paint mỗi lần vẽ
+        strokePaint.apply {
+            textSize      = this@OutlinedEditText.textSize
+            typeface      = this@OutlinedEditText.typeface
+            letterSpacing = this@OutlinedEditText.letterSpacing
+            color         = strokeColor
+            strokeWidth   = strokeWidth
+            alpha         = if (isHint) 100 else 255
+        }
+        fillPaint.apply {
+            textSize      = this@OutlinedEditText.textSize
+            typeface      = this@OutlinedEditText.typeface
+            letterSpacing = this@OutlinedEditText.letterSpacing
+            color         = fillColor
+            alpha         = if (isHint) 100 else 255
+        }
 
-        // Cấu hình paint cho stroke
-        strokePaint.textSize = textSize
-        strokePaint.typeface = typeface
-        strokePaint.letterSpacing = letterSpacing
+        val padL = compoundPaddingLeft
+        val padT = compoundPaddingTop
+        canvas.save()
+        canvas.translate(padL - scrollX.toFloat(), padT - scrollY.toFloat())
 
-        // Cấu hình paint cho fill
-        fillPaint.textSize = textSize
-        fillPaint.typeface = typeface
-        fillPaint.letterSpacing = letterSpacing
+        val offset = strokeWidth / 2f
+        val diag   = offset * 0.707f
 
-        // Phương pháp 1: Vẽ outline bằng cách offset theo 4 hướng chính
-        val strokeWidth = strokePaint.strokeWidth
-        val offset = strokeWidth / 2
+        for (i in 0 until layout.lineCount) {
+            val start = layout.getLineStart(i)
+            val end   = layout.getLineEnd(i)
+            val line  = content.substring(start, end)
+            val x     = layout.getLineLeft(i)
+            val y     = layout.getLineBaseline(i).toFloat()
 
-        // Vẽ outline ở 4 hướng chính
-        canvas.drawText(text, x - offset, y, strokePaint) // Trái
-        canvas.drawText(text, x + offset, y, strokePaint) // Phải
-        canvas.drawText(text, x, y - offset, strokePaint) // Trên
-        canvas.drawText(text, x, y + offset, strokePaint) // Dưới
+            // vẽ outline 8 hướng
+            listOf(
+                -offset to  0f,  offset to  0f,
+                0f     to -offset, 0f     to  offset,
+                -diag   to -diag,   diag   to -diag,
+                -diag   to  diag,   diag   to  diag
+            ).forEach { (dx, dy) ->
+                canvas.drawText(line, x + dx, y + dy, strokePaint)
+            }
 
-        // Vẽ outline ở 4 hướng chéo để làm mượt hơn
-        val diagonalOffset = offset * 0.7f // Giảm offset cho hướng chéo
-        canvas.drawText(text, x - diagonalOffset, y - diagonalOffset, strokePaint) // Trái-trên
-        canvas.drawText(text, x + diagonalOffset, y - diagonalOffset, strokePaint) // Phải-trên
-        canvas.drawText(text, x - diagonalOffset, y + diagonalOffset, strokePaint) // Trái-dưới
-        canvas.drawText(text, x + diagonalOffset, y + diagonalOffset, strokePaint) // Phải-dưới
+            // vẽ fill chính giữa
+            canvas.drawText(line, x, y, fillPaint)
+        }
 
-        // Vẽ fill text lên trên
-        canvas.drawText(text, x, y, fillPaint)
+        canvas.restore()
     }
 
-    // Cập nhật màu text khi thay đổi
+    // override để fillColor theo setTextColor()
     override fun setTextColor(color: Int) {
-        super.setTextColor(color)
+        fillColor = color
         fillPaint.color = color
+        super.setTextColor(Color.TRANSPARENT)
         invalidate()
     }
 
-    // Các phương thức để set màu stroke và fill programmatically
+    /** Programmatic API **/
     fun setStrokeColor(color: Int) {
-        strokePaint.color = color
-        invalidate()
+        strokeColor = color; strokePaint.color = color; invalidate()
     }
-
     fun setStrokeWidth(width: Float) {
-        strokePaint.strokeWidth = width
-        invalidate()
+        strokeWidth = width; strokePaint.strokeWidth = width; invalidate()
+    }
+    fun setFillColor(color: Int) {
+        fillColor = color; fillPaint.color = color; invalidate()
     }
 
-    fun setFillColor(color: Int) {
-        fillPaint.color = color
-        invalidate()
-    }
+    fun getStrokeColor(): Int  = strokeColor
+    fun getStrokeWidth(): Float = strokeWidth
+    fun getFillColor(): Int    = fillColor
 }

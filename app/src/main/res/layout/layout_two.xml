@@ -1,0 +1,263 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/imageView7"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="40dp"
+        android:adjustViewBounds="true"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:src="@drawable/tv_couple_header2"
+        android:text="Hai bạn đã bên nhau"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:strokeColor="@color/borderBrown"
+        app:strokeWidth="4dp" />
+
+    <ImageView
+        android:id="@+id/bgYear"
+        android:layout_width="0dp"
+        android:layout_height="70dp"
+        android:layout_marginTop="20dp"
+        android:src="@drawable/bg_days_in_couple"
+        app:layout_constraintEnd_toStartOf="@+id/bgMonth"
+        app:layout_constraintHorizontal_chainStyle="spread"
+        app:layout_constraintStart_toStartOf="@+id/imageView7"
+        app:layout_constraintTop_toBottomOf="@id/imageView7" />
+
+    <!-- 1st item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvYearNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvY"
+        app:layout_constraintEnd_toEndOf="@id/bgYear"
+        app:layout_constraintStart_toStartOf="@id/bgYear"
+        app:layout_constraintTop_toTopOf="@id/bgYear"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:strokeColor="@color/borderBrown"
+        app:strokeWidth="2dp" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvY"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f800"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Years"
+        android:textColor="@color/white"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgYear"
+        app:layout_constraintEnd_toEndOf="@id/bgYear"
+        app:layout_constraintStart_toStartOf="@id/bgYear"
+        app:layout_constraintTop_toBottomOf="@id/tvYearNumber"
+        app:strokeColor="@color/borderBrown" />
+
+
+    <ImageView
+        android:id="@+id/bgMonth"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        android:src="@drawable/bg_days_in_couple"
+        app:layout_constraintEnd_toStartOf="@+id/bgWeek"
+        app:layout_constraintStart_toEndOf="@id/bgYear"
+        app:layout_constraintTop_toTopOf="@id/bgYear" />
+
+    <!-- 1st item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvMonthNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvM"
+        app:layout_constraintEnd_toEndOf="@id/bgMonth"
+        app:layout_constraintStart_toStartOf="@id/bgMonth"
+        app:layout_constraintTop_toTopOf="@id/bgMonth"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:strokeColor="@color/borderBrown"
+        app:strokeWidth="2dp" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvM"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f800"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Months"
+        android:textColor="@color/white"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgMonth"
+        app:layout_constraintEnd_toEndOf="@id/bgMonth"
+        app:layout_constraintStart_toStartOf="@id/bgMonth"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthNumber"
+        app:strokeColor="@color/borderBrown" />
+
+
+    <!-- 1st item of the vertical chain: -->
+    <ImageView
+        android:id="@+id/bgWeek"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        android:src="@drawable/bg_days_in_couple"
+        app:layout_constraintEnd_toStartOf="@+id/bgDay"
+        app:layout_constraintStart_toEndOf="@id/bgMonth"
+        app:layout_constraintTop_toTopOf="@id/bgMonth" />
+
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvWeekNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvW"
+        app:layout_constraintEnd_toEndOf="@id/bgWeek"
+        app:layout_constraintStart_toStartOf="@id/bgWeek"
+        app:layout_constraintTop_toTopOf="@id/bgWeek"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:strokeColor="@color/borderBrown"
+        app:strokeWidth="2dp" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvW"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f800"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Weeks"
+        android:textColor="@color/white"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgWeek"
+        app:layout_constraintEnd_toEndOf="@id/bgWeek"
+        app:layout_constraintStart_toStartOf="@id/bgWeek"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthNumber"
+        app:strokeColor="@color/borderBrown" />
+
+    <ImageView
+        android:id="@+id/bgDay"
+        android:layout_width="0dp"
+        android:layout_height="66dp"
+        android:src="@drawable/bg_days_in_couple"
+        app:layout_constraintEnd_toEndOf="@+id/imageView7"
+        app:layout_constraintStart_toEndOf="@id/bgWeek"
+        app:layout_constraintTop_toTopOf="@id/bgWeek" />
+
+    <!-- 1st item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvDayNumber"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:textColor="@color/white"
+        android:textSize="20dp"
+        app:layout_constraintBottom_toTopOf="@+id/tvD"
+        app:layout_constraintEnd_toEndOf="@id/bgDay"
+        app:layout_constraintStart_toStartOf="@id/bgDay"
+        app:layout_constraintTop_toTopOf="@id/bgDay"
+        app:layout_constraintVertical_chainStyle="packed"
+        app:strokeColor="@color/borderBrown"
+        app:strokeWidth="2dp" />
+
+    <!-- 2nd item of the vertical chain: -->
+    <com.example.hitproduct.common.util.OutlinedTextView
+        android:id="@+id/tvD"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="4dp"
+        android:fontFamily="@font/f800"
+        android:gravity="center"
+        android:includeFontPadding="false"
+        android:text="Days"
+        android:textColor="@color/white"
+        android:textSize="14dp"
+        app:layout_constraintBottom_toBottomOf="@id/bgDay"
+        app:layout_constraintEnd_toEndOf="@id/bgDay"
+        app:layout_constraintStart_toStartOf="@id/bgDay"
+        app:layout_constraintTop_toBottomOf="@id/tvMonthNumber"
+        app:strokeColor="@color/borderBrown" />
+
+    <ImageView
+        android:id="@+id/imageView14"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/bg_status_couple"
+        app:layout_constraintEnd_toEndOf="@+id/bgDay"
+        app:layout_constraintStart_toStartOf="@id/bgYear"
+        app:layout_constraintTop_toBottomOf="@id/bgYear" />
+
+    <TextView
+        android:id="@+id/tvInloveStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="12dp"
+        android:fontFamily="@font/f900"
+        android:text="Inlove status:"
+        android:textColor="@color/textBrown"
+        android:textSize="16dp"
+        app:layout_constraintStart_toStartOf="@+id/imageView14"
+        app:layout_constraintTop_toTopOf="@+id/imageView14" />
+
+    <com.erif.readmoretextview.TextViewReadMore
+        android:id="@+id/tvStatus"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:layout_marginEnd="12dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/bg_orange_border"
+        android:ellipsize="end"
+        android:fontFamily="@font/f700"
+        android:paddingHorizontal="10dp"
+        android:paddingVertical="6dp"
+        android:textColor="@color/textBrown"
+        android:textSize="16dp"
+        app:actionClickColor="@color/textBrown"
+        app:collapseText="Thu gọn"
+        app:collapseTextColor="@color/textBrown"
+        app:collapseTextStyle="italic"
+        app:collapseTextUnderline="true"
+        app:expandText="Xem thêm"
+        app:expandTextColor="@color/textBrown"
+        app:expandTextStyle="italic"
+        app:interpolator="decelerate"
+        app:expandTextUnderline="true"
+        app:layout_constraintBottom_toBottomOf="@+id/imageView14"
+        app:layout_constraintEnd_toEndOf="@id/imageView14"
+        app:layout_constraintStart_toStartOf="@id/tvInloveStatus"
+        app:layout_constraintTop_toBottomOf="@id/tvInloveStatus"
+        app:readMoreMaxLines="3" />
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

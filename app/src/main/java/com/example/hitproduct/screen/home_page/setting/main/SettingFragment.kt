@@ -6,8 +6,6 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
-import com.bumptech.glide.Glide
-import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -18,6 +16,7 @@ import com.example.hitproduct.databinding.FragmentSettingBinding
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.dialog.disconnect.DialogDisconnectFragment
 import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingFragment
+import io.getstream.avatarview.glide.loadImage
 
 
 class SettingFragment : BaseFragment<FragmentSettingBinding>() {
@@ -88,20 +87,22 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                 }
 
                 is UiState.Success -> {
-                    // Cập nhật giao diện với dữ liệu người dùng
                     val user = state.data
-                    // đổ data lên form
                     binding.tvName.text = user.username
-                    binding.tvNickname.text = user.nickname
 
-                    user.avatar?.takeIf { it.isNotBlank() }?.let { url ->
-                        val secureUrl = url.replaceFirst("http://", "https://")
-                        // dùng Glide / Coil / Picasso tuỳ thích
-                        Glide.with(this)
-                            .load(secureUrl)
-                            .placeholder(R.drawable.avatar_default)
-                            .error(R.drawable.avatar_default)
-                            .into(binding.imgAvatar)
+                    val nickname = user.nickname
+                        .takeIf { !it.isNullOrBlank() }
+                        ?: ""
+                    binding.tvNickname.text = nickname
+
+                    val avatarUrl = user.avatar
+                        ?.takeIf { it.isNotBlank() }
+                        ?.replaceFirst("http://", "https://")
+                        ?: R.drawable.avatar_default
+                    if (avatarUrl != "/example.png") {
+                        binding.imgAvatar.loadImage(avatarUrl)
+                    } else {
+                        binding.imgAvatar.loadImage(R.drawable.avatar_default)
                     }
                 }
             }
@@ -113,10 +114,15 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                     val err = state.error
                     Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
                 }
+
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    Toast.makeText(requireContext(), "Hủy kết nối thành công", Toast.LENGTH_SHORT)
+                    Toast.makeText(
+                        requireContext(),
+                        "Bạn đã chia tay với cậu ấy :(((",
+                        Toast.LENGTH_SHORT
+                    )
                         .show()
 
                     prefs.edit().clear().apply()

@@ -16,6 +16,7 @@
     <color name="nav_text_inactive">#A5623D</color>
     <color name="nav_icon_active">#FFFFFF</color>
     <color name="nav_icon_inactive">#A5623D</color>
+    <color name="orange_dialog">#FFEADD</color>
 
 <!--    progressbar-->
     <color name="status1">#DA9973</color>

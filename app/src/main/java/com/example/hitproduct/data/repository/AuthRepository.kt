@@ -11,7 +11,14 @@ import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
+import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
+import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
+import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
+import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
+import com.example.hitproduct.data.model.couple.CoupleData
 import com.example.hitproduct.data.model.couple.CoupleProfile
 import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
@@ -19,7 +26,6 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
-import com.example.hitproduct.data.model.note.NoteResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.Pet
@@ -113,9 +119,9 @@ class AuthRepository(
     }
 
     // AuthRepository.kt
-    suspend fun checkInvite(token: String): DataResult<InviteData> {
+    suspend fun checkInvite(): DataResult<InviteData> {
         return when (val result = getResult {
-            api.checkInvite("Bearer $token")
+            api.checkInvite()
         }) {
             is DataResult.Success -> {
                 // result.data: ApiResponse<InviteData>
@@ -127,9 +133,9 @@ class AuthRepository(
     }
 
 
-    suspend fun fetchProfile(token: String): DataResult<User> {
+    suspend fun fetchProfile(): DataResult<User> {
         return when (val result = getResult {
-            api.getProfile("Bearer $token")
+            api.getProfile()
         }) {
             is DataResult.Success ->
                 DataResult.Success(result.data.data)
@@ -152,6 +158,15 @@ class AuthRepository(
 
     suspend fun disconnect(): DataResult<ApiResponse<String>> {
         return when (val result = getResult { api.disconnectCouple() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun chooseStartDate(loveStartedAt: String): DataResult<ApiResponse<CoupleData>> {
+        return when (val result = getResult {
+            api.chooseStartDate(ChooseStartDateRequest(loveStartedAt))
+        }) {
             is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
@@ -230,8 +245,35 @@ class AuthRepository(
         }
     }
 
-    suspend fun fetchNote(): DataResult<ApiResponse<NoteResponse>> {
+    suspend fun fetchNote(): DataResult<ApiResponse<GetNoteResponse>> {
         return when (val result = getResult { api.getNotes() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun createNote(
+        content: String,
+        date: String
+    ): DataResult<ApiResponse<NewNoteResponse>> {
+        return when (val result = getResult { api.createNote(NewNoteRequest(content, date)) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun deleteNote(noteId: String): DataResult<ApiResponse<String>> {
+        return when (val result = getResult { api.deleteNote(noteId) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun editNote(
+        noteId: String,
+        content: String
+    ): DataResult<ApiResponse<EditNoteResponse>> {
+        return when (val result = getResult { api.editNote(noteId, EditNoteRequest(content)) }) {
             is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
@@ -253,9 +295,4 @@ class AuthRepository(
             .apply()
     }
 
-    fun saveUserId(userId: String) {
-        prefs.edit()
-            .putString(AuthPrefersConstants.USER_ID, userId)
-            .apply()
-    }
 }

@@ -10,7 +10,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 object UserProfileRequest {
 
     /**
-     * Chỉ tạo các field text không-null, không-blank để gửi lên server.
+     * Tạo các field text, null sẽ thành "" để gửi lên server.
      */
     fun prepareFields(
         firstName: String?,
@@ -18,24 +18,16 @@ object UserProfileRequest {
         nickName: String?,
         gender: String?,
         dateOfBirth: String?
-    ): Map<String, RequestBody> {
-        val map = mutableMapOf<String, RequestBody>()
-        firstName?.takeIf { it.isNotBlank() }?.let {
-            map["firstName"] = it.toRequestBody("text/plain".toMediaType())
-        }
-        lastName?.takeIf { it.isNotBlank() }?.let {
-            map["lastName"] = it.toRequestBody("text/plain".toMediaType())
-        }
-        nickName?.takeIf { it.isNotBlank() }?.let {
-            map["nickname"] = it.toRequestBody("text/plain".toMediaType())
-        }
-        gender?.takeIf { it.isNotBlank() }?.let {
-            map["gender"] = it.toRequestBody("text/plain".toMediaType())
-        }
-        dateOfBirth?.takeIf { it.isNotBlank() }?.let {
-            map["dateOfBirth"] = it.toRequestBody("text/plain".toMediaType())
-        }
-        return map
+    ): Map<String, RequestBody> = mutableMapOf<String, RequestBody>().apply {
+        // MediaType text/plain
+        val mt = "text/plain".toMediaType()
+
+        // Luôn map key → RequestBody, dùng orEmpty() với null
+        put("firstName",  (firstName.orEmpty()).toRequestBody(mt))
+        put("lastName",   (lastName.orEmpty()).toRequestBody(mt))
+        put("nickname",   (nickName.orEmpty()).toRequestBody(mt))
+        put("gender",     (gender.orEmpty()).toRequestBody(mt))
+        put("dateOfBirth",(dateOfBirth.orEmpty()).toRequestBody(mt))
     }
 
     /**

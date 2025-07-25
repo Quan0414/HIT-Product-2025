@@ -33,7 +33,7 @@
         app:layout_constraintTop_toTopOf="@+id/iv1" />
 
     <ImageView
-        android:id="@+id/btnCheckQuestion"
+        android:id="@+id/btnCancel"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:layout_marginEnd="24dp"
@@ -41,19 +41,19 @@
         android:adjustViewBounds="true"
         android:src="@drawable/btn_not_delete_note"
         app:layout_constraintBottom_toBottomOf="@id/iv1"
-        app:layout_constraintEnd_toStartOf="@+id/btnSaveAnswer"
+        app:layout_constraintEnd_toStartOf="@+id/btnAccept"
         app:layout_constraintHorizontal_chainStyle="spread"
         app:layout_constraintStart_toStartOf="@+id/tvTitle" />
 
     <ImageView
-        android:id="@+id/btnSaveAnswer"
+        android:id="@+id/btnAccept"
         android:layout_width="wrap_content"
         android:layout_height="48dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_accept_delete_note"
-        app:layout_constraintBottom_toBottomOf="@+id/btnCheckQuestion"
+        app:layout_constraintBottom_toBottomOf="@+id/btnCancel"
         app:layout_constraintEnd_toEndOf="@+id/tvTitle"
-        app:layout_constraintStart_toEndOf="@id/btnCheckQuestion"
-        app:layout_constraintTop_toTopOf="@+id/btnCheckQuestion" />
+        app:layout_constraintStart_toEndOf="@id/btnCancel"
+        app:layout_constraintTop_toTopOf="@+id/btnCancel" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

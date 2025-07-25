@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.home_page.calendar
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,16 +9,18 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.fragment.app.activityViewModels
+import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.OutlinedTextView
 import com.example.hitproduct.data.api.NetworkClient
-import com.example.hitproduct.data.model.note.Note
+import com.example.hitproduct.data.model.calendar.Note
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentNoteBinding
-import com.example.hitproduct.screen.dialog.note.DialogNote
+import com.example.hitproduct.screen.dialog.note.create.DialogCreateNote
+import com.example.hitproduct.screen.dialog.note.get.DialogNote
 import com.kizitonwose.calendar.core.CalendarDay
 import com.kizitonwose.calendar.core.CalendarMonth
 import com.kizitonwose.calendar.core.DayPosition
@@ -54,9 +57,37 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
     private var selectedDate: LocalDate? = null
     private val today = LocalDate.now()
 
+    override fun onHiddenChanged(hidden: Boolean) {
+        super.onHiddenChanged(hidden)
+        if (!hidden) {
+            viewModel.fetchNotes()
+            binding.cvCalendar.scrollToMonth(YearMonth.now())
+        }
+    }
+
+    @SuppressLint("ClickableViewAccessibility")
     override fun initView() {
         setupCalendar()
+        requireActivity().supportFragmentManager.setFragmentResultListener(
+            "refresh_notes",
+            viewLifecycleOwner
+        ) { _, _ ->
+            Log.d("NoteFragment", "🔔 refresh_notes received — reloading notes")
+            viewModel.fetchNotes()
+        }
+
         viewModel.fetchNotes()
+
+        // Disable horizontal swipe on the calendar
+        binding.cvCalendar.apply {
+            // find the internal RecyclerView
+            val rv = (this as ViewGroup)
+                .findViewById<RecyclerView>(R.id.cvCalendar)
+            rv?.setOnTouchListener { _, _ ->
+                // Trả về true để consume mọi touch, chặn swipe
+                true
+            }
+        }
     }
 
     private fun setupCalendar() {
@@ -72,6 +103,7 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
         binding.cvCalendar.dayBinder = object : MonthDayBinder<DayContainer> {
             override fun create(view: View) = DayContainer(view)
 
+            @SuppressLint("DefaultLocale")
             override fun bind(container: DayContainer, data: CalendarDay) {
                 container.day = data
                 container.tvDay.text = String.format("%02d", data.date.dayOfMonth)
@@ -89,6 +121,9 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 when (data.position) {
                     DayPosition.MonthDate -> {
                         // Ngày trong tháng hiện tại
+                        container.itemDay.visibility = View.VISIBLE
+                        container.ivNote.visibility =
+                            if (noteDates.contains(data.date)) View.VISIBLE else View.INVISIBLE
                         container.tvDay.apply {
                             visibility = View.VISIBLE
                             val bgRes = when {
@@ -169,9 +204,15 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 .atZone(ZoneId.systemDefault())
                 .toLocalDate() == date
         }
-        // Show dialog với list đã filter
-        DialogNote.newInstance(notesForDate)
-            .show(childFragmentManager, "dialog_note")
+        if (notesForDate.isEmpty()) {
+            DialogCreateNote
+                .newInstance(date.toString())
+                .show(requireActivity().supportFragmentManager, "dialog_create_note")
+
+        } else {
+            DialogNote.newInstance(notesForDate)
+                .show(requireActivity().supportFragmentManager, "dialog_note")
+        }
 
         // Handle date selection
         handleDateSelection(date)
@@ -213,6 +254,8 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
                 }
             }
         }
+
+
     }
 
     override fun inflateLayout(
