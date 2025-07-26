@@ -6,9 +6,10 @@ import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
+import android.graphics.drawable.ClipDrawable
 import android.graphics.drawable.ColorDrawable
+import android.graphics.drawable.GradientDrawable
 import android.graphics.drawable.LayerDrawable
-import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -35,10 +36,11 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
 import com.example.hitproduct.screen.dialog.daily_question.your.YourDailyQuestionDialogFragment
+import com.example.hitproduct.screen.dialog.mission.DialogMission
 import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate
 import com.example.hitproduct.socket.SocketManager
-import com.example.hitproduct.util.Constant
+import com.example.hitproduct.common.util.Constant
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
@@ -91,7 +93,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun initView() {
 
-        registerSocketListeners()
+        viewModel.listenToSocket()
 
         childFragmentManager.setFragmentResultListener(
             "update_start_date",
@@ -177,6 +179,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             } else {
                 questionDialog.dialog?.show()
             }
+        }
+
+        binding.btnMission.setOnClickListener {
+            DialogMission().show(childFragmentManager, "mission")
         }
     }
 
@@ -303,15 +309,69 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             }
         }
 
+        // ===== Quan sát LiveData của socket =====
+        SocketManager.notifications.observe(viewLifecycleOwner) { notifications ->
+            Log.d("HomeFragment", "Received notifications: $notifications")
+        }
 
+
+        viewModel.activeKey.observe(viewLifecycleOwner) { key ->
+            val gifRes = catStateGifMap[key] ?: R.raw.meo_cay
+            binding.gifCat.setAnimation(gifRes)
+            binding.gifCat.playAnimation()
+        }
+
+        viewModel.hunger.observe(viewLifecycleOwner) { hunger ->
+            animateStateChange(binding.state1, binding.icon1, hunger * 10)
+            currentCatList = when {
+                hunger < Constant.HUNGER_LOW -> hungryCat
+                hunger < Constant.HUNGER_MEDIUM -> normalCat
+                else -> happyCat
+            }
+        }
+
+        viewModel.happiness.observe(viewLifecycleOwner) { hp ->
+            animateStateChange(binding.state2, binding.icon2, hp)
+        }
+
+        viewModel.coin.observe(viewLifecycleOwner) { coin ->
+            binding.tvMoney.text = coin.toThousandComma()
+            (activity as MainActivity).coin = coin
+        }
+
+        viewModel.eatEvent.observe(viewLifecycleOwner) {
+            binding.gifCat.apply {
+                isClickable = false
+                removeAllAnimatorListeners()
+
+                setAnimation(eattingCat)
+                repeatCount = 1
+                playAnimation()
+
+                addAnimatorListener(object : AnimatorListenerAdapter() {
+                    override fun onAnimationEnd(animation: Animator) {
+                        removeAnimatorListener(this)
+                        isClickable = true
+
+                        val next = currentCatList.random()
+                        currentCat = next
+                        val keyState = catStateGifMap.filterValues { it == currentCat }
+                            .keys
+                            .firstOrNull()
+                        Log.d("HomeFragment", "Cat state key: $keyState")
+                        if (keyState != null) {
+                            SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
+                            Log.d("HomeFragment", "Cat state sent to server")
+                        }
+
+                        setAnimation(next)
+                        repeatCount = LottieDrawable.INFINITE
+                        playAnimation()
+                    }
+                })
+            }
+        }
     }
-
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-
-        Log.d("HomeFragment", "Socket listeners registered")
-    }
-
 
     override fun inflateLayout(
         inflater: LayoutInflater,
@@ -348,34 +408,30 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     private fun tintOnlyFill(bar: ProgressBar, @ColorRes fillColorRes: Int) {
         val color = ContextCompat.getColor(requireContext(), fillColorRes)
-        // Lấy progressDrawable là LayerDrawable
         val layer = bar.progressDrawable.mutate() as LayerDrawable
 
-        // Tìm layer progress (ClipDrawable hoặc ShapeDrawable)
-        val prog = layer.findDrawableByLayerId(android.R.id.progress)
-        prog?.let {
-            // wrap để tint an toàn
-            val wrapped = DrawableCompat.wrap(it).mutate()
-            DrawableCompat.setTint(wrapped, color)
-            // gán lại vào layer
-            layer.setDrawableByLayerId(android.R.id.progress, wrapped)
+        val prog = layer.findDrawableByLayerId(R.id.progress)
+        if (prog is ClipDrawable) {
+            val shape = prog.drawable
+            if (shape is GradientDrawable) {
+                // Chỉ đổi màu solid, giữ nguyên stroke
+                shape.setColor(color)
+            }
         }
 
-        // apply lại drawable đã chỉnh
         bar.progressDrawable = layer
     }
 
 
     private fun updateStateBar(bar: ProgressBar, icon: View, value: Int) {
         bar.progress = value
-
+        Log.d("HomeFragment", "Updating state bar ${bar.id} with value: $value")
         // chỉ đổi màu fill của state1
         if (bar.id == R.id.state1) {
             val colorRes = when {
-                value <= 24 -> R.color.status1
-                value <= 49 -> R.color.status2
-                value <= 74 -> R.color.status3
-                else -> R.color.status4
+                value > Constant.HUNGER_MEDIUM * 10 -> R.color.status4
+                value <= Constant.HUNGER_MEDIUM * 10 && value > Constant.HUNGER_LOW * 10 -> R.color.status3
+                else -> R.color.status1
             }
             tintOnlyFill(bar, colorRes)
         }

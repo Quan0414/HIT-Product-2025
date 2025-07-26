@@ -3,7 +3,8 @@ package com.example.hitproduct.socket
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
-import com.example.hitproduct.R
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.hitproduct.common.constants.ApiConstants
 import io.socket.client.IO
 import io.socket.client.IO.Options
@@ -29,6 +30,9 @@ object SocketManager {
     private lateinit var socket: Socket
     private const val SERVER_URL = ApiConstants.BASE_URL
     private var authToken: String? = null
+
+    private val _notifications = MutableLiveData<JSONObject>()
+    val notifications: LiveData<JSONObject> = _notifications
 
     /**
      * Kết nối tới Socket server kèm token (server lấy myUserId từ token)
@@ -227,8 +231,6 @@ object SocketManager {
 
 
     // Nuoi pet
-
-
     // Gửi trạng thái mèo qua Socket với key PET_ACTIVE
     fun sendCatStateToSocket(state: String, myLoveId: String) {
         val payLoad = JSONObject().apply {
@@ -261,6 +263,21 @@ object SocketManager {
         socket.on("PET_DECREASE_HUNGER") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
                 Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    //=====================================================
+    // Notification
+
+    fun onNotificationReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_SEND_NOT_TO_USER") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "notification: $data")
+                Handler(Looper.getMainLooper()).post {
+                    listener(data)
+                    _notifications.postValue(data)
+                }
             }
         }
     }

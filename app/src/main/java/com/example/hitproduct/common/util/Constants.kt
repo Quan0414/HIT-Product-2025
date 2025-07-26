@@ -1,4 +1,4 @@
-package com.example.hitproduct.util
+package com.example.hitproduct.common.util
 
 import android.content.res.Resources
 
@@ -8,8 +8,10 @@ object Constant {
     const val READ_TIME_OUT    = 30L  // thời gian chờ đọc 30 giây
     const val CONNECT_TIME_OUT = 30L  // thời gian chờ kết nối 30 giây
 
-    const val HUNGER_LOW = 35
-    const val HUNGER_MEDIUM = 70
+    const val HP_LEVEL_1 = 1000
+    const val HP_LEVEL_2 = 2500
+    const val HUNGER_LOW = 30
+    const val HUNGER_MEDIUM = 80
 
     const val ARG_FOOD = "arg_food"
 
