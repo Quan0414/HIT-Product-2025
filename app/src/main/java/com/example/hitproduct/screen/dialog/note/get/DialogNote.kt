@@ -1,6 +1,5 @@
 package com.example.hitproduct.screen.dialog.note.get
 
-import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
@@ -9,39 +8,21 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
-import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.example.hitproduct.base.DataResult
-import com.example.hitproduct.common.constants.AuthPrefersConstants
-import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.common.util.Constant.ARG_NOTES
 import com.example.hitproduct.data.model.calendar.Note
-import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogNoteBinding
 import com.example.hitproduct.screen.dialog.note.NoteAdapter
 import com.example.hitproduct.screen.dialog.note.create.DialogCreateNote
 import com.example.hitproduct.screen.dialog.note.delete.DialogDeleteNote
 import com.example.hitproduct.screen.dialog.note.edit.DialogEditNote
-import com.example.hitproduct.util.Constant.ARG_NOTES
-import kotlinx.coroutines.launch
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 
-
 class DialogNote : DialogFragment() {
     private var _binding: DialogNoteBinding? = null
     private val binding get() = _binding!!
-
-    private val prefs by lazy {
-        requireContext().getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
-    }
-
-    private val authRepo by lazy {
-        AuthRepository(
-            NetworkClient.provideApiService(requireContext()),
-            prefs
-        )
-    }
 
     companion object {
         fun newInstance(notes: List<Note>): DialogNote {
@@ -136,7 +117,10 @@ class DialogNote : DialogFragment() {
         binding.btnAddNote.setOnClickListener {
             DialogCreateNote
                 .newInstance(selectedDate.toString())
-                .show(requireActivity().supportFragmentManager, DialogCreateNote::class.java.simpleName)
+                .show(
+                    requireActivity().supportFragmentManager,
+                    DialogCreateNote::class.java.simpleName
+                )
         }
 
         binding.btnClose.setOnClickListener {

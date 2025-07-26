@@ -41,6 +41,7 @@ import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate
 import com.example.hitproduct.socket.SocketManager
 import com.example.hitproduct.common.util.Constant
+import com.example.hitproduct.screen.dialog.notification.DialogNotification
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
@@ -136,16 +137,21 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         }
 
 
+        SocketManager.notifications.observe(viewLifecycleOwner) {
+            //mo dialog thông báo
+
+            // khi có thông báo mới, đổi icon
+            binding.btnNotification.setImageResource(R.drawable.ic_new_noti)
+        }
+
+
     }
 
     override fun initListener() {
 
-        binding.imageView.setOnClickListener {
-            val dialog = DialogStartDate()
-            dialog.show(
-                childFragmentManager,
-                DialogStartDate::class.java.simpleName
-            )
+        binding.btnNotification.setOnClickListener {
+            DialogNotification().show(childFragmentManager, "notification")
+            binding.btnNotification.setImageResource(R.drawable.ic_noti)
         }
 
         binding.icon1.setOnClickListener {
@@ -196,7 +202,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     }
 
-    @SuppressLint("SetTextI18n")
     override fun bindData() {
         viewModel.coupleProfile.observe(viewLifecycleOwner) { state ->
             when (state) {
@@ -355,14 +360,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
                         val next = currentCatList.random()
                         currentCat = next
-                        val keyState = catStateGifMap.filterValues { it == currentCat }
-                            .keys
-                            .firstOrNull()
-                        Log.d("HomeFragment", "Cat state key: $keyState")
-                        if (keyState != null) {
-                            SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
-                            Log.d("HomeFragment", "Cat state sent to server")
-                        }
+//                        val keyState = catStateGifMap.filterValues { it == currentCat }
+//                            .keys
+//                            .firstOrNull()
+//                        Log.d("HomeFragment", "Cat state key: $keyState")
+//                        if (keyState != null) {
+//                            SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
+//                            Log.d("HomeFragment", "Cat state sent to server")
+//                        }
 
                         setAnimation(next)
                         repeatCount = LottieDrawable.INFINITE

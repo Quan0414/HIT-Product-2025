@@ -4,8 +4,8 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="370dp"
     android:layout_height="wrap_content"
-    android:background="@drawable/dialog_background"
-    tools:context=".DialogInloveStatus">
+    android:background="@drawable/dialog_bg"
+    tools:context=".screen.dialog.inlove_status.DialogInloveStatus">
 
 
     <androidx.constraintlayout.widget.ConstraintLayout

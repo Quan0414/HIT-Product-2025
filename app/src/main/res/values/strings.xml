@@ -12,5 +12,9 @@
     <string name="hunger_index_of_food">+%1$d</string>
     <string name="happy_index_of_food">+%1$d</string>
 
+    <!--    Dialog Mission  -->
+    <string name="mess">Nhắn tin (%1$d/3)</string>
+    <string name="feed_pet">Cho pet ăn (%1$d/1)</string>
+    <string name="daily_question">Trả lời câu hỏi (%1$d/1)</string>
 
 </resources>

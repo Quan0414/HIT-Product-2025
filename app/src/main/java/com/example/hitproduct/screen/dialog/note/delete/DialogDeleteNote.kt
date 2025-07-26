@@ -16,8 +16,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogDeleteNoteBinding
-import com.example.hitproduct.screen.dialog.note.get.DialogNote
-import com.example.hitproduct.util.Constant.ARG_NOTE_ID
+import com.example.hitproduct.common.util.Constant.ARG_NOTE_ID
 
 
 class DialogDeleteNote : DialogFragment() {

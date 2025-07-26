@@ -272,12 +272,17 @@ object SocketManager {
 
     fun onNotificationReceived(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_SEND_NOT_TO_USER") { args ->
-            (args.getOrNull(0) as? JSONObject)?.let { data ->
-                Log.d("SocketManager", "notification: $data")
-                Handler(Looper.getMainLooper()).post {
-                    listener(data)
-                    _notifications.postValue(data)
-                }
+            // 1. Lấy wrapper JSON
+            val wrapper = args.getOrNull(0) as? JSONObject ?: return@on
+            // 2. Unwrap object "not" (nếu không có thì bỏ qua)
+            val notObj = wrapper.optJSONObject("not") ?: return@on
+
+            Log.d("SocketManager", "unwrapped notification: $notObj")
+            Handler(Looper.getMainLooper()).post {
+                // 3. Gọi callback với object đã unwrap
+                listener(notObj)
+                // 4. Đẩy vào LiveData cũng là object unwrap
+                _notifications.postValue(notObj)
             }
         }
     }

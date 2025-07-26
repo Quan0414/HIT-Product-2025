@@ -3,14 +3,14 @@
     android:shape="rectangle">
 
     <!-- Nền trong suốt -->
-    <solid android:color="@android:color/transparent" />
+    <solid android:color="@color/orange_dialog" />
 
     <!-- Viền nét đứt -->
     <stroke
         android:width="2dp"
         android:color="@color/borderBrown"
-        android:dashWidth="4dp"
-        android:dashGap="4dp" />
+        android:dashWidth="10dp"
+        android:dashGap="10dp" />
 
     <!-- Tùy chọn bo góc -->
     <corners android:radius="12dp" />

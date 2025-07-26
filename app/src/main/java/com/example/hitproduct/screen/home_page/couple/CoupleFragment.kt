@@ -12,7 +12,7 @@ import android.view.animation.AnimationUtils
 import androidx.core.os.bundleOf
 import androidx.core.view.GestureDetectorCompat
 import androidx.fragment.app.activityViewModels
-import com.example.hitproduct.DialogInloveStatus
+import com.example.hitproduct.screen.dialog.inlove_status.DialogInloveStatus
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -20,7 +20,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCoupleBinding
-import com.example.hitproduct.screen.dialog.couple_detail.DialogProfileDetail
+import com.example.hitproduct.screen.dialog.profile_detail.DialogProfileDetail
 import com.example.hitproduct.screen.home_page.home.HomeViewModel
 import com.example.hitproduct.screen.home_page.home.HomeViewModelFactory
 import io.getstream.avatarview.glide.loadImage
@@ -52,7 +52,6 @@ class CoupleFragment : BaseFragment<FragmentCoupleBinding>() {
     private lateinit var animInLeft: Animation
     private lateinit var animOutRight: Animation
 
-    @SuppressLint("SetTextI18n")
     override fun initView() {
         animInRight = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_in_right)
         animOutLeft = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_out_left)
@@ -178,7 +177,6 @@ class CoupleFragment : BaseFragment<FragmentCoupleBinding>() {
     }
 
 
-    @SuppressLint("ResourceType", "SetTextI18n")
     override fun initData() {
         viewModel.getCoupleProfile()
 

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@drawable/bg_profile_detail"
-    tools:context=".screen.dialog.couple_detail.DialogProfileDetail">
+    tools:context=".screen.dialog.profile_detail.DialogProfileDetail">
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/bgProfileDetail"

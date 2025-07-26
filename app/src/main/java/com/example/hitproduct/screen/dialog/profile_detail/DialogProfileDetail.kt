@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog.couple_detail
+package com.example.hitproduct.screen.dialog.profile_detail
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable

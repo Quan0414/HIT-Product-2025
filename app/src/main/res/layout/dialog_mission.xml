@@ -16,7 +16,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
 
-    <ImageView
+    <LinearLayout
         android:id="@+id/imageView4"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
@@ -24,136 +24,210 @@
         android:layout_marginTop="40dp"
         android:layout_marginEnd="24dp"
         android:adjustViewBounds="true"
+        android:background="@drawable/dialog_bg_content"
+        android:orientation="vertical"
+        android:paddingHorizontal="24dp"
+        android:paddingVertical="24dp"
         android:src="@drawable/bg_food_detail"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/imgShop" />
+        app:layout_constraintTop_toTopOf="@+id/imgShop">
 
-    <TextView
-        android:id="@+id/tvName"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
-        android:layout_marginTop="10dp"
-        android:background="@drawable/bg_name_food_detail"
-        android:fontFamily="@font/f700"
-        android:gravity="center"
-        android:text="dsajhf"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
 
-        android:textColor="@color/textBrown"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toTopOf="@+id/imageView5"
-        app:layout_constraintStart_toStartOf="@+id/imageView4"
-        app:layout_constraintTop_toTopOf="@+id/imageView4" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/f900"
+                android:text="Đăng nhập"
+                android:textColor="@color/textBrown"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imageView5"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="28dp"
-        android:background="@drawable/bg_img_food_detail"
-        android:padding="14dp"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView4"
-        app:layout_constraintEnd_toEndOf="@+id/tvName"
-        app:layout_constraintStart_toStartOf="@+id/tvName" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_money_mission"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <View
-        android:id="@+id/view1"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="20dp"
-        android:background="@drawable/bg_dashed_border"
-        app:layout_constraintBottom_toBottomOf="@+id/imageView5"
-        app:layout_constraintEnd_toEndOf="@id/imageView4"
-        app:layout_constraintStart_toEndOf="@id/tvName"
-        app:layout_constraintTop_toTopOf="@id/tvName" />
+            <com.example.hitproduct.common.util.OutlinedTextView
+                android:id="@+id/tvMoney1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/f900"
+                android:padding="2dp"
+                android:textSize="16dp"
+                app:fillColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@id/imgMoneyFoodDetail"
+                app:layout_constraintEnd_toEndOf="@+id/imgMoneyFoodDetail"
+                app:layout_constraintStart_toStartOf="@id/imgMoneyFoodDetail"
+                app:layout_constraintTop_toTopOf="@id/imgMoneyFoodDetail"
+                app:strokeColor="@color/borderBrown"
+                app:strokeWidth="2dp" />
 
-    <ImageView
-        android:id="@+id/imgHungerIndex"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:src="@drawable/bg_hunger_index"
-        app:layout_constraintBottom_toTopOf="@id/imgHappyIndex"
-        app:layout_constraintEnd_toEndOf="@+id/view1"
-        app:layout_constraintStart_toStartOf="@+id/view1"
-        app:layout_constraintTop_toTopOf="@+id/view1" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/tvHungerIndex"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:fontFamily="@font/f900"
-        android:text="@string/hunger_index_of_food"
-        android:textColor="@color/textBrown"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="@id/imgHungerIndex"
-        app:layout_constraintEnd_toEndOf="@id/imgHungerIndex"
-        app:layout_constraintStart_toStartOf="@id/imgHungerIndex"
-        app:layout_constraintTop_toTopOf="@id/imgHungerIndex" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/dashed_line" />
 
-    <ImageView
-        android:id="@+id/imgHappyIndex"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:src="@drawable/bg_happy_index"
-        app:layout_constraintEnd_toEndOf="@+id/view1"
-        app:layout_constraintStart_toStartOf="@+id/view1"
-        app:layout_constraintTop_toBottomOf="@id/imgHungerIndex" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
 
-    <TextView
-        android:id="@+id/tvHappyIndex"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="14dp"
-        android:fontFamily="@font/f900"
-        android:text="@string/happy_index_of_food"
-        android:textColor="@color/pinkText"
-        android:textSize="16dp"
-        app:layout_constraintBottom_toBottomOf="@id/imgHappyIndex"
-        app:layout_constraintEnd_toEndOf="@id/imgHappyIndex"
-        app:layout_constraintStart_toStartOf="@id/imgHappyIndex"
-        app:layout_constraintTop_toTopOf="@id/imgHappyIndex" />
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/f900"
+                android:text="@string/mess"
+                android:textColor="@color/textBrown"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <ImageView
-        android:id="@+id/imgMoneyFoodDetail"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/bg_money_food_detail"
-        app:layout_constraintBottom_toBottomOf="@+id/view1"
-        app:layout_constraintEnd_toEndOf="@+id/view1"
-        app:layout_constraintStart_toStartOf="@+id/view1"
-        app:layout_constraintTop_toBottomOf="@+id/imgHappyIndex" />
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_money_mission"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
 
-    <com.example.hitproduct.common.util.OutlinedTextView
-        android:id="@+id/tvMoney"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginBottom="4dp"
-        android:fontFamily="@font/f900"
-        android:padding="2dp"
-        android:textSize="16dp"
-        app:fillColor="@color/white"
-        app:layout_constraintBottom_toBottomOf="@id/imgMoneyFoodDetail"
-        app:layout_constraintEnd_toEndOf="@+id/imgMoneyFoodDetail"
-        app:layout_constraintStart_toStartOf="@id/imgMoneyFoodDetail"
-        app:layout_constraintTop_toTopOf="@id/imgMoneyFoodDetail"
-        app:strokeColor="@color/borderBrown"
-        app:strokeWidth="2dp" />
+            <com.example.hitproduct.common.util.OutlinedTextView
+                android:id="@+id/tvMoney2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/f900"
+                android:padding="2dp"
+                android:textSize="16dp"
+                app:fillColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@id/imgMoneyFoodDetail"
+                app:layout_constraintEnd_toEndOf="@+id/imgMoneyFoodDetail"
+                app:layout_constraintStart_toStartOf="@id/imgMoneyFoodDetail"
+                app:layout_constraintTop_toTopOf="@id/imgMoneyFoodDetail"
+                app:strokeColor="@color/borderBrown"
+                app:strokeWidth="2dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/dashed_line" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/f900"
+                android:text="@string/feed_pet"
+                android:textColor="@color/textBrown"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_money_mission"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <com.example.hitproduct.common.util.OutlinedTextView
+                android:id="@+id/tvMoney3"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="32dp"
+                android:layout_marginBottom="4dp"
+                android:fontFamily="@font/f900"
+                android:padding="2dp"
+                android:textSize="16dp"
+                app:fillColor="@color/white"
+                app:layout_constraintBottom_toBottomOf="@id/imgMoneyFoodDetail"
+                app:layout_constraintEnd_toEndOf="@+id/imgMoneyFoodDetail"
+                app:layout_constraintStart_toStartOf="@id/imgMoneyFoodDetail"
+                app:layout_constraintTop_toTopOf="@id/imgMoneyFoodDetail"
+                app:strokeColor="@color/borderBrown"
+                app:strokeWidth="2dp" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/dashed_line" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:fontFamily="@font/f900"
+                android:text="@string/daily_question"
+                android:textColor="@color/textBrown"
+                android:textSize="20dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/bg_money_mission"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:layout_marginTop="4dp"
+            android:background="@drawable/dashed_line" />
+
+
+    </LinearLayout>
 
     <ImageView
         android:id="@+id/btn_close"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_margin="16dp"
         android:src="@drawable/btn_close_bigger"
-        app:layout_constraintBottom_toTopOf="@+id/view1"
-        app:layout_constraintEnd_toEndOf="@+id/imageView4"
-        app:layout_constraintStart_toEndOf="@id/view1" />
-
-
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/imgShop" />
 </androidx.constraintlayout.widget.ConstraintLayout>
