@@ -16,7 +16,7 @@ class ShopViewModel(
     private val authRepository: AuthRepository
 ) : ViewModel() {
     private val _foodListState = MutableLiveData<UiState<List<Food>>>(UiState.Idle)
-    val foodListState: MutableLiveData<UiState<List<Food>>> = _foodListState
+    val foodListState: LiveData<UiState<List<Food>>> = _foodListState
 
     private val _feedPet = MutableLiveData<UiState<ApiResponse<FeedPetData>>>(UiState.Idle)
     val feedPet: LiveData<UiState<ApiResponse<FeedPetData>>> = _feedPet

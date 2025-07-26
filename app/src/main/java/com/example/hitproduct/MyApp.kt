@@ -19,11 +19,12 @@ class MyApp : Application() {
 
         if (!token.isNullOrEmpty()) {
             SocketManager.connect(token)
+            registerSocketListeners()
         }
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
-        registerSocketListeners()
+
     }
 
     private fun registerSocketListeners() {

@@ -27,6 +27,7 @@ import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
 import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
 import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
+import com.example.hitproduct.data.model.notification.NotificationResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
@@ -147,4 +148,8 @@ interface ApiService {
         @Path("id") noteId: String,
         @Body request: EditNoteRequest
     ): Response<ApiResponse<EditNoteResponse>>
+
+    @GET(ApiConstants.GET_NOTIFICATIONS)
+    suspend fun getNotifications(
+    ): Response<ApiResponse<NotificationResponse>>
 }

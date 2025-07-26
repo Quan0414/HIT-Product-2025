@@ -2,6 +2,8 @@ package com.example.hitproduct.screen.splash
 
 import android.content.Context
 import android.content.Intent
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.widget.Toast
@@ -48,6 +50,16 @@ class SplashActivity : AppCompatActivity() {
     }
 
     private fun routeNext() {
+        // Kiểm tra kết nối internet
+        if (!isNetworkAvailable()) {
+            // Nếu không có kết nối, hiển thị thông báo lỗi
+            Toast.makeText(this, "Không có kết nối Internet. Vui lòng kiểm tra lại!", Toast.LENGTH_LONG).show()
+            Handler(mainLooper).postDelayed({
+                finishAffinity()
+            }, 1000)
+            return
+        }
+
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, null)
         if (token.isNullOrEmpty()) {
             // Chưa login → sang Login
@@ -100,5 +112,13 @@ class SplashActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    // Kiểm tra kết nối internet
+    private fun isNetworkAvailable(): Boolean {
+        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val networkCapabilities = connectivityManager.activeNetwork ?: return false
+        val activeNetwork = connectivityManager.getNetworkCapabilities(networkCapabilities)
+        return activeNetwork != null && activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
 }

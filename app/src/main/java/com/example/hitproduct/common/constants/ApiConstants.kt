@@ -35,4 +35,7 @@ object ApiConstants {
     const val DELETE_NOTE = "api/v1/notes/{id}"
     const val EDIT_NOTE = "api/v1/notes/{id}"
 
+    // Notification
+    const val GET_NOTIFICATIONS = "api/v1/notification"
+
 }
