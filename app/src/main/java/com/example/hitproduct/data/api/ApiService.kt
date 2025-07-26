@@ -8,7 +8,13 @@ import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
+import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
+import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
+import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
+import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
 import com.example.hitproduct.data.model.couple.CoupleData
 import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
@@ -16,25 +22,19 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
-import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
-import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
-import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
+import com.example.hitproduct.data.model.mission.MissionResponse
+import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.PetData
 import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
-import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
-import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
-import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
-import com.example.hitproduct.data.model.notification.NotificationResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -152,4 +152,8 @@ interface ApiService {
     @GET(ApiConstants.GET_NOTIFICATIONS)
     suspend fun getNotifications(
     ): Response<ApiResponse<NotificationResponse>>
+
+    @GET(ApiConstants.GET_MISSIONS)
+    suspend fun getMissions(
+    ): Response<ApiResponse<MissionResponse>>
 }

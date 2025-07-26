@@ -26,6 +26,7 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.mission.MissionResponse
 import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
@@ -282,6 +283,13 @@ class AuthRepository(
 
     suspend fun getNotification(): DataResult<ApiResponse<NotificationResponse>> {
         return when (val result = getResult { api.getNotifications() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getMissions(): DataResult<ApiResponse<MissionResponse>> {
+        return when (val result = getResult { api.getMissions() }) {
             is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }

@@ -38,4 +38,7 @@ object ApiConstants {
     // Notification
     const val GET_NOTIFICATIONS = "api/v1/notification"
 
+    // Mission
+    const val GET_MISSIONS = "api/v1/mission"
+
 }
