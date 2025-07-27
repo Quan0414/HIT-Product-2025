@@ -15,7 +15,9 @@ import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSettingBinding
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.dialog.disconnect.DialogDisconnectFragment
+import com.example.hitproduct.screen.dialog.logout.DialogLogout
 import com.example.hitproduct.screen.home_page.setting.account_setting.AccountSettingFragment
+import com.example.hitproduct.screen.splash.SplashActivity
 import io.getstream.avatarview.glide.loadImage
 
 
@@ -61,6 +63,27 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                 // callback khi bấm "Đồng ý"
                 viewModel.disconnectCouple()
             }.show(parentFragmentManager, "disconnect_dialog")
+        }
+
+        binding.btnLogout.setOnClickListener {
+            DialogLogout {
+                // 1. Clear all prefs
+                requireContext()
+                    .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+                    .edit()
+                    .clear()
+                    .apply()
+
+                // 2. Start LoginActivity và clear back-stack
+                val intent = Intent(requireContext(), SplashActivity::class.java).apply {
+                    flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+                }
+                startActivity(intent)
+
+                // 3. Finish luôn Activity chứa dialog
+                requireActivity().finish()
+
+            }.show(parentFragmentManager, "logout_dialog")
         }
 
 

@@ -1,11 +1,20 @@
 package com.example.hitproduct.screen.splash
 
+import android.animation.Animator
+import android.animation.AnimatorListenerAdapter
+import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
+import android.view.View
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
+import android.widget.ImageView
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -40,20 +49,56 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(sys.left, sys.top, sys.right, sys.bottom)
+            v.setPadding(sys.left, sys.top, sys.right, /*bottom=*/0)
             insets
         }
 
-        Handler(mainLooper).postDelayed({
-            routeNext()
-        }, 1000)
+        val img = findViewById<ImageView>(R.id.imgOnboarding)
+        img.apply {
+            visibility = View.VISIBLE
+            alpha = 0f
+            scaleX = 0f
+            scaleY = 0f
+
+            post {
+                // 1) Phình to + fade-in
+                animate()
+                    .alpha(1f)
+                    .scaleX(1.2f)
+                    .scaleY(1.2f)
+                    .setDuration(600)
+                    .setInterpolator(DecelerateInterpolator())
+                    .withEndAction {
+                        // 2) Delay giữa hai bước
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            // 3) Thu nhỏ về size gốc
+                            img.animate()
+                                .scaleX(1f)
+                                .scaleY(1f)
+                                .setDuration(400)
+                                .setInterpolator(DecelerateInterpolator())
+                                .withEndAction {
+                                    // 4) tiếp tục flow: start ProgressBar…
+                                    startProgressBarAndRoute()
+                                }
+                                .start()
+                        }, 50) // delay 200ms giữa 2 animation
+                    }
+                    .start()
+            }
+        }
+
     }
 
     private fun routeNext() {
         // Kiểm tra kết nối internet
         if (!isNetworkAvailable()) {
             // Nếu không có kết nối, hiển thị thông báo lỗi
-            Toast.makeText(this, "Không có kết nối Internet. Vui lòng kiểm tra lại!", Toast.LENGTH_LONG).show()
+            Toast.makeText(
+                this,
+                "Không có kết nối Internet. Vui lòng kiểm tra lại!",
+                Toast.LENGTH_LONG
+            ).show()
             Handler(mainLooper).postDelayed({
                 finishAffinity()
             }, 1000)
@@ -116,9 +161,42 @@ class SplashActivity : AppCompatActivity() {
 
     // Kiểm tra kết nối internet
     private fun isNetworkAvailable(): Boolean {
-        val connectivityManager = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        val connectivityManager =
+            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         val networkCapabilities = connectivityManager.activeNetwork ?: return false
         val activeNetwork = connectivityManager.getNetworkCapabilities(networkCapabilities)
         return activeNetwork != null && activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
     }
+
+    private fun startProgressBarAndRoute() {
+        val pb = findViewById<ProgressBar>(R.id.state)
+        pb.visibility = View.VISIBLE
+        pb.max = 1000
+        pb.progress = 0
+
+        // Tạo animator progress 0→max
+        val animator = ObjectAnimator.ofInt(pb, "progress", 0, pb.max).apply {
+            duration = 1000L
+            interpolator = LinearInterpolator()
+        }
+
+        // Lắng nghe khi animation kết thúc → chuyển màn luôn
+        animator.addListener(object : AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator) {
+                super.onAnimationEnd(animation)
+                val done = prefs.getBoolean("onboarding_done", false)
+                if (!done) {
+                    supportFragmentManager.beginTransaction()
+                        .replace(R.id.fragmentSplash, OnboardingFragment(), "ON_BOARDING_FRAGMENT")
+                        .commit()
+                } else {
+                    routeNext()
+                }
+            }
+        })
+
+        animator.start()
+    }
+
+
 }

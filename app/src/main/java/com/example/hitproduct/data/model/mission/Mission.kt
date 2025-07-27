@@ -10,6 +10,7 @@ data class Mission(
 
 data class MissionDetail(
     val _id: String,
+    val key: String,
     val description: String,
     val coin: Int,
     val isActive: Boolean

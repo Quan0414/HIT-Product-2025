@@ -101,6 +101,11 @@ class LoginFragment : Fragment() {
                 is UiState.Error -> {
                     // Reset background và show lỗi
                     val err = state.error
+                    Toast.makeText(
+                        requireContext(),
+                        err.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
 
                     binding.edtEmail.setBackgroundResource(
                         if (err.emailError) R.drawable.bg_edit_text_error
@@ -110,14 +115,15 @@ class LoginFragment : Fragment() {
                         if (err.passwordError) R.drawable.bg_edit_text_error
                         else R.drawable.bg_edit_text
                     )
-                    Toast.makeText(
-                        requireContext(),
-                        "${err.message} Vui lòng nhập email để xác nhận tài khoản. ",
-                        Toast.LENGTH_SHORT
-                    ).show()
+
                     binding.tvLogin.isEnabled = true
 
                     if (err.message == "Tài khoản chưa được xác nhận!") {
+                        Toast.makeText(
+                            requireContext(),
+                            "Tài khoản chưa được xác nhận! Vui lòng nhập email để xác nhận tài khoản. ",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         //chuyen den verify code kem theo email da nhap trong text
                         val email = binding.edtEmail.text.toString().trim()
                         val bundle = Bundle().apply {
@@ -160,6 +166,8 @@ class LoginFragment : Fragment() {
 
         // 4. Validation form
         setUpListeners()
+        updateLoginButtonState()
+
 
         // 5. Quên mật khẩu
         binding.tvForgotPassword.setOnClickListener {
