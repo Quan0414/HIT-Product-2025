@@ -95,10 +95,12 @@ class LoginFragment : Fragment() {
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                     binding.tvLogin.isEnabled = false
                 }
 
                 is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     // Reset background và show lỗi
                     val err = state.error
                     Toast.makeText(
@@ -140,6 +142,7 @@ class LoginFragment : Fragment() {
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     binding.tvLogin.isEnabled = true
                     Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT)
                         .show()
@@ -172,6 +175,12 @@ class LoginFragment : Fragment() {
         // 5. Quên mật khẩu
         binding.tvForgotPassword.setOnClickListener {
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentStart, FindAccFragment())
                 .addToBackStack(null)
                 .commit()
@@ -182,6 +191,12 @@ class LoginFragment : Fragment() {
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
                 parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                    )
                     .replace(
                         R.id.fragmentStart,
                         RegisterFragment().apply {

@@ -312,4 +312,19 @@
             android:textSize="16dp" />
     </LinearLayout>
 
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:cpb_background_progressbar_color="@android:color/transparent"
+        app:cpb_indeterminate_mode="true"
+        app:cpb_progressbar_color="@color/orange"
+        app:cpb_progressbar_width="6dp"
+        app:cpb_round_border="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

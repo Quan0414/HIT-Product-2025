@@ -30,6 +30,12 @@ class SuccessCreateAccFragment : Fragment() {
         binding.tvContinue.setOnClickListener {
             val sendInviteCodeFragment = SendInviteCodeFragment()
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentStart, sendInviteCodeFragment)
                 .commit()
         }

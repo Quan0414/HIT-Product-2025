@@ -3,27 +3,19 @@ package com.example.hitproduct.screen.authentication.register.set_up_infor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.NetworkClient
-import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
-import com.example.hitproduct.screen.authentication.login.LoginViewModel
-import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate.ValidationResult
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -72,19 +64,22 @@ class SetUpInformationFragment : Fragment() {
         viewModel.updateState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
+                    binding.tvContinue.isEnabled = true
                     val err = state.error
                     Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
                 }
 
                 UiState.Idle -> {
-
                 }
 
                 UiState.Loading -> {
-
+                    binding.tvContinue.isEnabled = false
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     Toast.makeText(
                         requireContext(),
                         "Cập nhật thông tin thành công",
@@ -93,6 +88,12 @@ class SetUpInformationFragment : Fragment() {
                     // Chuyển đến SuccessCreateAccFragment
                     val successCreateAccFragment = SuccessCreateAccFragment()
                     parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left,
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right
+                        )
                         .replace(R.id.fragmentStart, successCreateAccFragment)
                         .commit()
                 }

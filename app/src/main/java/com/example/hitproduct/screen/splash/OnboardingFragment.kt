@@ -69,6 +69,11 @@ class OnboardingFragment : BaseFragment<FragmentOnBoardingBinding>() {
         }
 
         binding.btnSkip.setOnClickListener {
+            requireContext()
+                .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+                .edit()
+                .putBoolean("onboarding_done", true)
+                .apply()
             val intent = Intent(requireContext(), LoginActivity::class.java)
             startActivity(intent)
         }

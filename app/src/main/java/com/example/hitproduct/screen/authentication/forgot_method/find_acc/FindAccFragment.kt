@@ -36,6 +36,12 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
             override fun onClick(widget: View) {
 
                 parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                    )
                     .replace(R.id.fragmentStart, RegisterFragment().apply {
                         arguments = Bundle().apply { putString("flow", "register") }
                     })
@@ -46,7 +52,7 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
                 ds.color = ContextCompat.getColor(requireContext(), R.color.orange)
-                ds.isUnderlineText = false   // tắt gạch chân nếu không muốn
+                ds.isUnderlineText = false
             }
         }
 
@@ -133,6 +139,12 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
                 }
             }
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentStart, fragment)
                 .addToBackStack("EnterEmail")
                 .commit()

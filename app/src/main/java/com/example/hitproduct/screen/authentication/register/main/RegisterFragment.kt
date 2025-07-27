@@ -96,6 +96,7 @@ class RegisterFragment : Fragment() {
         viewModel.registerState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     val err = state.error
                     binding.edtTenNguoiDung.setBackgroundResource(
                         if (err.accountExits) R.drawable.bg_edit_text_error else R.drawable.bg_edit_text
@@ -123,10 +124,12 @@ class RegisterFragment : Fragment() {
                 }
 
                 UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                     binding.tvRegister.isEnabled = false
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     binding.tvRegister.isEnabled = true
                     Toast.makeText(requireContext(), "Đăng ký thành công", Toast.LENGTH_SHORT)
                         .show()
@@ -139,6 +142,12 @@ class RegisterFragment : Fragment() {
                         }
                     }
                     parentFragmentManager.beginTransaction()
+                        .setCustomAnimations(
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left,
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right
+                        )
                         .replace(R.id.fragmentStart, verifyCodeFragment)
                         .addToBackStack("Register")
                         .commit()
