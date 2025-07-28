@@ -12,7 +12,7 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.hitproduct.common.util.Constant.ARG_NOTES
 import com.example.hitproduct.data.model.calendar.Note
 import com.example.hitproduct.databinding.DialogNoteBinding
-import com.example.hitproduct.screen.dialog.note.NoteAdapter
+import com.example.hitproduct.screen.adapter.NoteAdapter
 import com.example.hitproduct.screen.dialog.note.create.DialogCreateNote
 import com.example.hitproduct.screen.dialog.note.delete.DialogDeleteNote
 import com.example.hitproduct.screen.dialog.note.edit.DialogEditNote

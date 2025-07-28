@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog.mission
+package com.example.hitproduct.screen.adapter
 
 import android.view.View
 import android.view.ViewGroup

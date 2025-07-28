@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.splash
+package com.example.hitproduct.screen.adapter
 
 import android.view.LayoutInflater
 import android.view.View

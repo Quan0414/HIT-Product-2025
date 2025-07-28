@@ -17,6 +17,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogMissionBinding
+import com.example.hitproduct.screen.adapter.MissionAdapter
 
 
 class DialogMission : DialogFragment() {

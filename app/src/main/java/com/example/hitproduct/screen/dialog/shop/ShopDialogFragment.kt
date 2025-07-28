@@ -19,6 +19,7 @@ import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogShopBinding
+import com.example.hitproduct.screen.adapter.ShopAdapter
 import com.example.hitproduct.screen.dialog.food_detail.FoodDetailDialogFragment
 
 

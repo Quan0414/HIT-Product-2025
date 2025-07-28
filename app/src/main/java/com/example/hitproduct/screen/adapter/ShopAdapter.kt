@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog.shop
+package com.example.hitproduct.screen.adapter
 
 import android.view.LayoutInflater
 import android.view.View

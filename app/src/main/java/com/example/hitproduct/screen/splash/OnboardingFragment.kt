@@ -9,6 +9,7 @@ import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.model.onboarding.OnboardingItem
 import com.example.hitproduct.databinding.FragmentOnBoardingBinding
+import com.example.hitproduct.screen.adapter.OnboardingAdapter
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 
 class OnboardingFragment : BaseFragment<FragmentOnBoardingBinding>() {

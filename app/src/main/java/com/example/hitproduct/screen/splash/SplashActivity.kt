@@ -49,7 +49,7 @@ class SplashActivity : AppCompatActivity() {
         setContentView(R.layout.activity_splash)
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
             val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(sys.left, sys.top, sys.right, /*bottom=*/0)
+            v.setPadding(sys.left, sys.top, sys.right, sys.bottom)
             insets
         }
 
@@ -117,6 +117,9 @@ class SplashActivity : AppCompatActivity() {
                     is DataResult.Success -> {
                         val myUserId = res.data.id
                         prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                        val idRoomChat = res.data.roomChatId
+                        prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
+                            .apply()
 
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {
@@ -180,7 +183,23 @@ class SplashActivity : AppCompatActivity() {
             interpolator = LinearInterpolator()
         }
 
-        // Lắng nghe khi animation kết thúc → chuyển màn luôn
+        // Mỗi lần giá trị progress thay đổi, kiểm tra mạng
+        animator.addUpdateListener {
+            if (!isNetworkAvailable()) {
+                // Hủy animation, thông báo và thoát app
+                animator.cancel()
+                Toast.makeText(
+                    this@SplashActivity,
+                    "Không có kết nối Internet. Vui lòng kiểm tra lại!",
+                    Toast.LENGTH_LONG
+                ).show()
+                Handler(mainLooper).postDelayed({
+                    finishAffinity()
+                }, 1000)
+            }
+        }
+
+        // Lắng nghe khi animation kết thúc → chuyển màn
         animator.addListener(object : AnimatorListenerAdapter() {
             override fun onAnimationEnd(animation: Animator) {
                 super.onAnimationEnd(animation)

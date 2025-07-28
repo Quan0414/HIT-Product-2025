@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog.notification
+package com.example.hitproduct.screen.adapter
 
 import android.text.format.DateUtils
 import android.view.View

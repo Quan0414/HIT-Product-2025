@@ -67,6 +67,8 @@ class LoginFragment : Fragment() {
                 is UiState.Success -> {
                     val myUserId = state.data.id
                     prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                    val idRoomChat = state.data.roomChatId
+                    prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat).apply()
 
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment

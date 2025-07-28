@@ -18,6 +18,7 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.notification.Notification
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogNotificationBinding
+import com.example.hitproduct.screen.adapter.NotificationAdapter
 import com.example.hitproduct.socket.SocketManager
 
 

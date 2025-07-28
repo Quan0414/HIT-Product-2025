@@ -26,6 +26,8 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.message.ChatItem
+import com.example.hitproduct.data.model.message.MessageResponse
 import com.example.hitproduct.data.model.mission.MissionResponse
 import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
@@ -291,6 +293,57 @@ class AuthRepository(
     suspend fun getMissions(): DataResult<ApiResponse<MissionResponse>> {
         return when (val result = getResult { api.getMissions() }) {
             is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+
+    companion object {
+        private const val PAGE_SIZE = 20
+    }
+
+    /**
+     * Trả về danh sách ChatItem đã biết fromMe
+     */
+    suspend fun getMessages(
+        roomChatId: String,
+        before: String? = null
+    ): DataResult<List<ChatItem>> {
+        return when (val result = getResult {
+            api.getMessages(roomChatId, PAGE_SIZE, before)
+        }) {
+            is DataResult.Success -> {
+                val resp = result.data.data
+                val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+
+                val items = resp.messages.map { dto ->
+                    // dto.senderId bây giờ là SenderDto, không phải String
+                    val sender = dto.senderId
+                    val fromMe = sender.id == myUserId
+                    val avatarUrl = if (!fromMe) sender.avatar else null
+
+                    if (dto.images.isNotEmpty()) {
+                        ChatItem.ImageMessage(
+                            id = dto.id,
+                            senderId = sender.id,
+                            imageUrl = dto.images.first(),
+                            sentAt = dto.sentAt,
+                            fromMe = fromMe,
+                        )
+                    } else {
+                        ChatItem.TextMessage(
+                            id = dto.id,
+                            senderId = sender.id,
+                            text = dto.content,
+                            sentAt = dto.sentAt,
+                            fromMe = fromMe,
+                        )
+                    }
+                }
+
+                DataResult.Success(items)
+            }
+
             is DataResult.Error -> result
         }
     }

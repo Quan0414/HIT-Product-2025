@@ -22,6 +22,7 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.message.MessageResponse
 import com.example.hitproduct.data.model.mission.MissionResponse
 import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
@@ -156,4 +157,11 @@ interface ApiService {
     @GET(ApiConstants.GET_MISSIONS)
     suspend fun getMissions(
     ): Response<ApiResponse<MissionResponse>>
+
+    @GET(ApiConstants.GET_MESSAGE)
+    suspend fun getMessages(
+        @Path("roomChatId") roomChatId: String,
+        @Query("limit") limit: Int,
+        @Query("before") before: String? = null
+    ): Response<ApiResponse<MessageResponse>>
 }
