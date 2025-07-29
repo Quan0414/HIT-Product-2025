@@ -7,10 +7,10 @@
 
     <io.getstream.avatarview.AvatarView
         android:id="@+id/imgAvatar"
-        android:layout_width="44dp"
-        android:layout_height="44dp"
+        android:layout_width="32dp"
+        android:layout_height="32dp"
         app:avatarViewBorderColor="@color/borderBrown"
-        app:avatarViewBorderWidth="2dp"
+        app:avatarViewBorderWidth="0dp"
         app:avatarViewShape="circle"
         app:layout_constraintBottom_toBottomOf="@+id/cardImage"
         app:layout_constraintStart_toStartOf="parent" />
@@ -37,4 +37,17 @@
             android:scaleType="centerInside"
             android:src="@drawable/b" />
     </com.google.android.material.card.MaterialCardView>
+
+    <TextView
+        android:id="@+id/tvTimeReceive"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        android:fontFamily="@font/f700"
+        android:text="09:45"
+        android:layout_marginStart="10dp"
+        android:textColor="@color/textBrown"
+        android:textSize="10dp"
+        app:layout_constraintStart_toStartOf="@id/cardImage"
+        app:layout_constraintTop_toBottomOf="@id/cardImage" />
 </androidx.constraintlayout.widget.ConstraintLayout>

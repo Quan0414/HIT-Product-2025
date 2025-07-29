@@ -3,17 +3,21 @@ package com.example.hitproduct.screen.home_page.message
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.data.model.message.ChatItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentMessageBinding
 import com.example.hitproduct.screen.adapter.MessageAdapter
-import java.time.YearMonth
+import com.example.hitproduct.screen.home_page.home.HomeViewModel
+import com.example.hitproduct.screen.home_page.home.HomeViewModelFactory
+import io.getstream.avatarview.glide.loadImage
 
 
 class MessageFragment : BaseFragment<FragmentMessageBinding>() {
@@ -29,8 +33,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         )
     }
 
-    private val viewModel by activityViewModels<MessageViewModel> {
+    private val viewModel by viewModels<MessageViewModel> {
         MessageViewModelFactory(authRepo)
+    }
+
+    private val viewModel2 by viewModels<HomeViewModel> {
+        HomeViewModelFactory(authRepo)
     }
 
     private val roomId by lazy {
@@ -38,16 +46,15 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             ?: throw IllegalStateException("Room ID not found")
     }
     private lateinit var adapter: MessageAdapter
+    private val currentMessages = mutableListOf<ChatItem>()
+
 
     override fun initView() {
         adapter = MessageAdapter()
         binding.rvMessage.apply {
-            layoutManager = LinearLayoutManager(requireContext()).apply {
-                stackFromEnd = true
-            }
+            layoutManager = LinearLayoutManager(requireContext())
             adapter = this@MessageFragment.adapter
 
-            // Scroll listener để lazy‐load khi kéo lên đầu
             addOnScrollListener(object : RecyclerView.OnScrollListener() {
                 override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(rv, dx, dy)
@@ -72,6 +79,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
     override fun initData() {
         viewModel.fetchInitialMessages(roomId)
+        viewModel2.getCoupleProfile()
     }
 
     override fun handleEvent() {
@@ -79,30 +87,84 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
 
     override fun bindData() {
-        // Lần đầu load
-        viewModel.messagesState.observe(viewLifecycleOwner) { state ->
+
+        viewModel2.coupleProfile.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Error -> {}
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    adapter.submitList(state.data)
-                    binding.rvMessage.scrollToPosition(state.data.size - 1)
+                    //lay avatar va usernam cua  my love
+                    val couple = state.data
+                    if ((prefs.getString(
+                            AuthPrefersConstants.MY_LOVE_ID,
+                            null
+                        ) ?: "") == couple.userA.id
+                    ) {
+                        binding.tvName.text = couple.userA.username
+                        val avatar = couple.userA.avatar
+                            ?.takeIf { it.isNotBlank() && it != "/example.png" }
+                            ?.replaceFirst("http://", "https://")
+                        if (avatar != null) {
+                            binding.imgAvatar.loadImage(avatar)
+                        } else {
+                            binding.imgAvatar.loadImage(R.drawable.avatar_default)
+                        }
+                    } else {
+                        binding.tvName.text = couple.userB.username
+                        val avatar = couple.userB.avatar
+                            ?.takeIf { it.isNotBlank() && it != "/example.png" }
+                            ?.replaceFirst("http://", "https://")
+                        if (avatar != null) {
+                            binding.imgAvatar.loadImage(avatar)
+                        } else {
+                            binding.imgAvatar.loadImage(R.drawable.avatar_default)
+                        }
+                    }
+
                 }
+            }
+        }
+
+
+        // Lần đầu load
+        // 1) Initial load
+        viewModel.messagesState.observe(viewLifecycleOwner) { state ->
+            if (state is UiState.Success) {
+                currentMessages.clear()
+                currentMessages.addAll(state.data)
+                adapter.submitList(currentMessages)
+                // scroll xuống cuối
+                binding.rvMessage.scrollToPosition(currentMessages.size - 1)
             }
         }
 
         // Load thêm
         viewModel.loadMoreState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Error -> {}
-                UiState.Idle -> {}
-                UiState.Loading -> {}
-                is UiState.Success -> {
-                    adapter.submitList(state.data)
+            if (state is UiState.Success) {
+                val fullList = state.data
+
+                val newItems = fullList.filter { it !in currentMessages }
+                if (newItems.isEmpty()) return@observe
+
+                // 2.1 lưu vị trí và offset trước khi insert
+                val lm = binding.rvMessage.layoutManager as LinearLayoutManager
+                val firstPos = lm.findFirstVisibleItemPosition()
+                val firstView = lm.findViewByPosition(firstPos)
+                val offset = firstView?.top ?: 0
+
+                // 2.2 cập nhật danh sách local và adapter
+                currentMessages.addAll(0, newItems)
+                adapter.prependMessages(newItems)
+
+                // 2.3 restore scroll trong next UI loop
+                binding.rvMessage.post {
+                    lm.scrollToPositionWithOffset(firstPos + newItems.size, offset)
                 }
             }
         }
+
+
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
@@ -118,5 +180,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     ): FragmentMessageBinding {
         return FragmentMessageBinding.inflate(inflater, container, false)
     }
+
 
 }

@@ -5,10 +5,12 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
@@ -27,7 +29,6 @@ import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYo
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.message.ChatItem
-import com.example.hitproduct.data.model.message.MessageResponse
 import com.example.hitproduct.data.model.mission.MissionResponse
 import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
@@ -67,6 +68,15 @@ class AuthRepository(
             getResult { api.register(RegisterRequest(username, email, password, repeatPassword)) }
         return when (result) {
             is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun findAccount(
+        email: String
+    ): DataResult<ApiResponse<FindAccResponse>> {
+        return when (val result = getResult { api.findAcc(FindAccRequest(email)) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }
@@ -329,6 +339,7 @@ class AuthRepository(
                             imageUrl = dto.images.first(),
                             sentAt = dto.sentAt,
                             fromMe = fromMe,
+                            avatarUrl = avatarUrl ?: "",
                         )
                     } else {
                         ChatItem.TextMessage(
@@ -337,6 +348,7 @@ class AuthRepository(
                             text = dto.content,
                             sentAt = dto.sentAt,
                             fromMe = fromMe,
+                            avatarUrl = avatarUrl ?: "",
                         )
                     }
                 }

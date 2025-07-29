@@ -152,7 +152,7 @@ class SplashActivity : AppCompatActivity() {
                             // Lỗi khác, có thể do mạng, thông báo lỗi
                             Toast.makeText(
                                 this@SplashActivity,
-                                "Lỗi: ${res.error.message}",
+                                res.error.message,
                                 Toast.LENGTH_SHORT
                             ).show()
                         }

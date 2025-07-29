@@ -132,6 +132,7 @@ class LoginFragment : Fragment() {
                         val email = binding.edtEmail.text.toString().trim()
                         val bundle = Bundle().apply {
                             putString("email", email)
+                            putString("flow", "register")
                         }
                         val fragment = FindAccFragment().apply {
                             arguments = bundle

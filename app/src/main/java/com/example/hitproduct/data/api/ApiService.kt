@@ -1,10 +1,12 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
+import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
@@ -65,6 +67,12 @@ interface ApiService {
     suspend fun verifyCode(
         @Body request: VerifyCodeRequest
     ): Response<ApiResponse<String>>
+
+    // Forgot method
+    @POST(ApiConstants.AUTH_FORGOT_PASSWORD)
+    suspend fun findAcc(
+        @Body request: FindAccRequest
+    ): Response<ApiResponse<FindAccResponse>>
 
     @Multipart
     @POST(ApiConstants.SETUP_PROFILE)

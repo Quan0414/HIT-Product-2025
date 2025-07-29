@@ -9,15 +9,29 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.hitproduct.R
 import com.example.hitproduct.data.model.message.ChatItem
+import io.getstream.avatarview.AvatarView
+import io.getstream.avatarview.glide.loadImage
+import java.time.Instant
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
 
 class MessageAdapter(
     private val items: MutableList<ChatItem> = mutableListOf()
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
+    private val expandedIds = mutableSetOf<String>()
+
     fun submitList(list: List<ChatItem>) {
         items.clear()
         items.addAll(list)
         notifyDataSetChanged()
+    }
+
+    fun prependMessages(newMessages: List<ChatItem>) {
+        if (newMessages.isEmpty()) return
+        items.addAll(0, newMessages)
+        notifyItemRangeInserted(0, newMessages.size)
     }
 
     companion object {
@@ -39,18 +53,24 @@ class MessageAdapter(
 
     inner class TextInVH(view: View) : RecyclerView.ViewHolder(view) {
         val tv: TextView = view.findViewById(R.id.tvMessReceive)
+        val avatar: AvatarView = view.findViewById(R.id.imgAvatar)
+        val tvTime = view.findViewById<TextView>(R.id.tvTimeReceive)
     }
 
     inner class TextOutVH(view: View) : RecyclerView.ViewHolder(view) {
         val tv: TextView = view.findViewById(R.id.tvMessSend)
+        val tvTime = view.findViewById<TextView>(R.id.tvTimeSend)
     }
 
     inner class ImageInVH(view: View) : RecyclerView.ViewHolder(view) {
         val iv: ImageView = view.findViewById(R.id.ivImgReceive)
+        val avatar: AvatarView = view.findViewById(R.id.imgAvatar)
+        val tvTime = view.findViewById<TextView>(R.id.tvTimeReceive)
     }
 
     inner class ImageOutVH(view: View) : RecyclerView.ViewHolder(view) {
         val iv: ImageView = view.findViewById(R.id.ivImgSend)
+        val tvTime = view.findViewById<TextView>(R.id.tvTimeSend)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -67,28 +87,92 @@ class MessageAdapter(
     override fun getItemCount(): Int = items.size
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-        when (val item = items[position]) {
+        val item = items[position]
+
+        // Chỉ show avatar cho incoming (fromMe == false)
+        // và khi message kế tiếp là của mình hoặc không còn message nào
+        val showAvatar = !item.fromMe && (
+                items.getOrNull(position + 1)?.fromMe == true
+                        || position == items.lastIndex
+                )
+        val isLast = position == items.lastIndex
+        val showTime = isLast || expandedIds.contains(item.id)
+
+
+        when (item) {
             is ChatItem.TextMessage -> {
-                if (holder is TextInVH && !item.fromMe) {
+                if (holder is TextInVH) {
                     holder.tv.text = item.text
-                } else if (holder is TextOutVH && item.fromMe) {
+                    holder.avatar.visibility = if (showAvatar) View.VISIBLE else View.INVISIBLE
+                    if (showAvatar) {
+                        holder.avatar.loadAvatar(item.avatarUrl)
+                    }
+                    // show/hide time
+                    holder.tvTime.visibility = if (showTime) View.VISIBLE else View.GONE
+                    holder.tvTime.text = item.sentAt.formatTime()
+
+                    holder.itemView.setOnClickListener {
+                        toggleExpanded(item.id, position)
+                    }
+                }
+                if (holder is TextOutVH) {
                     holder.tv.text = item.text
+
+                    holder.tvTime.visibility = if (showTime) View.VISIBLE else View.GONE
+                    holder.tvTime.text = item.sentAt.formatTime()
+
+                    holder.itemView.setOnClickListener {
+                        toggleExpanded(item.id, position)
+                    }
                 }
             }
 
             is ChatItem.ImageMessage -> {
-                if (holder is ImageInVH && !item.fromMe) {
-                    Glide.with(holder.iv.context)
-                        .load(item.imageUrl)
-//                        .placeholder(R.drawable.ic_placeholder)
-                        .into(holder.iv)
-                } else if (holder is ImageOutVH && item.fromMe) {
-                    Glide.with(holder.iv.context)
-                        .load(item.imageUrl)
-//                        .placeholder(R.drawable.ic_placeholder)
-                        .into(holder.iv)
+                if (holder is ImageInVH) {
+                    // bind ảnh
+                    Glide.with(holder.iv).load(item.imageUrl).into(holder.iv)
+
+                    // bind avatar
+                    holder.avatar.visibility = if (showAvatar) View.VISIBLE else View.INVISIBLE
+                    if (showAvatar) {
+                        holder.avatar.loadAvatar(item.avatarUrl)
+                    }
+                }
+                if (holder is ImageOutVH) {
+                    Glide.with(holder.iv).load(item.imageUrl).into(holder.iv)
                 }
             }
         }
     }
+
+    private fun toggleExpanded(id: String, pos: Int) {
+        if (expandedIds.contains(id)) expandedIds.remove(id)
+        else expandedIds.add(id)
+        notifyItemChanged(pos)
+    }
+
+
+    private fun AvatarView.loadAvatar(rawUrl: String?) {
+        val avatar = rawUrl
+            ?.takeIf { it.isNotBlank() && it != "/example.png" }
+            ?.replaceFirst("http://", "https://")
+        if (avatar != null) {
+            this.loadImage(avatar)
+        } else {
+            this.loadImage(R.drawable.avatar_default)
+        }
+    }
+
+    private fun String.formatTime(): String {
+        return try {
+            val instant = Instant.parse(this)
+            val zoned = instant.atZone(ZoneId.systemDefault())
+            DateTimeFormatter
+                .ofPattern("HH:mm d 'TH'M", Locale("vi"))
+                .format(zoned)
+        } catch (e: Exception) {
+            this
+        }
+    }
+
 }

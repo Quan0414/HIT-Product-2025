@@ -3,7 +3,6 @@ package com.example.hitproduct.screen.home_page.home
 import android.animation.Animator
 import android.animation.AnimatorListenerAdapter
 import android.animation.ValueAnimator
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ClipDrawable
@@ -21,7 +20,6 @@ import androidx.annotation.ColorRes
 import androidx.annotation.IdRes
 import androidx.annotation.LayoutRes
 import androidx.core.content.ContextCompat
-import androidx.core.graphics.drawable.DrawableCompat
 import androidx.core.os.bundleOf
 import androidx.fragment.app.activityViewModels
 import com.airbnb.lottie.LottieDrawable
@@ -31,17 +29,17 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.Constant
 import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentHomeBinding
 import com.example.hitproduct.screen.dialog.daily_question.your.YourDailyQuestionDialogFragment
 import com.example.hitproduct.screen.dialog.mission.DialogMission
+import com.example.hitproduct.screen.dialog.notification.DialogNotification
 import com.example.hitproduct.screen.dialog.shop.ShopDialogFragment
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate
 import com.example.hitproduct.socket.SocketManager
-import com.example.hitproduct.common.util.Constant
-import com.example.hitproduct.screen.dialog.notification.DialogNotification
 import java.time.Instant
 import java.time.LocalDate
 import java.time.Period
@@ -65,7 +63,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val viewModel by activityViewModels<HomeViewModel> {
         HomeViewModelFactory(authRepo)
     }
-
 
     private val hungryCat = listOf(
         R.raw.meo_doi,
@@ -93,6 +90,9 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val questionDialog by lazy { YourDailyQuestionDialogFragment() }
 
     override fun initView() {
+
+        checkMyLoveId()
+        val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null)
 
         viewModel.listenToSocket()
 
@@ -128,7 +128,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     .firstOrNull()
                 Log.d("HomeFragment", "Cat state key: $keyState")
                 if (keyState != null) {
-                    SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
+                    SocketManager.sendCatStateToSocket(keyState, myLoveId ?: "")
                     Log.d("HomeFragment", "Cat state sent to server")
                 }
                 setAnimation(next)
@@ -301,7 +301,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                         .firstOrNull()
                     Log.d("HomeFragment", "Cat state key: $keyState")
                     if (keyState != null) {
-                        SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
+                        SocketManager.sendCatStateToSocket(
+                            keyState,
+                            myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null) ?: ""
+                        )
                         Log.d("HomeFragment", "Cat state sent to server")
                     }
                     currentCat = first
@@ -477,72 +480,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         popup.showAsDropDown(anchor, xOffset, yOffset)
     }
 
-    private fun registerSocketListeners() {
-
-        SocketManager.onListenForPetActive { data ->
-            Log.d("HomeFragment", "onListenForPetActive fired with $data")
-            val key = data.optString("active")
-            val gifRes = catStateGifMap[key] ?: R.raw.meo_cay
-            binding.gifCat.setAnimation(gifRes)
-            binding.gifCat.playAnimation()
-        }
-
-
-        SocketManager.onFeedPetSuccess { data ->
-            Log.d("HomeFragment", "onFeedPetSuccess fired with $data")
-            val newHunger = data.optInt("hunger")
-            val newHappiness = data.optInt("happiness")
-            val newCoin = data.optInt("coin")
-
-            animateStateChange(binding.state1, binding.icon1, newHunger * 10)
-            animateStateChange(binding.state2, binding.icon2, newHappiness)
-            binding.tvMoney.text = newCoin.toThousandComma()
-            (activity as MainActivity).coin = newCoin
-
-            currentCatList = when {
-                newHunger < Constant.HUNGER_LOW -> hungryCat
-                newHunger < Constant.HUNGER_MEDIUM -> normalCat
-                else -> happyCat
-            }
-            binding.gifCat.apply {
-                isClickable = false
-                removeAllAnimatorListeners()
-                setAnimation(eattingCat)
-                repeatCount = 1
-                playAnimation()
-
-                // khi kết thúc ăn, tự chuyển sang random cat
-                addAnimatorListener(object : AnimatorListenerAdapter() {
-                    override fun onAnimationEnd(animation: Animator) {
-                        // gỡ listener này để không lặp lại
-                        removeAnimatorListener(this)
-                        isClickable = true
-
-                        // chọn 1 GIF random từ currentCatList
-                        val next = currentCatList.random()
-                        currentCat = next
-
-                        // play bình thường
-                        setAnimation(next)
-                        repeatCount = LottieDrawable.INFINITE
-                        playAnimation()
-                    }
-                })
-            }
-        }
-
-        SocketManager.onDecreaseHunger { data ->
-            Log.d("HomeFragment", "onDecreaseHunger fired with $data")
-            val newHunger = data.optInt("hunger")
-            animateStateChange(binding.state1, binding.icon1, newHunger * 10)
-            currentCatList = when {
-                newHunger < Constant.HUNGER_LOW -> hungryCat
-                newHunger < Constant.HUNGER_MEDIUM -> normalCat
-                else -> happyCat
-            }
-        }
-    }
-
     private fun animateStateChange(
         bar: ProgressBar,
         icon: View,
@@ -577,12 +514,22 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         "eating_key" to R.raw.meo_an
     )
 
-    private fun checkMyLoveId(): String? {
+    private fun checkMyLoveId() {
         //so sanh my user id va user id
         val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
         if (myId == prefs.getString(AuthPrefersConstants.USER_A_ID, null)) {
-            return prefs.getString(AuthPrefersConstants.USER_B_ID, null)
+            prefs.edit()
+                .putString(
+                    AuthPrefersConstants.MY_LOVE_ID,
+                    prefs.getString(AuthPrefersConstants.USER_B_ID, null)
+                )
+                .apply()
         }
-        return prefs.getString(AuthPrefersConstants.USER_A_ID, null)
+        prefs.edit()
+            .putString(
+                AuthPrefersConstants.MY_LOVE_ID,
+                prefs.getString(AuthPrefersConstants.USER_A_ID, null)
+            )
+            .apply()
     }
 }

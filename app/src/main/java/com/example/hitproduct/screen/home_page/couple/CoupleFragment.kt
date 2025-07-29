@@ -232,7 +232,7 @@ class CoupleFragment : BaseFragment<FragmentCoupleBinding>() {
                     if (avatarDataA != "/example.png") {
                         binding.imgAvatar1.loadImage(avatarDataA)
                     } else {
-                        binding.imgAvatar1.loadImage(R.drawable.avatar_default)
+                        binding.imgAvatar1.loadImage(R.drawable.avatar_default2)
                     }
 
                     // User B
