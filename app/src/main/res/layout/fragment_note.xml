@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_login"
     android:paddingHorizontal="16dp"
+    android:paddingBottom="100dp"
     tools:context=".screen.home_page.calendar.NoteFragment">
 
     <ImageView

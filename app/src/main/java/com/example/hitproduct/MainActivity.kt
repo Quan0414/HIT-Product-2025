@@ -5,13 +5,16 @@ import android.os.Bundle
 import android.view.View
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowInsetsCompat
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.databinding.ActivityMainBinding
+import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.couple.CoupleFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
-import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
 import com.example.hitproduct.socket.SocketManager
 
@@ -42,6 +45,14 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_splash)
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+            val sys = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(sys.left, sys.top, sys.right, sys.bottom)
+            insets
+        }
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 

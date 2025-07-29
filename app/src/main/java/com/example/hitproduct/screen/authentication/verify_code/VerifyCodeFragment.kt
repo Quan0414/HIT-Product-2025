@@ -83,6 +83,7 @@ class VerifyCodeFragment : Fragment() {
                 is UiState.Loading -> {
                     // show loading nếu cần
                 }
+
                 is UiState.Success -> {
                     Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
                     // sau khi gửi lại thành công, restart đếm
@@ -162,12 +163,22 @@ class VerifyCodeFragment : Fragment() {
         viewModel.verifyCodeState.observe(viewLifecycleOwner) { state ->
             binding.tvContinue.isEnabled = state !is UiState.Loading
             when (state) {
+                is UiState.Idle -> {
+                }
+
+                is UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                }
+
                 is UiState.Success -> {
-                    Toast.makeText(requireContext(), "Xác thực OTP thành công!", Toast.LENGTH_SHORT).show()
+                    binding.loadingProgressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Xác thực OTP thành công!", Toast.LENGTH_SHORT)
+                        .show()
                     navigateNext()
                 }
 
                 is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     // Hiển thị thông báo lỗi
                     val err = state.error
                     if (err.otp) {
@@ -207,6 +218,12 @@ class VerifyCodeFragment : Fragment() {
                 "Register", FragmentManager.POP_BACK_STACK_INCLUSIVE
             )
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentStart, SetUpInformationFragment())
                 .addToBackStack(null)
                 .commit()
@@ -215,6 +232,12 @@ class VerifyCodeFragment : Fragment() {
                 "EnterEmail", FragmentManager.POP_BACK_STACK_INCLUSIVE
             )
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentStart, CreateNewPasswordFragment())
                 .addToBackStack(null)
                 .commit()

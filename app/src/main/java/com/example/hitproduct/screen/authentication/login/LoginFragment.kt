@@ -28,7 +28,6 @@ import com.example.hitproduct.databinding.FragmentLoginBinding
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
-import com.example.hitproduct.screen.authentication.verify_code.VerifyCodeFragment
 
 class LoginFragment : Fragment() {
 
@@ -66,6 +65,11 @@ class LoginFragment : Fragment() {
         viewModel.coupleState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
+                    val myUserId = state.data.id
+                    prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                    val idRoomChat = state.data.roomChatId
+                    prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat).apply()
+
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment
                         parentFragmentManager.beginTransaction()
@@ -93,12 +97,19 @@ class LoginFragment : Fragment() {
         viewModel.loginState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                     binding.tvLogin.isEnabled = false
                 }
 
                 is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     // Reset background và show lỗi
                     val err = state.error
+                    Toast.makeText(
+                        requireContext(),
+                        err.message,
+                        Toast.LENGTH_SHORT
+                    ).show()
 
                     binding.edtEmail.setBackgroundResource(
                         if (err.emailError) R.drawable.bg_edit_text_error
@@ -108,14 +119,20 @@ class LoginFragment : Fragment() {
                         if (err.passwordError) R.drawable.bg_edit_text_error
                         else R.drawable.bg_edit_text
                     )
-                    Toast.makeText(requireContext(), "${err.message} Vui lòng nhập email để xác nhận tài khoản. ", Toast.LENGTH_SHORT).show()
+
                     binding.tvLogin.isEnabled = true
 
                     if (err.message == "Tài khoản chưa được xác nhận!") {
+                        Toast.makeText(
+                            requireContext(),
+                            "Tài khoản chưa được xác nhận! Vui lòng nhập email để xác nhận tài khoản. ",
+                            Toast.LENGTH_SHORT
+                        ).show()
                         //chuyen den verify code kem theo email da nhap trong text
                         val email = binding.edtEmail.text.toString().trim()
                         val bundle = Bundle().apply {
                             putString("email", email)
+                            putString("flow", "register")
                         }
                         val fragment = FindAccFragment().apply {
                             arguments = bundle
@@ -128,6 +145,7 @@ class LoginFragment : Fragment() {
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     binding.tvLogin.isEnabled = true
                     Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT)
                         .show()
@@ -154,10 +172,18 @@ class LoginFragment : Fragment() {
 
         // 4. Validation form
         setUpListeners()
+        updateLoginButtonState()
+
 
         // 5. Quên mật khẩu
         binding.tvForgotPassword.setOnClickListener {
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentStart, FindAccFragment())
                 .addToBackStack(null)
                 .commit()
@@ -168,6 +194,12 @@ class LoginFragment : Fragment() {
         spannable.setSpan(object : ClickableSpan() {
             override fun onClick(widget: View) {
                 parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                    )
                     .replace(
                         R.id.fragmentStart,
                         RegisterFragment().apply {

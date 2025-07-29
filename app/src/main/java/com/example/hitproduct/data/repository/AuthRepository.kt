@@ -5,10 +5,12 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
@@ -26,6 +28,9 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.message.ChatItem
+import com.example.hitproduct.data.model.mission.MissionResponse
+import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.Pet
@@ -63,6 +68,15 @@ class AuthRepository(
             getResult { api.register(RegisterRequest(username, email, password, repeatPassword)) }
         return when (result) {
             is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun findAccount(
+        email: String
+    ): DataResult<ApiResponse<FindAccResponse>> {
+        return when (val result = getResult { api.findAcc(FindAccRequest(email)) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }
@@ -275,6 +289,73 @@ class AuthRepository(
     ): DataResult<ApiResponse<EditNoteResponse>> {
         return when (val result = getResult { api.editNote(noteId, EditNoteRequest(content)) }) {
             is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getNotification(): DataResult<ApiResponse<NotificationResponse>> {
+        return when (val result = getResult { api.getNotifications() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getMissions(): DataResult<ApiResponse<MissionResponse>> {
+        return when (val result = getResult { api.getMissions() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+
+    companion object {
+        private const val PAGE_SIZE = 20
+    }
+
+    /**
+     * Trả về danh sách ChatItem đã biết fromMe
+     */
+    suspend fun getMessages(
+        roomChatId: String,
+        before: String? = null
+    ): DataResult<List<ChatItem>> {
+        return when (val result = getResult {
+            api.getMessages(roomChatId, PAGE_SIZE, before)
+        }) {
+            is DataResult.Success -> {
+                val resp = result.data.data
+                val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+
+                val items = resp.messages.map { dto ->
+                    // dto.senderId bây giờ là SenderDto, không phải String
+                    val sender = dto.senderId
+                    val fromMe = sender.id == myUserId
+                    val avatarUrl = if (!fromMe) sender.avatar else null
+
+                    if (dto.images.isNotEmpty()) {
+                        ChatItem.ImageMessage(
+                            id = dto.id,
+                            senderId = sender.id,
+                            imageUrl = dto.images.first(),
+                            sentAt = dto.sentAt,
+                            fromMe = fromMe,
+                            avatarUrl = avatarUrl ?: "",
+                        )
+                    } else {
+                        ChatItem.TextMessage(
+                            id = dto.id,
+                            senderId = sender.id,
+                            text = dto.content,
+                            sentAt = dto.sentAt,
+                            fromMe = fromMe,
+                            avatarUrl = avatarUrl ?: "",
+                        )
+                    }
+                }
+
+                DataResult.Success(items)
+            }
+
             is DataResult.Error -> result
         }
     }

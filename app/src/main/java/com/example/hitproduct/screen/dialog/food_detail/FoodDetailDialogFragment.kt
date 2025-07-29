@@ -22,7 +22,7 @@ import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogFoodDetailBinding
 import com.example.hitproduct.screen.dialog.shop.ShopViewModel
 import com.example.hitproduct.screen.dialog.shop.ShopViewModelFactory
-import com.example.hitproduct.util.Constant
+import com.example.hitproduct.common.util.Constant
 
 class FoodDetailDialogFragment : DialogFragment() {
     private var _binding: DialogFoodDetailBinding? = null
@@ -74,7 +74,6 @@ class FoodDetailDialogFragment : DialogFragment() {
         return binding.root
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val food = requireArguments().getSerializable(Constant.ARG_FOOD) as? Food

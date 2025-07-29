@@ -110,4 +110,7 @@ dependencies {
 
     implementation("com.github.eriffanani:TextViewReadMore:4.1.0")
 
+    // DotsIndicator
+    implementation("com.tbuonomo:dotsindicator:5.1.0")
+
 }

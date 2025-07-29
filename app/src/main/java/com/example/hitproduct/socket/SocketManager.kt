@@ -3,6 +3,8 @@ package com.example.hitproduct.socket
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.hitproduct.common.constants.ApiConstants
 import io.socket.client.IO
 import io.socket.client.IO.Options
@@ -28,6 +30,9 @@ object SocketManager {
     private lateinit var socket: Socket
     private const val SERVER_URL = ApiConstants.BASE_URL
     private var authToken: String? = null
+
+    private val _notifications = MutableLiveData<JSONObject>()
+    val notifications: LiveData<JSONObject> = _notifications
 
     /**
      * Kết nối tới Socket server kèm token (server lấy myUserId từ token)
@@ -226,8 +231,26 @@ object SocketManager {
 
 
     // Nuoi pet
+    // Gửi trạng thái mèo qua Socket với key PET_ACTIVE
+    fun sendCatStateToSocket(state: String, myLoveId: String) {
+        val payLoad = JSONObject().apply {
+            put("active", state)
+            put("myLoveId", myLoveId)
+        }
+        socket.emit("USER_SEND_PET_ACTIVE", payLoad)
+        Log.d("SocketManager", "Sent cat state: $state, myLoveId: $myLoveId")
+    }
 
     //Listener
+    fun onListenForPetActive(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_SEND_PET_ACTIVE") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received pet active data: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     fun onFeedPetSuccess(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_FEED_PET_SUCCESS") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
@@ -240,6 +263,26 @@ object SocketManager {
         socket.on("PET_DECREASE_HUNGER") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
                 Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    //=====================================================
+    // Notification
+
+    fun onNotificationReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_SEND_NOT_TO_USER") { args ->
+            // 1. Lấy wrapper JSON
+            val wrapper = args.getOrNull(0) as? JSONObject ?: return@on
+            // 2. Unwrap object "not" (nếu không có thì bỏ qua)
+            val notObj = wrapper.optJSONObject("not") ?: return@on
+
+            Log.d("SocketManager", "unwrapped notification: $notObj")
+            Handler(Looper.getMainLooper()).post {
+                // 3. Gọi callback với object đã unwrap
+                listener(notObj)
+                // 4. Đẩy vào LiveData cũng là object unwrap
+                _notifications.postValue(notObj)
             }
         }
     }

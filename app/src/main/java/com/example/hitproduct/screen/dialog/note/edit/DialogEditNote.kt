@@ -17,8 +17,7 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.calendar.Note
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogEditNoteBinding
-import com.example.hitproduct.screen.dialog.note.get.DialogNote
-import com.example.hitproduct.util.Constant.ARG_NOTES
+import com.example.hitproduct.common.util.Constant.ARG_NOTES
 
 
 class DialogEditNote : DialogFragment() {

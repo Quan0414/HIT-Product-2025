@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/f900"
+        android:text="Kết nối với người bạn yêu quý"
+        android:textSize="24dp" />
+
+    <TextView
+        android:id="@+id/tvContent"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:fontFamily="@font/f600"
+        android:text="Kết nối với nửa ấy của bạn một cách dễ dàng, cùng nhau trải nhiệm những điều tuyệt vời nhất của Đếm Ngày “Xa” Nhau nhé"
+        android:textSize="12dp" />
+
+</LinearLayout>

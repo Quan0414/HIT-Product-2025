@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.home_page.couple.detail
+package com.example.hitproduct.screen.dialog.profile_detail
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -23,7 +23,7 @@ class DialogProfileDetail : DialogFragment() {
         super.onStart()
         dialog?.window?.apply {
             setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
+                (resources.displayMetrics.widthPixels * 0.9).toInt(),
                 ViewGroup.LayoutParams.WRAP_CONTENT
             )
             setGravity(Gravity.CENTER)

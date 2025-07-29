@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">HIT Product</string>
+    <string name="app_name">Đếm ngày "xa" nhau</string>
 
     <string name="hello_blank_fragment">Hello blank fragment</string>
 
@@ -12,5 +12,10 @@
     <string name="hunger_index_of_food">+%1$d</string>
     <string name="happy_index_of_food">+%1$d</string>
 
+    <!--    Dialog Mission  -->
+    <string name="login">Đăng nhập</string>
+    <string name="mess">Nhắn tin (%1$d/3)</string>
+    <string name="feed_pet">Cho pet ăn (%1$d/1)</string>
+    <string name="daily_question">Câu hỏi hàng ngày</string>
 
 </resources>

@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog.note
+package com.example.hitproduct.screen.adapter
 
 import android.view.View
 import android.view.ViewGroup

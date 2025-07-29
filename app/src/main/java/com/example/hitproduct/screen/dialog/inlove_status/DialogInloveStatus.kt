@@ -1,4 +1,4 @@
-package com.example.hitproduct
+package com.example.hitproduct.screen.dialog.inlove_status
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
