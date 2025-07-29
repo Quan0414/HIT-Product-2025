@@ -30,4 +30,7 @@ replay_pid*
 .gradle/
 # Ignore local SDK settings
 local.properties
+# Firebase config
+app/google-services.json
+
 
