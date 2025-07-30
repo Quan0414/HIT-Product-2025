@@ -249,7 +249,7 @@ class SendInviteCodeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         inviteDialog?.dismiss()
-        SocketManager.disconnect()
+//        SocketManager.disconnect()
     }
 
     private fun showInviteDialog() {

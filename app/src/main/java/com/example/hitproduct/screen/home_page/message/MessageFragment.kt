@@ -3,6 +3,7 @@ package com.example.hitproduct.screen.home_page.message
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -10,6 +11,7 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.MappedError
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.message.ChatItem
 import com.example.hitproduct.data.repository.AuthRepository
@@ -71,13 +73,14 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         binding.btnSendMessage.setOnClickListener {
             val text = binding.etMessage.text.toString().trim()
             if (text.isNotEmpty()) {
-                // TODO: viewModel.sendMessage(roomId, text)
+                viewModel.sendMessage(text)
                 binding.etMessage.text?.clear()
             }
         }
     }
 
     override fun initData() {
+        viewModel.joinRoom(roomId)
         viewModel.fetchInitialMessages(roomId)
         viewModel2.getCoupleProfile()
     }
@@ -164,12 +167,40 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
         }
 
+        // disable nut gui khi dang gui
+        viewModel.sendState.observe(viewLifecycleOwner) { state ->
+            // Bỏ qua nếu là null (chưa có giá trị nào được set)
+            state ?: return@observe
 
+            when (state) {
+                is UiState.Error -> {
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.toString(),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    binding.btnSendMessage.isEnabled = true
+                }
+
+                UiState.Idle -> {
+                    binding.btnSendMessage.isEnabled = true
+                }
+
+                UiState.Loading -> {
+                    binding.btnSendMessage.isEnabled = false
+                }
+
+                is UiState.Success -> {
+                    binding.btnSendMessage.isEnabled = true
+                }
+            }
+        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (!hidden) {
+            viewModel.joinRoom(roomId)
             viewModel.fetchInitialMessages(roomId)
         }
     }

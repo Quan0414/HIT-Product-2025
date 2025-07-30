@@ -15,6 +15,8 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
+        SocketManager.init(this)
+
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
 
         if (!token.isNullOrEmpty()) {
@@ -23,7 +25,6 @@ class MyApp : Application() {
         }
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
 
     }
 

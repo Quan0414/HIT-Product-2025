@@ -39,6 +39,7 @@ class MessageAdapter(
         private const val TYPE_TEXT_OUT = 1
         private const val TYPE_IMAGE_IN = 2
         private const val TYPE_IMAGE_OUT = 3
+        private const val TYPE_TYPING = 4
     }
 
     override fun getItemViewType(position: Int): Int {
@@ -48,29 +49,33 @@ class MessageAdapter(
 
             is ChatItem.ImageMessage ->
                 if (item.fromMe) TYPE_IMAGE_OUT else TYPE_IMAGE_IN
+
+            is ChatItem.TypingIndicator -> TYPE_TYPING
         }
     }
 
     inner class TextInVH(view: View) : RecyclerView.ViewHolder(view) {
         val tv: TextView = view.findViewById(R.id.tvMessReceive)
         val avatar: AvatarView = view.findViewById(R.id.imgAvatar)
-        val tvTime = view.findViewById<TextView>(R.id.tvTimeReceive)
+        val tvTime: TextView = view.findViewById(R.id.tvTimeReceive)
     }
 
     inner class TextOutVH(view: View) : RecyclerView.ViewHolder(view) {
         val tv: TextView = view.findViewById(R.id.tvMessSend)
-        val tvTime = view.findViewById<TextView>(R.id.tvTimeSend)
+        val tvTime: TextView = view.findViewById(R.id.tvTimeSend)
     }
 
     inner class ImageInVH(view: View) : RecyclerView.ViewHolder(view) {
         val iv: ImageView = view.findViewById(R.id.ivImgReceive)
         val avatar: AvatarView = view.findViewById(R.id.imgAvatar)
-        val tvTime = view.findViewById<TextView>(R.id.tvTimeReceive)
     }
 
     inner class ImageOutVH(view: View) : RecyclerView.ViewHolder(view) {
         val iv: ImageView = view.findViewById(R.id.ivImgSend)
-        val tvTime = view.findViewById<TextView>(R.id.tvTimeSend)
+    }
+
+    inner class TypingVH(view: View) : RecyclerView.ViewHolder(view) {
+        val imgTyping: ImageView = view.findViewById(R.id.imgTyping)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
@@ -142,6 +147,8 @@ class MessageAdapter(
                     Glide.with(holder.iv).load(item.imageUrl).into(holder.iv)
                 }
             }
+
+            ChatItem.TypingIndicator -> TODO()
         }
     }
 

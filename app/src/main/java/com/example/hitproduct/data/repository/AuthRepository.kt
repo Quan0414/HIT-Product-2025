@@ -376,4 +376,10 @@ class AuthRepository(
             .apply()
     }
 
+    fun getMyUserId(): String =
+        prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+
+    fun getMyLoveId(): String =
+        prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
+
 }

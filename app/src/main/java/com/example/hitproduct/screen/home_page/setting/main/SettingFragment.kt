@@ -67,20 +67,12 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
         binding.btnLogout.setOnClickListener {
             DialogLogout {
-                // 1. Clear all prefs
-                requireContext()
-                    .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
-                    .edit()
-                    .clear()
-                    .apply()
-
-                // 2. Start LoginActivity và clear back-stack
+                authRepo.clearAccessToken()
                 val intent = Intent(requireContext(), SplashActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
                 startActivity(intent)
 
-                // 3. Finish luôn Activity chứa dialog
                 requireActivity().finish()
 
             }.show(parentFragmentManager, "logout_dialog")
