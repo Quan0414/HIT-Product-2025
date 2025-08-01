@@ -27,9 +27,9 @@ class MissionAdapter(
             val ctx = itemView.context
             title.text = when (mission.missionId.key) {
                 "daily_login" -> ctx.getString(R.string.login)
-                "message_partner" -> ctx.getString(R.string.mess)
-                "feed_pet" -> ctx.getString(R.string.feed_pet)
-                else -> ctx.getString(R.string.daily_question)
+                "message_partner" -> ctx.getString(R.string.mess, mission.countCompleted)
+                "feed_pet" -> ctx.getString(R.string.feed_pet, mission.countCompleted)
+                else -> ctx.getString(R.string.daily_question, mission.countCompleted)
             }
             coin.text = "+ ${mission.missionId.coin} đồng"
             checkBox.setImageResource(

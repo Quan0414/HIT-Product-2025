@@ -7,7 +7,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
-import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.MappedError
 import com.example.hitproduct.data.model.message.ChatItem
@@ -151,6 +150,11 @@ class MessageViewModel(
             hasUserInteracted = false
             _sendState.value = UiState.Error(MappedError(e.message ?: "Failed to send message"))
         }
+    }
+
+    fun sendIsTyping() {
+        // Gửi thông báo đang gõ
+        SocketManager.sendTyping()
     }
 
     /**

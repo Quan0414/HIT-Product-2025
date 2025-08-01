@@ -113,4 +113,9 @@ dependencies {
     // DotsIndicator
     implementation("com.tbuonomo:dotsindicator:5.1.0")
 
+    implementation("com.vanniktech:emoji-google:0.21.0")
+    implementation("com.vanniktech:emoji-material:0.21.0")
+
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
+
 }

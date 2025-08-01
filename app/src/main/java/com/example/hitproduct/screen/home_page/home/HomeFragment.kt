@@ -91,8 +91,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
     override fun initView() {
 
-        checkMyLoveId()
         val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null)
+        Log.d("HomeFragment", "My love ID: $myLoveId")
 
         viewModel.listenToSocket()
 
@@ -217,6 +217,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                     prefs.edit()
                         .putString(AuthPrefersConstants.USER_B_ID, userBID)
                         .apply()
+                    checkMyLoveId()
 
                     if (!state.data.loveStartedAtEdited && !hasShownStartDateDialog) {
                         hasShownStartDateDialog = true
@@ -515,21 +516,19 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     )
 
     private fun checkMyLoveId() {
-        //so sanh my user id va user id
         val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
-        if (myId == prefs.getString(AuthPrefersConstants.USER_A_ID, null)) {
-            prefs.edit()
-                .putString(
-                    AuthPrefersConstants.MY_LOVE_ID,
-                    prefs.getString(AuthPrefersConstants.USER_B_ID, null)
-                )
-                .apply()
-        }
+        val userA = prefs.getString(AuthPrefersConstants.USER_A_ID, null)
+        val userB = prefs.getString(AuthPrefersConstants.USER_B_ID, null)
+        Log.d("HomeFragment", "My ID: $myId, User A: $userA, User B: $userB")
+
+        if (myId == null || userA == null || userB == null) return
+
+        val loveId = if (myId == userA) userB else userA
+        Log.d("HomeFragment", "Setting MY_LOVE_ID to: $loveId")
+
         prefs.edit()
-            .putString(
-                AuthPrefersConstants.MY_LOVE_ID,
-                prefs.getString(AuthPrefersConstants.USER_A_ID, null)
-            )
+            .putString(AuthPrefersConstants.MY_LOVE_ID, loveId)
             .apply()
     }
+
 }

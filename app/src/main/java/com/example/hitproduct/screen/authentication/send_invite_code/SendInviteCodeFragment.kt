@@ -144,8 +144,7 @@ class SendInviteCodeFragment : Fragment() {
                     prefs.edit()
                         .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
                         .apply()
-                    val idRoomChat = result.data.roomChatId
-                    prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat).apply()
+
                     // Cập nhật mã mời
                     val coupleCode = result.data.coupleCode
                     binding.tvInviteCode.text = coupleCode
@@ -205,6 +204,28 @@ class SendInviteCodeFragment : Fragment() {
 //        }
 //    }
 
+//    @SuppressLint("ClickableViewAccessibility")
+//    private fun setupCopyInviteCode() {
+//        binding.tvInviteCode.setOnTouchListener { _, event ->
+//            if (event.action == MotionEvent.ACTION_UP) {
+//                val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2]
+//                    ?: return@setOnTouchListener false
+//                if (event.x >= binding.tvInviteCode.width
+//                    - binding.tvInviteCode.paddingEnd
+//                    - drawableEnd.bounds.width()
+//                ) {
+//                    val code = binding.tvInviteCode.text.toString()
+//                    val cm =
+//                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
+//                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
+//                    return@setOnTouchListener true
+//                }
+//            }
+//            false
+//        }
+//    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupCopyInviteCode() {
         binding.tvInviteCode.setOnTouchListener { _, event ->
@@ -215,12 +236,14 @@ class SendInviteCodeFragment : Fragment() {
                     - binding.tvInviteCode.paddingEnd
                     - drawableEnd.bounds.width()
                 ) {
-                    val code = binding.tvInviteCode.text.toString()
-                    val cm =
-                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
-                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
-                    return@setOnTouchListener true
+                    val textToShare = binding.tvInviteCode.text.toString().trim()
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, textToShare)
+                    }
+
+                    startActivity(Intent.createChooser(shareIntent, null))
                 }
             }
             false
@@ -396,6 +419,15 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
+        SocketManager.onListenRoomChatId { data ->
+            Log.d("SendInvite", "Received room chat ID: $data")
+            Handler(Looper.getMainLooper()).post {
+                val id = data.optString("roomChatId")
+                prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, id).apply()
+//                goHomeActivity()
+            }
+        }
+
     }
 
     private fun refreshDialog() {
@@ -414,4 +446,19 @@ class SendInviteCodeFragment : Fragment() {
             startActivity(intent)
         }
     }
+
+    private fun shareText() {
+        val textToShare = binding.tvInviteCode.text.toString().trim()
+
+        // Tạo Intent với ACTION_SEND để chia sẻ văn bản
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"  // loại dữ liệu là văn bản thuần
+            putExtra(Intent.EXTRA_SUBJECT, "Chia sẻ văn bản")  // Tiêu đề chia sẻ (tuỳ chọn)
+            putExtra(Intent.EXTRA_TEXT, textToShare)  // Nội dung văn bản chia sẻ
+        }
+
+        // Mở cửa sổ chia sẻ để người dùng chọn ứng dụng gửi
+        startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua..."))
+    }
+
 }

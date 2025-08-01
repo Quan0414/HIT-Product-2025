@@ -236,6 +236,15 @@ object SocketManager {
         }
     }
 
+    fun onListenRoomChatId(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_ROOM_CHAT_ID") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received roomChatId: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     //=====================================================
     // Check start date
     fun onCheckStartDate(listener: (data: JSONObject) -> Unit) {
@@ -389,6 +398,7 @@ object SocketManager {
     fun onTypingReceived(listener: (senderId: String) -> Unit) {
         socket.on("SERVER_RETURN_TYPING") { args ->
             (args.firstOrNull() as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received typing from: ${data.optString("senderId")}")
                 val senderId = data.optString("senderId", "")
                 Handler(Looper.getMainLooper()).post {
                     listener(senderId)

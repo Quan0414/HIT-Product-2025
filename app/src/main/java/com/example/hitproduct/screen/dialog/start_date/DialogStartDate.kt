@@ -79,8 +79,8 @@ class DialogStartDate : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
-        SocketManager.connect(token)
+//        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
+//        SocketManager.connect(token)
 
         registerSocketListeners()
 

@@ -5,6 +5,8 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.socket.SocketManager
+import com.vanniktech.emoji.EmojiManager
+import com.vanniktech.emoji.google.GoogleEmojiProvider
 
 class MyApp : Application() {
 
@@ -25,7 +27,6 @@ class MyApp : Application() {
         }
 
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
-
     }
 
     private fun registerSocketListeners() {

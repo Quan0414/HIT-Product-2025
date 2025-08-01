@@ -1,17 +1,22 @@
 package com.example.hitproduct.screen.home_page.message
 
 import android.content.Context
+import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.hitproduct.DialogEmoji
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.common.util.MappedError
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.message.ChatItem
 import com.example.hitproduct.data.repository.AuthRepository
@@ -45,11 +50,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
     private val roomId by lazy {
         prefs.getString(AuthPrefersConstants.ID_ROOM_CHAT, null)
-            ?: throw IllegalStateException("Room ID not found")
     }
     private lateinit var adapter: MessageAdapter
     private val currentMessages = mutableListOf<ChatItem>()
 
+    private var selectedImageUri: Uri? = null
 
     override fun initView() {
         adapter = MessageAdapter()
@@ -61,7 +66,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(rv, dx, dy)
                     if (!rv.canScrollVertically(-1)) {
-                        viewModel.loadMore(roomId)
+                        roomId?.let { viewModel.loadMore(it) }
                     }
                 }
             })
@@ -69,7 +74,10 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
 
     override fun initListener() {
-        // Ví dụ: xử lý nút gửi tin (nếu có)
+//        binding.btnSendMessage.setOnClickListener {
+//            pickImagesLauncher.launch("image/*") // Mở bộ chọn nhiều ảnh
+//        }
+
         binding.btnSendMessage.setOnClickListener {
             val text = binding.etMessage.text.toString().trim()
             if (text.isNotEmpty()) {
@@ -77,11 +85,26 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 binding.etMessage.text?.clear()
             }
         }
+
+        binding.etMessage.addTextChangedListener { text ->
+            if (!text.isNullOrEmpty()) {
+                viewModel.sendIsTyping()
+            }
+        }
+
+        binding.tilMessage.setEndIconOnClickListener {
+            DialogEmoji { emoji ->
+                val et = binding.etMessage
+                val pos = et.selectionStart.coerceAtLeast(0)
+                et.text?.insert(pos, emoji)
+                et.setSelection(pos + emoji.length)
+            }.show(childFragmentManager, "emoji_picker")
+        }
     }
 
     override fun initData() {
-        viewModel.joinRoom(roomId)
-        viewModel.fetchInitialMessages(roomId)
+//        roomId?.let { viewModel.joinRoom(it) }
+        roomId?.let { viewModel.fetchInitialMessages(it) }
         viewModel2.getCoupleProfile()
     }
 
@@ -195,13 +218,22 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 }
             }
         }
+
+        viewModel.typingState.observe(viewLifecycleOwner) { isTyping ->
+            adapter.showTyping(isTyping)
+            if (isTyping) {
+                Log.d("MessageFragment", "User is typing...")
+                // scroll xuống cuối để thấy bubble
+                binding.rvMessage.scrollToPosition(adapter.itemCount - 1)
+            }
+        }
     }
 
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (!hidden) {
-            viewModel.joinRoom(roomId)
-            viewModel.fetchInitialMessages(roomId)
+//            roomId?.let { viewModel.joinRoom(it) }
+            roomId?.let { viewModel.fetchInitialMessages(it) }
         }
     }
 
@@ -211,6 +243,5 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     ): FragmentMessageBinding {
         return FragmentMessageBinding.inflate(inflater, container, false)
     }
-
 
 }

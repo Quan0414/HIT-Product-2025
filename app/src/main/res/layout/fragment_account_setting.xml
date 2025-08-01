@@ -83,7 +83,6 @@
                     android:layout_height="wrap_content"
                     android:layout_marginTop="12dp"
                     android:fontFamily="@font/f800"
-                    android:text="aaa"
                     android:textSize="20dp" />
 
                 <TextView
@@ -91,7 +90,6 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/f500"
-                    android:text="aaa"
                     android:textColor="@color/grayText"
                     android:textSize="14dp" />
             </LinearLayout>

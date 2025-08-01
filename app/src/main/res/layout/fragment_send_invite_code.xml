@@ -81,7 +81,7 @@
             android:textColor="@color/orange"
             android:textSize="16dp"
             android:drawablePadding="4dp"
-            app:drawableEndCompat="@drawable/ic_copy" />
+            app:drawableEndCompat="@drawable/ic_share" />
 
         <TextView
             android:layout_width="wrap_content"
