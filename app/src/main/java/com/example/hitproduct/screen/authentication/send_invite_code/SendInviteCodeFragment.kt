@@ -2,8 +2,6 @@ package com.example.hitproduct.screen.authentication.send_invite_code
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -33,9 +31,9 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
+import com.example.hitproduct.screen.adapter.InviteAdapter
 import com.example.hitproduct.screen.authentication.login.LoginViewModel
 import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
-import com.example.hitproduct.screen.adapter.InviteAdapter
 import com.example.hitproduct.socket.SocketManager
 
 class SendInviteCodeFragment : Fragment() {
@@ -398,7 +396,7 @@ class SendInviteCodeFragment : Fragment() {
                 currentItems.removeAll { it is InviteItem.Received }
                 refreshDialog()
 
-                goHomeActivity()
+//                goHomeActivity()
             }
         }
 
@@ -415,17 +413,23 @@ class SendInviteCodeFragment : Fragment() {
                 currentItems.removeAll { it is InviteItem.Sent }
                 refreshDialog()
 
-                goHomeActivity()
+//                goHomeActivity()
             }
         }
 
-        SocketManager.onListenRoomChatId { data ->
-            Log.d("SendInvite", "Received room chat ID: $data")
+        SocketManager.onListenCouple { data ->
+            Log.d("SendInvite", "Received couple data: $data")
             Handler(Looper.getMainLooper()).post {
-                val id = data.optString("roomChatId")
-                prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, id).apply()
-//                goHomeActivity()
+                val roomId = data.optString("roomChatId")
+                val myUserId = data.optString("myUserId")
+                val myLoveId = data.optString("myLoveId")
+                prefs.edit()
+                    .putString(AuthPrefersConstants.ID_ROOM_CHAT, roomId)
+                    .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
+                    .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                    .apply()
             }
+            goHomeActivity()
         }
 
     }

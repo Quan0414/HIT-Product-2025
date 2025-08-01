@@ -48,15 +48,20 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         HomeViewModelFactory(authRepo)
     }
 
-    private val roomId by lazy {
+    private val roomId: String by lazy {
         prefs.getString(AuthPrefersConstants.ID_ROOM_CHAT, null)
+            ?: throw IllegalStateException("RoomChatId chưa được lưu trong SharedPreferences")
     }
+
     private lateinit var adapter: MessageAdapter
     private val currentMessages = mutableListOf<ChatItem>()
 
     private var selectedImageUri: Uri? = null
 
     override fun initView() {
+
+        viewModel.sendRoomChatId(roomId)
+
         adapter = MessageAdapter()
         binding.rvMessage.apply {
             layoutManager = LinearLayoutManager(requireContext())
@@ -66,7 +71,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(rv, dx, dy)
                     if (!rv.canScrollVertically(-1)) {
-                        roomId?.let { viewModel.loadMore(it) }
+                        roomId.let { viewModel.loadMore(it) }
                     }
                 }
             })
@@ -233,7 +238,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         super.onHiddenChanged(hidden)
         if (!hidden) {
 //            roomId?.let { viewModel.joinRoom(it) }
-            roomId?.let { viewModel.fetchInitialMessages(it) }
+            viewModel.sendRoomChatId(roomId)
+            roomId.let { viewModel.fetchInitialMessages(it) }
         }
     }
 

@@ -13,6 +13,7 @@ import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.auth.response.VerifyCodeResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
 import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
 import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
@@ -106,6 +107,28 @@ class AuthRepository(
                         .apply()
                 }
                 DataResult.Success(token)    // <-- phải return token
+            }
+
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun verifyCode2(
+        otp: String,
+        email: String,
+        type: String
+    ): DataResult<String> {
+        return when (val result = getResult {
+            api.verifyCode2(VerifyCodeRequest(otp, email, type))
+        }) {
+            is DataResult.Success -> {
+                val token = result.data.data.token
+//                if (type == "forgot-password") {
+//                    prefs.edit()
+//                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+//                        .apply()
+//                }
+                DataResult.Success(token)
             }
 
             is DataResult.Error -> result

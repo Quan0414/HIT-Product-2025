@@ -209,16 +209,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    val userAID = state.data.userA.id
-                    prefs.edit()
-                        .putString(AuthPrefersConstants.USER_A_ID, userAID)
-                        .apply()
-                    val userBID = state.data.userB.id
-                    prefs.edit()
-                        .putString(AuthPrefersConstants.USER_B_ID, userBID)
-                        .apply()
-                    checkMyLoveId()
-
                     if (!state.data.loveStartedAtEdited && !hasShownStartDateDialog) {
                         hasShownStartDateDialog = true
                         val dialog = DialogStartDate()
@@ -364,14 +354,14 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
                         val next = currentCatList.random()
                         currentCat = next
-//                        val keyState = catStateGifMap.filterValues { it == currentCat }
-//                            .keys
-//                            .firstOrNull()
-//                        Log.d("HomeFragment", "Cat state key: $keyState")
-//                        if (keyState != null) {
-//                            SocketManager.sendCatStateToSocket(keyState, checkMyLoveId() ?: "")
-//                            Log.d("HomeFragment", "Cat state sent to server")
-//                        }
+                        val keyState = catStateGifMap.filterValues { it == currentCat }
+                            .keys
+                            .firstOrNull()
+                        Log.d("HomeFragment", "Cat state key: $keyState")
+                        if (keyState != null) {
+                            SocketManager.sendCatStateToSocket(keyState, myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null) ?: "")
+                            Log.d("HomeFragment", "Cat state sent to server")
+                        }
 
                         setAnimation(next)
                         repeatCount = LottieDrawable.INFINITE
@@ -438,8 +428,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         // chỉ đổi màu fill của state1
         if (bar.id == R.id.state1) {
             val colorRes = when {
-                value > Constant.HUNGER_MEDIUM * 10 -> R.color.status4
-                value <= Constant.HUNGER_MEDIUM * 10 && value > Constant.HUNGER_LOW * 10 -> R.color.status3
+                value >= Constant.HUNGER_MEDIUM * 10 -> R.color.status4
+                value < Constant.HUNGER_MEDIUM * 10 && value > Constant.HUNGER_LOW * 10 -> R.color.status3
                 else -> R.color.status1
             }
             tintOnlyFill(bar, colorRes)
@@ -485,20 +475,33 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         bar: ProgressBar,
         icon: View,
         newValue: Int,
-        duration: Long = 800L    // thời gian animation (ms)
+        duration: Long = 800L
     ) {
         val oldValue = bar.progress
         ValueAnimator.ofInt(oldValue, newValue).apply {
             this.duration = duration
             addUpdateListener { anim ->
                 val v = anim.animatedValue as Int
+                // 1) cập nhật progress
                 bar.progress = v
-                // di chuyển icon theo progress
+
+                // 2) đổi màu fill tuỳ giá trị (chỉ cho state1 nếu muốn)
+                if (bar.id == R.id.state1) {
+                    val colorRes = when {
+                        v > Constant.HUNGER_MEDIUM * 10 -> R.color.status4
+                        v > Constant.HUNGER_LOW * 10    -> R.color.status3
+                        else                             -> R.color.status1
+                    }
+                    tintOnlyFill(bar, colorRes)
+                }
+
+                // 3) di chuyển icon theo progress
                 moveIcon(bar, icon)
             }
             start()
         }
     }
+
 
     private val catStateGifMap = mapOf(
         "hungry_key" to R.raw.meo_doi,
@@ -515,20 +518,20 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         "eating_key" to R.raw.meo_an
     )
 
-    private fun checkMyLoveId() {
-        val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
-        val userA = prefs.getString(AuthPrefersConstants.USER_A_ID, null)
-        val userB = prefs.getString(AuthPrefersConstants.USER_B_ID, null)
-        Log.d("HomeFragment", "My ID: $myId, User A: $userA, User B: $userB")
-
-        if (myId == null || userA == null || userB == null) return
-
-        val loveId = if (myId == userA) userB else userA
-        Log.d("HomeFragment", "Setting MY_LOVE_ID to: $loveId")
-
-        prefs.edit()
-            .putString(AuthPrefersConstants.MY_LOVE_ID, loveId)
-            .apply()
-    }
+//    private fun checkMyLoveId() {
+//        val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
+//        val userA = prefs.getString(AuthPrefersConstants.USER_A_ID, null)
+//        val userB = prefs.getString(AuthPrefersConstants.USER_B_ID, null)
+//        Log.d("HomeFragment", "My ID: $myId, User A: $userA, User B: $userB")
+//
+//        if (myId == null || userA == null || userB == null) return
+//
+//        val loveId = if (myId == userA) userB else userA
+//        Log.d("HomeFragment", "Setting MY_LOVE_ID to: $loveId")
+//
+//        prefs.edit()
+//            .putString(AuthPrefersConstants.MY_LOVE_ID, loveId)
+//            .apply()
+//    }
 
 }

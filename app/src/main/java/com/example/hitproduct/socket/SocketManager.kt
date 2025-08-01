@@ -245,6 +245,15 @@ object SocketManager {
         }
     }
 
+    fun onListenCouple(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_COUPLE") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     //=====================================================
     // Check start date
     fun onCheckStartDate(listener: (data: JSONObject) -> Unit) {
@@ -258,7 +267,7 @@ object SocketManager {
     }
 
 
-    // Nuoi pet
+    //====================================== Nuoi pet
     // Gửi trạng thái mèo qua Socket với key PET_ACTIVE
     fun sendCatStateToSocket(state: String, myLoveId: String) {
         val payLoad = JSONObject().apply {
@@ -266,16 +275,21 @@ object SocketManager {
             put("myLoveId", myLoveId)
         }
         socket.emit("USER_SEND_PET_ACTIVE", payLoad)
-        Log.d("SocketManager", "Sent cat state: $state, myLoveId: $myLoveId")
+        Log.d("SocketManager", "Sent cat state: $state, sendTo: $myLoveId")
     }
 
     //Listener
     fun onListenForPetActive(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_SEND_PET_ACTIVE") { args ->
-            (args.getOrNull(0) as? JSONObject)?.let { data ->
-                Log.d("SocketManager", "Received pet active data: $data")
-                Handler(Looper.getMainLooper()).post { listener(data) }
-            }
+            val data = args.getOrNull(0) as? JSONObject ?: return@on
+            val sendTo = data.optString("myLoveId", "")
+            val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+            Log.d("SocketManager", "onListenForPetActive: data=$data, myLoveId=$sendTo, myId=$myId")
+            // Nếu không phải gửi cho mình thì bỏ qua
+            if (sendTo != myId) return@on
+
+            Log.d("SocketManager", "Received pet active: $data")
+            Handler(Looper.getMainLooper()).post { listener(data) }
         }
     }
 
@@ -290,6 +304,18 @@ object SocketManager {
     fun onDecreaseHunger(listener: (data: JSONObject) -> Unit) {
         socket.on("PET_DECREASE_HUNGER") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+
+    //=====================================================
+    // Mission
+    fun onMissionCompleted(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_MISSION_COMPLETED") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Mission completed: $data")
                 Handler(Looper.getMainLooper()).post { listener(data) }
             }
         }
@@ -315,6 +341,7 @@ object SocketManager {
         }
     }
 
+    //=====================================================
     // Message
     fun joinRoom(roomId: String) {
         val payload = JSONObject().apply {
@@ -322,6 +349,14 @@ object SocketManager {
         }
         socket.emit("JOIN_ROOM", payload)
         Log.d("SocketManager", "Joining room: $roomId")
+    }
+
+    fun sendRoomChatId(roomId: String) {
+        val payload = JSONObject().apply {
+            put("roomChatId", roomId)
+        }
+        socket.emit("USER_SEND_ROOM_CHAT_ID", payload)
+        Log.d("SocketManager", "Sending roomChatId: $roomId")
     }
 
     fun sendMessage(content: String, images: List<String> = emptyList()) {

@@ -130,6 +130,9 @@ class MessageViewModel(
         SocketManager.joinRoom(roomId)
     }
 
+    fun sendRoomChatId(roomId: String) {
+        SocketManager.sendRoomChatId(roomId)
+    }
 
     fun sendMessage(content: String, images: List<String> = emptyList()) {
         val text = content.trim()

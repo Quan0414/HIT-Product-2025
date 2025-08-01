@@ -14,7 +14,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.core.content.ContextCompat
-import androidx.fragment.app.viewModels
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
@@ -23,11 +23,7 @@ import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentFindAccBinding
-import com.example.hitproduct.screen.authentication.login.LoginViewModel
-import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
-import com.example.hitproduct.screen.authentication.register.main.RegisterViewModel
-import com.example.hitproduct.screen.authentication.register.main.RegisterViewModelFactory
 import com.example.hitproduct.screen.authentication.verify_code.VerifyCodeFragment
 import kotlinx.coroutines.launch
 
@@ -153,9 +149,14 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
         //chuyen qua verify code
         binding.tvFindAcc.setOnClickListener {
             val email = binding.edtEmail.text.toString().trim()
+            binding.loadingProgressBar.visibility = View.VISIBLE
+            binding.tvFindAcc.isEnabled = false
+
             lifecycleScope.launch {
                 when (val res = authRepo.findAccount(email)) {
                     is DataResult.Error -> {
+                        binding.loadingProgressBar.visibility = View.GONE
+                        binding.tvFindAcc.isEnabled = true
                         Toast.makeText(
                             requireContext(),
                             res.error.message,
@@ -164,11 +165,10 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
                     }
 
                     is DataResult.Success -> {
+                        binding.loadingProgressBar.visibility = View.GONE
+                        binding.tvFindAcc.isEnabled = true
                         val verifyCodeFragment = VerifyCodeFragment().apply {
-                            arguments = Bundle().apply {
-                                putString("email", email)
-                                putString("flow", "forgot-password")
-                            }
+                            arguments = bundleOf("email" to email, "flow" to "forgot-password")
                         }
                         parentFragmentManager.beginTransaction()
                             .setCustomAnimations(

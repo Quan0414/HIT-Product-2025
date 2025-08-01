@@ -18,6 +18,9 @@ class VerifyCodeViewModel(
     private val _verifyCodeState = MutableLiveData<UiState<String>>(UiState.Idle)
     val verifyCodeState: MutableLiveData<UiState<String>> = _verifyCodeState
 
+    private val _verifyCodeState2 = MutableLiveData<UiState<String>>(UiState.Idle)
+    val verifyCodeState2: MutableLiveData<UiState<String>> = _verifyCodeState2
+
     fun sendOtp(email: String) {
 
         viewModelScope.launch {
@@ -47,4 +50,22 @@ class VerifyCodeViewModel(
                 }
             }
         }
+
+    fun verifyCode2(otp: String, email: String, type: String) =
+        viewModelScope.launch {
+            _verifyCodeState2.value = UiState.Loading
+            when (val result = authRepository.verifyCode2(otp, email, type)) {
+                is DataResult.Success -> {
+                    _verifyCodeState2.value = UiState.Success(result.data)
+                }
+
+                is DataResult.Error -> {
+                    _verifyCodeState2.value = UiState.Error(result.error)
+                }
+            }
+        }
+
+    fun clearVerifyCodeState2() {
+        _verifyCodeState2.value = UiState.Idle
+    }
 }

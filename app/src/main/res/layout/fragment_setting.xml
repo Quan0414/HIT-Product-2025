@@ -116,10 +116,10 @@
                     android:text="Quản lý tài khoản"
                     android:textSize="16sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grayUnderline" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:background="@color/grayUnderline" />-->
 
 <!--                <TextView-->
 <!--                    android:id="@+id/tvThongKe"-->

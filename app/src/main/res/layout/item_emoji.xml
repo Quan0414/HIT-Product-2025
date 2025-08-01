@@ -10,5 +10,5 @@
         android:layout_height="match_parent"
         android:gravity="center"
         android:text="😀"
-        android:textSize="28dp" />
+        android:textSize="26dp" />
 </FrameLayout>

@@ -2,6 +2,7 @@ package com.example.hitproduct
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import android.view.Window
 import android.widget.FrameLayout
@@ -35,6 +36,9 @@ class MainActivity : AppCompatActivity() {
     )
     private var currentIndex = 2   // mặc định show Home
 
+    private val prefs by lazy {
+        getSharedPreferences(AuthPrefersConstants.PREFS_NAME, MODE_PRIVATE)
+    }
 
     var coin: Int = 0
     var question: String = ""
@@ -54,6 +58,9 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
+        SocketManager.connect(token ?: "")
+        SocketManager.onNotificationReceived {}
 
         // 1) Pre-add all fragments, hide trừ Home (index 2)
         supportFragmentManager.beginTransaction().apply {
