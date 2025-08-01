@@ -10,6 +10,7 @@ import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.auth.response.VerifyCodeResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
 import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
 import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
@@ -73,6 +74,11 @@ interface ApiService {
     suspend fun findAcc(
         @Body request: FindAccRequest
     ): Response<ApiResponse<FindAccResponse>>
+
+    @POST(ApiConstants.AUTH_VERIFY_CODE)
+    suspend fun verifyCode2(
+        @Body request: VerifyCodeRequest
+    ): Response<ApiResponse<VerifyCodeResponse>>
 
     @Multipart
     @POST(ApiConstants.SETUP_PROFILE)

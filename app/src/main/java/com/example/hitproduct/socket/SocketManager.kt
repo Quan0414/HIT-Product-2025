@@ -1,15 +1,25 @@
 package com.example.hitproduct.socket
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.hitproduct.common.constants.ApiConstants
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.data.model.message.ChatItem
 import io.socket.client.IO
 import io.socket.client.IO.Options
 import io.socket.client.Socket
+import io.socket.emitter.Emitter
+import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 /**
  * SocketManager handles real-time friend request events:
@@ -30,6 +40,15 @@ object SocketManager {
     private lateinit var socket: Socket
     private const val SERVER_URL = ApiConstants.BASE_URL
     private var authToken: String? = null
+
+    private lateinit var prefs: SharedPreferences
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences(
+            AuthPrefersConstants.PREFS_NAME,
+            Context.MODE_PRIVATE
+        )
+    }
+
 
     private val _notifications = MutableLiveData<JSONObject>()
     val notifications: LiveData<JSONObject> = _notifications
@@ -217,6 +236,24 @@ object SocketManager {
         }
     }
 
+    fun onListenRoomChatId(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_ROOM_CHAT_ID") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received roomChatId: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    fun onListenCouple(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_COUPLE") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     //=====================================================
     // Check start date
     fun onCheckStartDate(listener: (data: JSONObject) -> Unit) {
@@ -230,7 +267,7 @@ object SocketManager {
     }
 
 
-    // Nuoi pet
+    //====================================== Nuoi pet
     // Gửi trạng thái mèo qua Socket với key PET_ACTIVE
     fun sendCatStateToSocket(state: String, myLoveId: String) {
         val payLoad = JSONObject().apply {
@@ -238,16 +275,21 @@ object SocketManager {
             put("myLoveId", myLoveId)
         }
         socket.emit("USER_SEND_PET_ACTIVE", payLoad)
-        Log.d("SocketManager", "Sent cat state: $state, myLoveId: $myLoveId")
+        Log.d("SocketManager", "Sent cat state: $state, sendTo: $myLoveId")
     }
 
     //Listener
     fun onListenForPetActive(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_SEND_PET_ACTIVE") { args ->
-            (args.getOrNull(0) as? JSONObject)?.let { data ->
-                Log.d("SocketManager", "Received pet active data: $data")
-                Handler(Looper.getMainLooper()).post { listener(data) }
-            }
+            val data = args.getOrNull(0) as? JSONObject ?: return@on
+            val sendTo = data.optString("myLoveId", "")
+            val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+            Log.d("SocketManager", "onListenForPetActive: data=$data, myLoveId=$sendTo, myId=$myId")
+            // Nếu không phải gửi cho mình thì bỏ qua
+            if (sendTo != myId) return@on
+
+            Log.d("SocketManager", "Received pet active: $data")
+            Handler(Looper.getMainLooper()).post { listener(data) }
         }
     }
 
@@ -262,6 +304,18 @@ object SocketManager {
     fun onDecreaseHunger(listener: (data: JSONObject) -> Unit) {
         socket.on("PET_DECREASE_HUNGER") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+
+    //=====================================================
+    // Mission
+    fun onMissionCompleted(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_MISSION_COMPLETED") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Mission completed: $data")
                 Handler(Looper.getMainLooper()).post { listener(data) }
             }
         }
@@ -283,6 +337,107 @@ object SocketManager {
                 listener(notObj)
                 // 4. Đẩy vào LiveData cũng là object unwrap
                 _notifications.postValue(notObj)
+            }
+        }
+    }
+
+    //=====================================================
+    // Message
+    fun joinRoom(roomId: String) {
+        val payload = JSONObject().apply {
+            put("roomChatId", roomId)
+        }
+        socket.emit("JOIN_ROOM", payload)
+        Log.d("SocketManager", "Joining room: $roomId")
+    }
+
+    fun sendRoomChatId(roomId: String) {
+        val payload = JSONObject().apply {
+            put("roomChatId", roomId)
+        }
+        socket.emit("USER_SEND_ROOM_CHAT_ID", payload)
+        Log.d("SocketManager", "Sending roomChatId: $roomId")
+    }
+
+    fun sendMessage(content: String, images: List<String> = emptyList()) {
+        val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+        val payload = JSONObject().apply {
+            put("senderId", myUserId)
+            put("content", content)
+            put("images", JSONArray(images))
+        }
+        Log.d("SocketManager", "Sending message: $payload")
+        socket.emit("USER_SEND_MESSAGE", payload)
+    }
+
+    fun sendTyping() {
+        val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+        val payload = JSONObject().apply {
+            put("senderId", myUserId)
+        }
+        socket.emit("CLIENT_SEND_TYPING", payload)
+        Log.d("SocketManager", "emit CLIENT_SEND_TYPING: $payload")
+    }
+
+    /**
+     * Lắng nghe sự kiện gửi tin nhắn từ server
+     */
+    fun onMessageReceived(listener: (ChatItem) -> Unit): Emitter =
+        socket.on("SERVER_RETURN_MESSAGE") { args ->
+            (args.firstOrNull() as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post {
+                    val senderId = data.optString("senderId", "")
+                    val content = data.optString("content", "")
+                    val imagesArr = data.optJSONArray("images")
+                    val imageUrl = imagesArr?.takeIf { it.length() > 0 }?.getString(0)
+
+                    val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+                    val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
+                    Log.d(
+                        "SocketManager",
+                        "Received message from $senderId: content='$content', imageUrl='$imageUrl'"
+                    )
+
+                    val fromMe = senderId == myUserId
+
+                    val id = data.optString("messageId", UUID.randomUUID().toString())
+                    val timestamp = data.optLong("timestamp", System.currentTimeMillis())
+                    val sentAt = SimpleDateFormat("HH:mm", Locale("vi", "VN"))
+                        .format(Date(timestamp))
+
+                    val item = if (!imageUrl.isNullOrBlank()) {
+                        ChatItem.ImageMessage(
+                            id = id,
+                            senderId = senderId,
+                            avatarUrl = null,
+                            imageUrl = imageUrl,
+                            sentAt = sentAt,
+                            fromMe = fromMe
+                        )
+                    } else {
+                        ChatItem.TextMessage(
+                            id = id,
+                            senderId = senderId,
+                            avatarUrl = null,
+                            text = content,
+                            sentAt = sentAt,
+                            fromMe = fromMe
+                        )
+                    }
+
+                    listener(item)
+                }
+            }
+        }
+
+    fun onTypingReceived(listener: (senderId: String) -> Unit) {
+        socket.on("SERVER_RETURN_TYPING") { args ->
+            (args.firstOrNull() as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received typing from: ${data.optString("senderId")}")
+                val senderId = data.optString("senderId", "")
+                Handler(Looper.getMainLooper()).post {
+                    listener(senderId)
+                }
             }
         }
     }

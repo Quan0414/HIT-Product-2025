@@ -5,7 +5,8 @@ data class Mission(
     val coupleId: String,
     val missionId: MissionDetail,
     val date: String,
-    val isCompleted: Boolean
+    val isCompleted: Boolean,
+    val countCompleted: Int
 )
 
 data class MissionDetail(

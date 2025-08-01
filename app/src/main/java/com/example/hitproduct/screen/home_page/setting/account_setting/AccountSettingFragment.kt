@@ -53,7 +53,7 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
     ) { uri ->
         uri?.let {
             selectedAvatarUri = it
-            binding.imgAvatar.setImageURI(it)    // preview
+            binding.imgAvatar.loadImage(it)    // preview
         }
     }
 

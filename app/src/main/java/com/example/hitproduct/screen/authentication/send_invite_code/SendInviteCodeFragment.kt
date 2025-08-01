@@ -2,8 +2,6 @@ package com.example.hitproduct.screen.authentication.send_invite_code
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -33,9 +31,9 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
+import com.example.hitproduct.screen.adapter.InviteAdapter
 import com.example.hitproduct.screen.authentication.login.LoginViewModel
 import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
-import com.example.hitproduct.screen.adapter.InviteAdapter
 import com.example.hitproduct.socket.SocketManager
 
 class SendInviteCodeFragment : Fragment() {
@@ -144,8 +142,7 @@ class SendInviteCodeFragment : Fragment() {
                     prefs.edit()
                         .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
                         .apply()
-                    val idRoomChat = result.data.roomChatId
-                    prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat).apply()
+
                     // Cập nhật mã mời
                     val coupleCode = result.data.coupleCode
                     binding.tvInviteCode.text = coupleCode
@@ -205,6 +202,28 @@ class SendInviteCodeFragment : Fragment() {
 //        }
 //    }
 
+//    @SuppressLint("ClickableViewAccessibility")
+//    private fun setupCopyInviteCode() {
+//        binding.tvInviteCode.setOnTouchListener { _, event ->
+//            if (event.action == MotionEvent.ACTION_UP) {
+//                val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2]
+//                    ?: return@setOnTouchListener false
+//                if (event.x >= binding.tvInviteCode.width
+//                    - binding.tvInviteCode.paddingEnd
+//                    - drawableEnd.bounds.width()
+//                ) {
+//                    val code = binding.tvInviteCode.text.toString()
+//                    val cm =
+//                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
+//                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
+//                    return@setOnTouchListener true
+//                }
+//            }
+//            false
+//        }
+//    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupCopyInviteCode() {
         binding.tvInviteCode.setOnTouchListener { _, event ->
@@ -215,12 +234,14 @@ class SendInviteCodeFragment : Fragment() {
                     - binding.tvInviteCode.paddingEnd
                     - drawableEnd.bounds.width()
                 ) {
-                    val code = binding.tvInviteCode.text.toString()
-                    val cm =
-                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
-                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
-                    return@setOnTouchListener true
+                    val textToShare = binding.tvInviteCode.text.toString().trim()
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, textToShare)
+                    }
+
+                    startActivity(Intent.createChooser(shareIntent, null))
                 }
             }
             false
@@ -249,7 +270,7 @@ class SendInviteCodeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         inviteDialog?.dismiss()
-        SocketManager.disconnect()
+//        SocketManager.disconnect()
     }
 
     private fun showInviteDialog() {
@@ -375,7 +396,7 @@ class SendInviteCodeFragment : Fragment() {
                 currentItems.removeAll { it is InviteItem.Received }
                 refreshDialog()
 
-                goHomeActivity()
+//                goHomeActivity()
             }
         }
 
@@ -392,8 +413,23 @@ class SendInviteCodeFragment : Fragment() {
                 currentItems.removeAll { it is InviteItem.Sent }
                 refreshDialog()
 
-                goHomeActivity()
+//                goHomeActivity()
             }
+        }
+
+        SocketManager.onListenCouple { data ->
+            Log.d("SendInvite", "Received couple data: $data")
+            Handler(Looper.getMainLooper()).post {
+                val roomId = data.optString("roomChatId")
+                val myUserId = data.optString("myUserId")
+                val myLoveId = data.optString("myLoveId")
+                prefs.edit()
+                    .putString(AuthPrefersConstants.ID_ROOM_CHAT, roomId)
+                    .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
+                    .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                    .apply()
+            }
+            goHomeActivity()
         }
 
     }
@@ -414,4 +450,19 @@ class SendInviteCodeFragment : Fragment() {
             startActivity(intent)
         }
     }
+
+    private fun shareText() {
+        val textToShare = binding.tvInviteCode.text.toString().trim()
+
+        // Tạo Intent với ACTION_SEND để chia sẻ văn bản
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/plain"  // loại dữ liệu là văn bản thuần
+            putExtra(Intent.EXTRA_SUBJECT, "Chia sẻ văn bản")  // Tiêu đề chia sẻ (tuỳ chọn)
+            putExtra(Intent.EXTRA_TEXT, textToShare)  // Nội dung văn bản chia sẻ
+        }
+
+        // Mở cửa sổ chia sẻ để người dùng chọn ứng dụng gửi
+        startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua..."))
+    }
+
 }

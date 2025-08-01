@@ -174,7 +174,49 @@ class VerifyCodeFragment : Fragment() {
                     binding.loadingProgressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), "Xác thực OTP thành công!", Toast.LENGTH_SHORT)
                         .show()
-                    navigateNext()
+                    navigateNext(email)
+                }
+
+                is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
+                    // Hiển thị thông báo lỗi
+                    val err = state.error
+                    if (err.otp) {
+                        // Nếu lỗi là do OTP không chính xác, highlight các ô nhập
+                        codes.forEach { it.setBackgroundResource(R.drawable.bg_edit_text_error) }
+                    } else {
+                        // Nếu lỗi khác, reset các ô nhập
+                        codes.forEach { it.setBackgroundResource(R.drawable.bg_confirm_code) }
+                    }
+
+                    // Hiển thị Toast với thông báo lỗi
+                    Toast.makeText(
+                        requireContext(),
+                        state.error.message, Toast.LENGTH_SHORT
+                    ).show()
+                }
+
+                else -> {}
+            }
+        }
+
+        // Quan sát xác thực OTP cho quên mật khẩu
+        viewModel.verifyCodeState2.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Idle -> {
+                }
+
+                is UiState.Loading -> {
+                    binding.loadingProgressBar.visibility = View.VISIBLE
+                }
+
+                is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
+                    Toast.makeText(requireContext(), "Xác thực OTP thành công!", Toast.LENGTH_SHORT)
+                        .show()
+                    viewModel.clearVerifyCodeState2()
+                    val token = state.data
+                    navigateNext(email, token)
                 }
 
                 is UiState.Error -> {
@@ -203,7 +245,11 @@ class VerifyCodeFragment : Fragment() {
         // Nút xác thực
         binding.tvContinue.setOnClickListener {
             val otp = codes.joinToString(separator = "") { it.text.toString() }
-            viewModel.verifyCode(otp, email, flow)
+            if (flow == "register") {
+                viewModel.verifyCode(otp, email, flow)
+            } else {
+                viewModel.verifyCode2(otp, email, flow)
+            }
         }
 
         // Nút back
@@ -212,7 +258,7 @@ class VerifyCodeFragment : Fragment() {
         }
     }
 
-    private fun navigateNext() {
+    private fun navigateNext(email: String, token: String? = null) {
         if (flow == "register") {
             parentFragmentManager.popBackStack(
                 "Register", FragmentManager.POP_BACK_STACK_INCLUSIVE
@@ -224,7 +270,11 @@ class VerifyCodeFragment : Fragment() {
                     R.anim.slide_in_left,
                     R.anim.slide_out_right
                 )
-                .replace(R.id.fragmentStart, SetUpInformationFragment())
+                .replace(R.id.fragmentStart, SetUpInformationFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("email", email)
+                    }
+                })
                 .addToBackStack(null)
                 .commit()
         } else {
@@ -238,7 +288,12 @@ class VerifyCodeFragment : Fragment() {
                     R.anim.slide_in_left,
                     R.anim.slide_out_right
                 )
-                .replace(R.id.fragmentStart, CreateNewPasswordFragment())
+                .replace(R.id.fragmentStart, CreateNewPasswordFragment().apply {
+                    arguments = Bundle().apply {
+                        putString("token", token)
+                        putString("email", email)
+                    }
+                })
                 .addToBackStack(null)
                 .commit()
         }

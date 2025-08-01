@@ -86,6 +86,10 @@ class HomeViewModel(
         SocketManager.onDecreaseHunger { data ->
             _hunger.postValue(data.optInt("hunger"))
         }
+
+        SocketManager.onMissionCompleted { data ->
+            _coin.postValue(data.optInt("coin"))
+        }
     }
 
 

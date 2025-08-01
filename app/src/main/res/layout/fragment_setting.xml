@@ -116,20 +116,20 @@
                     android:text="Quản lý tài khoản"
                     android:textSize="16sp" />
 
-                <View
-                    android:layout_width="match_parent"
-                    android:layout_height="1dp"
-                    android:background="@color/grayUnderline" />
+<!--                <View-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="1dp"-->
+<!--                    android:background="@color/grayUnderline" />-->
 
-                <TextView
-                    android:id="@+id/tvThongKe"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:drawableEnd="@drawable/ic_arrow_right"
-                    android:fontFamily="@font/f700"
-                    android:padding="16dp"
-                    android:text="Thống kê"
-                    android:textSize="16sp" />
+<!--                <TextView-->
+<!--                    android:id="@+id/tvThongKe"-->
+<!--                    android:layout_width="match_parent"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:drawableEnd="@drawable/ic_arrow_right"-->
+<!--                    android:fontFamily="@font/f700"-->
+<!--                    android:padding="16dp"-->
+<!--                    android:text="Thống kê"-->
+<!--                    android:textSize="16sp" />-->
 
                 <View
                     android:layout_width="match_parent"

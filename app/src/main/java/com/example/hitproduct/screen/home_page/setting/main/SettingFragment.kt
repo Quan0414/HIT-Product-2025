@@ -67,20 +67,19 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
         binding.btnLogout.setOnClickListener {
             DialogLogout {
-                // 1. Clear all prefs
-                requireContext()
-                    .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
-                    .edit()
-                    .clear()
+                val prefs = requireContext().getSharedPreferences(
+                    AuthPrefersConstants.PREFS_NAME,
+                    Context.MODE_PRIVATE
+                )
+                val onboardingDone = prefs.getBoolean(AuthPrefersConstants.ON_BOARDING_DONE, false)
+                authRepo.clearAccessToken()
+                prefs.edit().putBoolean(AuthPrefersConstants.ON_BOARDING_DONE, onboardingDone)
                     .apply()
-
-                // 2. Start LoginActivity và clear back-stack
                 val intent = Intent(requireContext(), SplashActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }
                 startActivity(intent)
 
-                // 3. Finish luôn Activity chứa dialog
                 requireActivity().finish()
 
             }.show(parentFragmentManager, "logout_dialog")
@@ -143,12 +142,16 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                 is UiState.Success -> {
                     Toast.makeText(
                         requireContext(),
-                        "Bạn đã chia tay với cậu ấy :(((",
+                        "Bạn đã chia tay với cậu ấy.",
                         Toast.LENGTH_SHORT
                     )
                         .show()
 
+                    val onboardingDone =
+                        prefs.getBoolean(AuthPrefersConstants.ON_BOARDING_DONE, false)
                     prefs.edit().clear().apply()
+                    prefs.edit().putBoolean(AuthPrefersConstants.ON_BOARDING_DONE, onboardingDone)
+                        .apply()
                     // Chuyển về Splash và clear toàn bộ stack
                     val intent = Intent(requireContext(), LoginActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

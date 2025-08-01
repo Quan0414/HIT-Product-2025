@@ -107,15 +107,13 @@
                     android:layout_height="wrap_content"
                     android:background="@drawable/bg_input_mess"
                     android:fontFamily="@font/f600"
-                    android:hint="Nhập tin nhắn..."
                     android:inputType="textCapSentences|textMultiLine"
                     android:maxLines="3"
-                    android:paddingHorizontal="16dp"
+                    android:paddingStart="20dp"
                     android:paddingVertical="10dp"
-                    android:paddingStart="12dp"
                     android:textColor="@color/textBrown"
                     android:textColorHint="#c99d85"
-                    android:textSize="14dp" />
+                    android:textSize="18dp" />
 
             </com.google.android.material.textfield.TextInputLayout>
 
