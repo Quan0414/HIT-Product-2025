@@ -12,10 +12,10 @@ data class CoupleProfile(
     @SerializedName("userIdA") val userA: User,
     @SerializedName("userIdB") val userB: User,
     @SerializedName("coin") val coin: Int,
-    @SerializedName("loveStartedAt") val loveStartedAt: String,  // hoặc Instant nếu bạn config DateTypeAdapter
+    @SerializedName("loveStartedAt") val loveStartedAt: String,
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
-    @SerializedName("__v") val version: Int
+    @SerializedName("public_key_my_love") val myLovePubKey: String?
 )
 
 data class User(

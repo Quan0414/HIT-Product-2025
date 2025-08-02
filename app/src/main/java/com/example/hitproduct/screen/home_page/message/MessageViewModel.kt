@@ -1,22 +1,35 @@
 package com.example.hitproduct.screen.home_page.message
 
+import android.app.Application
 import android.os.Handler
 import android.os.Looper
+import android.util.Base64
+import android.util.Log
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.common.util.MappedError
 import com.example.hitproduct.data.model.message.ChatItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.socket.SocketManager
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
+import javax.crypto.SecretKey
 
 class MessageViewModel(
+    application: Application,
     private val authRepository: AuthRepository
-) : ViewModel() {
+) : AndroidViewModel(application) {
+
+    private val sharedKey: SecretKey? =
+        CryptoHelper.getSharedAesKey(getApplication())
 
     companion object {
         private const val PAGE_SIZE = 20
@@ -34,7 +47,6 @@ class MessageViewModel(
     private val _typingState = MutableLiveData<Boolean>()
     val typingState: LiveData<Boolean> = _typingState
 
-
     // Giữ trường sentAt cũ nhất để lazy–load
     private var oldestSentAt: String? = null
     private var hasMore = true
@@ -46,18 +58,59 @@ class MessageViewModel(
         setupSocketListeners()
     }
 
-
     private fun setupSocketListeners() {
-        SocketManager.onMessageReceived { item ->
+        SocketManager.onMessageReceived { data ->
+            val senderId = data.optString("senderId", "")
+            val encoded = data.optString("content", "")
+            val imagesArr = data.optJSONArray("images")
+            val imageUrl = imagesArr?.takeIf { it.length() > 0 }?.getString(0)
+            Log.d("MessageViewModel", "Nhận tin nhắn: $encoded")
+
+            val text = if (encoded.isNotBlank()) {
+                val cipher = Base64.decode(encoded, Base64.NO_WRAP)
+                val key = sharedKey
+                    ?: throw IllegalStateException("Shared key chưa derive!")
+                val plain = CryptoHelper.decrypt(key, cipher)
+                String(plain, Charsets.UTF_8)
+            } else {
+                ""
+            }
+
+            val myUserId = authRepository.getMyUserId()
+            val fromMe = senderId == myUserId
+            val id = data.optString("messageId", UUID.randomUUID().toString())
+            val timestamp = data.optLong("timestamp", System.currentTimeMillis())
+            val sentAt = SimpleDateFormat("HH:mm", Locale("vi", "VN"))
+                .format(Date(timestamp))
+
+            val item = if (!imageUrl.isNullOrBlank()) {
+                ChatItem.ImageMessage(
+                    id = id,
+                    senderId = senderId,
+                    avatarUrl = null,
+                    imageUrl = imageUrl,
+                    sentAt = sentAt,
+                    fromMe = fromMe
+                )
+            } else {
+                ChatItem.TextMessage(
+                    id = id,
+                    senderId = senderId,
+                    avatarUrl = null,
+                    text = text,
+                    sentAt = sentAt,
+                    fromMe = fromMe
+                )
+            }
+
             val current = (_messagesState.value as? UiState.Success)?.data.orEmpty()
             _messagesState.postValue(UiState.Success(current + item))
         }
 
         SocketManager.onError { msg ->
-            // Chỉ post error nếu user đã tương tác (đang gửi tin nhắn)
             if (hasUserInteracted && _sendState.value is UiState.Loading) {
                 _sendState.postValue(UiState.Error(MappedError(msg)))
-                hasUserInteracted = false // Reset flag
+                hasUserInteracted = false
             }
         }
 
@@ -75,12 +128,10 @@ class MessageViewModel(
         viewModelScope.launch {
             when (val result = authRepository.getMessages(roomId, before = null)) {
                 is DataResult.Success -> {
-                    val list = result.data
-                    // Lưu sentAt và hasMore
-                    oldestSentAt = list.firstOrNull()?.sentAt
-                    hasMore = list.size >= PAGE_SIZE
-
-                    _messagesState.value = UiState.Success(list)
+                    val decrypted = decryptItems(result.data)
+                    oldestSentAt = decrypted.firstOrNull()?.sentAt
+                    hasMore = decrypted.size >= PAGE_SIZE
+                    _messagesState.value = UiState.Success(decrypted)
                 }
 
                 is DataResult.Error -> {
@@ -98,17 +149,16 @@ class MessageViewModel(
         viewModelScope.launch {
             when (val result = authRepository.getMessages(roomId, before = oldestSentAt)) {
                 is DataResult.Success -> {
-                    val newItems = result.data
+                    // 1. Decrypt list mới
+                    val decryptedNew = decryptItems(result.data)
+                    // 2. Ghép vào đầu, cập nhật sentAt & hasMore
                     val current = (_messagesState.value as? UiState.Success)?.data.orEmpty()
-
-                    if (newItems.isNotEmpty()) {
-                        // Ghép vào đầu danh sách cũ
-                        val updated = newItems + current
-                        oldestSentAt = newItems.first().sentAt
-                        hasMore = newItems.size >= PAGE_SIZE
+                    if (decryptedNew.isNotEmpty()) {
+                        val updated = decryptedNew + current
+                        oldestSentAt = decryptedNew.first().sentAt
+                        hasMore = decryptedNew.size >= PAGE_SIZE
 
                         _loadMoreState.value = UiState.Success(updated)
-                        // Cũng cập nhật luôn messagesState để UI có thể scrollToPosition
                         _messagesState.value = UiState.Success(updated)
                     } else {
                         hasMore = false
@@ -126,10 +176,6 @@ class MessageViewModel(
     /**
      * Gửi tin nhắn
      */
-    fun joinRoom(roomId: String) {
-        SocketManager.joinRoom(roomId)
-    }
-
     fun sendRoomChatId(roomId: String) {
         SocketManager.sendRoomChatId(roomId)
     }
@@ -140,23 +186,23 @@ class MessageViewModel(
 
         // Đánh dấu user đã tương tác
         hasUserInteracted = true
-
         _sendState.value = UiState.Loading
 
         try {
-            SocketManager.sendMessage(text, images)
-
-            hasUserInteracted = false
+            val key = sharedKey
+                ?: throw IllegalStateException("Shared key chưa derive!")
+            val cipher = CryptoHelper.encrypt(key, text.toByteArray(Charsets.UTF_8))
+            val encoded = Base64.encodeToString(cipher, Base64.NO_WRAP)
+            SocketManager.sendMessage(encoded, images)
+            Log.d("MessageViewModel", "Gửi tin nhắn: $encoded, images: $images")
             _sendState.value = UiState.Success(Unit)
-
+            resetSendState()
         } catch (e: Exception) {
-            hasUserInteracted = false
-            _sendState.value = UiState.Error(MappedError(e.message ?: "Failed to send message"))
+            _sendState.value = UiState.Error(MappedError(e.message ?: "Gửi thất bại"))
         }
     }
 
     fun sendIsTyping() {
-        // Gửi thông báo đang gõ
         SocketManager.sendTyping()
     }
 
@@ -179,4 +225,22 @@ class MessageViewModel(
         super.onCleared()
         hasUserInteracted = false
     }
+
+    private fun decryptItems(raw: List<ChatItem>): List<ChatItem> {
+        val key = sharedKey
+            ?: throw IllegalStateException("Shared key chưa derive!")
+        return raw.map { item ->
+            when (item) {
+                is ChatItem.TextMessage -> {
+                    // item.text đang là Base64-encoded cipher
+                    val cipher = Base64.decode(item.text, Base64.NO_WRAP)
+                    val plain = CryptoHelper.decrypt(key, cipher)
+                    item.copy(text = String(plain, Charsets.UTF_8))
+                }
+
+                else -> item
+            }
+        }
+    }
+
 }

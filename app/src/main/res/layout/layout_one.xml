@@ -4,23 +4,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.hitproduct.common.util.OutlinedTextView
-        android:id="@+id/imageView7"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="80dp"
-        android:adjustViewBounds="true"
-        android:fontFamily="@font/f900"
-        android:gravity="center"
-        android:src="@drawable/tv_couple_header2"
-        android:text="Hai bạn đã bên nhau"
-        android:textColor="@color/white"
-        android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/borderBrown"
-        app:strokeWidth="4dp" />
+<!--    <com.example.hitproduct.common.util.OutlinedTextView-->
+<!--        android:id="@+id/imageView7"-->
+<!--        android:layout_width="0dp"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="80dp"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:fontFamily="@font/f900"-->
+<!--        android:gravity="center"-->
+<!--        android:src="@drawable/tv_couple_header2"-->
+<!--        android:text="Hai bạn đã bên nhau"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="20dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:strokeColor="@color/borderBrown"-->
+<!--        app:strokeWidth="4dp" />-->
 
     <com.example.hitproduct.common.util.OutlinedTextView
         android:id="@+id/tvDay"
@@ -33,7 +33,7 @@
         android:textSize="96dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView7"
+        app:layout_constraintTop_toTopOf="parent"
         app:strokeColor="@color/borderBrown"
         app:strokeWidth="8dp" />
 
@@ -46,8 +46,8 @@
         android:text="Ngày"
         android:textColor="@color/white"
         android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/tvDay"
-        app:layout_constraintStart_toStartOf="@+id/tvDay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvDay"
         app:strokeColor="@color/borderBrown"
         app:strokeWidth="4dp" />

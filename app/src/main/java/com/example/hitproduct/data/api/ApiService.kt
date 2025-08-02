@@ -5,6 +5,7 @@ import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
@@ -178,4 +179,11 @@ interface ApiService {
         @Query("limit") limit: Int,
         @Query("before") before: String? = null
     ): Response<ApiResponse<MessageResponse>>
+
+
+    // Key
+    @POST(ApiConstants.PUBLIC_KEY)
+    suspend fun sendPublicKey(
+        @Body request: SendPublicKeyRequest
+    ): Response<ApiResponse<String>>
 }

@@ -38,7 +38,7 @@
             android:id="@+id/tvStatus"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="14dp"
             android:layout_marginBottom="40dp"
             android:background="@drawable/bg_orange_border"
             android:ellipsize="end"

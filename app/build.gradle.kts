@@ -118,4 +118,6 @@ dependencies {
 
     implementation("com.cloudinary:cloudinary-android:3.0.2")
 
+    implementation ("androidx.security:security-crypto:1.1.0-alpha07")
+
 }

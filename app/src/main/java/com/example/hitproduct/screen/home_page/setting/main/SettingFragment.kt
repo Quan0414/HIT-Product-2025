@@ -10,6 +10,7 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSettingBinding
@@ -62,6 +63,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
             DialogDisconnectFragment {
                 // callback khi bấm "Đồng ý"
                 viewModel.disconnectCouple()
+                CryptoHelper.deleteAllKeys(requireContext())
             }.show(parentFragmentManager, "disconnect_dialog")
         }
 
@@ -75,6 +77,10 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                 authRepo.clearAccessToken()
                 prefs.edit().putBoolean(AuthPrefersConstants.ON_BOARDING_DONE, onboardingDone)
                     .apply()
+
+                // Xoa key pair ECDH
+                CryptoHelper.deleteAllKeys(requireContext())
+
                 val intent = Intent(requireContext(), SplashActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
                 }

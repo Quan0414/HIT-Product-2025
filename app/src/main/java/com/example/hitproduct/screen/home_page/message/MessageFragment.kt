@@ -41,7 +41,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
 
     private val viewModel by viewModels<MessageViewModel> {
-        MessageViewModelFactory(authRepo)
+        MessageViewModelFactory(requireActivity().application, authRepo)
     }
 
     private val viewModel2 by viewModels<HomeViewModel> {
@@ -71,7 +71,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 override fun onScrolled(rv: RecyclerView, dx: Int, dy: Int) {
                     super.onScrolled(rv, dx, dy)
                     if (!rv.canScrollVertically(-1)) {
-                        roomId.let { viewModel.loadMore(it) }
+                        viewModel.loadMore(roomId)
                     }
                 }
             })
@@ -108,8 +108,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
 
     override fun initData() {
-//        roomId?.let { viewModel.joinRoom(it) }
-        roomId?.let { viewModel.fetchInitialMessages(it) }
+        viewModel.fetchInitialMessages(roomId)
         viewModel2.getCoupleProfile()
     }
 
@@ -125,14 +124,20 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
-                    //lay avatar va usernam cua  my love
+                    //lay avatar va username cua  my love
                     val couple = state.data
                     if ((prefs.getString(
                             AuthPrefersConstants.MY_LOVE_ID,
                             null
                         ) ?: "") == couple.userA.id
                     ) {
-                        binding.tvName.text = couple.userA.username
+                        val userA = couple.userA
+                        binding.tvName.text = userA.nickname
+                            ?.takeIf { it.isNotBlank() }
+                            ?: userA.firstName
+                                ?.takeIf { it.isNotBlank() }
+                                    ?: userA.username
+
                         val avatar = couple.userA.avatar
                             ?.takeIf { it.isNotBlank() && it != "/example.png" }
                             ?.replaceFirst("http://", "https://")
@@ -142,7 +147,12 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                             binding.imgAvatar.loadImage(R.drawable.avatar_default)
                         }
                     } else {
-                        binding.tvName.text = couple.userB.username
+                        val userB = couple.userB
+                        binding.tvName.text = userB.nickname
+                            ?.takeIf { it.isNotBlank() }
+                            ?: userB.firstName
+                                ?.takeIf { it.isNotBlank() }
+                                    ?: userB.username
                         val avatar = couple.userB.avatar
                             ?.takeIf { it.isNotBlank() && it != "/example.png" }
                             ?.replaceFirst("http://", "https://")
@@ -159,13 +169,11 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
 
         // Lần đầu load
-        // 1) Initial load
         viewModel.messagesState.observe(viewLifecycleOwner) { state ->
             if (state is UiState.Success) {
                 currentMessages.clear()
                 currentMessages.addAll(state.data)
                 adapter.submitList(currentMessages)
-                // scroll xuống cuối
                 binding.rvMessage.scrollToPosition(currentMessages.size - 1)
             }
         }
@@ -178,17 +186,15 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                 val newItems = fullList.filter { it !in currentMessages }
                 if (newItems.isEmpty()) return@observe
 
-                // 2.1 lưu vị trí và offset trước khi insert
+                // lưu vị trí và offset trước khi insert
                 val lm = binding.rvMessage.layoutManager as LinearLayoutManager
                 val firstPos = lm.findFirstVisibleItemPosition()
                 val firstView = lm.findViewByPosition(firstPos)
                 val offset = firstView?.top ?: 0
 
-                // 2.2 cập nhật danh sách local và adapter
                 currentMessages.addAll(0, newItems)
                 adapter.prependMessages(newItems)
 
-                // 2.3 restore scroll trong next UI loop
                 binding.rvMessage.post {
                     lm.scrollToPositionWithOffset(firstPos + newItems.size, offset)
                 }
@@ -197,7 +203,6 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
         // disable nut gui khi dang gui
         viewModel.sendState.observe(viewLifecycleOwner) { state ->
-            // Bỏ qua nếu là null (chưa có giá trị nào được set)
             state ?: return@observe
 
             when (state) {
@@ -237,9 +242,8 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     override fun onHiddenChanged(hidden: Boolean) {
         super.onHiddenChanged(hidden)
         if (!hidden) {
-//            roomId?.let { viewModel.joinRoom(it) }
             viewModel.sendRoomChatId(roomId)
-            roomId.let { viewModel.fetchInitialMessages(it) }
+            viewModel.fetchInitialMessages(roomId)
         }
     }
 

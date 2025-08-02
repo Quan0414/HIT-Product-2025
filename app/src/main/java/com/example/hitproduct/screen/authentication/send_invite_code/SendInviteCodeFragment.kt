@@ -27,6 +27,7 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
@@ -106,7 +107,7 @@ class SendInviteCodeFragment : Fragment() {
 
         // 2. Fetch initial list từ API
         viewModel.checkInvite()
-        viewModel2.checkCouple()
+        viewModel2.checkProfile()
 
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             if (result is DataResult.Success) {
@@ -132,7 +133,7 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
-        viewModel2.coupleState.observe(viewLifecycleOwner) { result ->
+        viewModel2.profileState.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is UiState.Error -> {}
                 UiState.Idle -> {}
@@ -149,6 +150,26 @@ class SendInviteCodeFragment : Fragment() {
                 }
             }
         }
+
+        viewModel2.coupleProfile.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    val myLovePubKey = state.data.myLovePubKey
+                    if (myLovePubKey != null) {
+                        CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
+                        CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
+                        val key = CryptoHelper.getSharedAesKey(requireContext())
+                        Log.d("SendInvite", "Shared AES key: $key")
+                    }
+                    Log.d("SendInvite", "My love public key: $myLovePubKey")
+                }
+            }
+        }
+
+
 
         registerSocketListeners()
 
@@ -383,7 +404,7 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
-        //A gui B, B chap nhan → remove Received, go HomeActivity
+        //A gui B, B chap nhan → remove Received
         SocketManager.onAccepted {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(
@@ -395,12 +416,10 @@ class SendInviteCodeFragment : Fragment() {
                 // Xoá khỏi danh sách Received
                 currentItems.removeAll { it is InviteItem.Received }
                 refreshDialog()
-
-//                goHomeActivity()
             }
         }
 
-        // B nhận được A chấp nhận → remove Sent, go HomeActivity
+        // B nhận được A chấp nhận → remove Sent
         SocketManager.onTheyAccept {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(
@@ -412,8 +431,6 @@ class SendInviteCodeFragment : Fragment() {
                 // Xoá khỏi danh sách Sent
                 currentItems.removeAll { it is InviteItem.Sent }
                 refreshDialog()
-
-//                goHomeActivity()
             }
         }
 
@@ -428,8 +445,19 @@ class SendInviteCodeFragment : Fragment() {
                     .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
                     .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
                     .apply()
+
+                // tao public key
+                CryptoHelper.ensureKeyPair(requireContext())
+                // lấy public key dạng Base64
+                val myPub = CryptoHelper.getMyPublicKey(requireContext())
+                Log.d("SendInvite", "My public key: $myPub")
+                viewModel.sendPublicKey(myPub)
+                Handler(Looper.getMainLooper()).postDelayed({
+                    viewModel2.getCoupleProfile()
+                    goHomeActivity()
+                }, 100)
+
             }
-            goHomeActivity()
         }
 
     }
@@ -450,19 +478,4 @@ class SendInviteCodeFragment : Fragment() {
             startActivity(intent)
         }
     }
-
-    private fun shareText() {
-        val textToShare = binding.tvInviteCode.text.toString().trim()
-
-        // Tạo Intent với ACTION_SEND để chia sẻ văn bản
-        val shareIntent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/plain"  // loại dữ liệu là văn bản thuần
-            putExtra(Intent.EXTRA_SUBJECT, "Chia sẻ văn bản")  // Tiêu đề chia sẻ (tuỳ chọn)
-            putExtra(Intent.EXTRA_TEXT, textToShare)  // Nội dung văn bản chia sẻ
-        }
-
-        // Mở cửa sổ chia sẻ để người dùng chọn ứng dụng gửi
-        startActivity(Intent.createChooser(shareIntent, "Chia sẻ qua..."))
-    }
-
 }

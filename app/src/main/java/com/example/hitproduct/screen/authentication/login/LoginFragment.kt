@@ -11,6 +11,7 @@ import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.method.PasswordTransformationMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
@@ -62,7 +64,7 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 1. Quan sát kết quả checkCouple
-        viewModel.coupleState.observe(viewLifecycleOwner) { state ->
+        viewModel.profileState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
                     val myUserId = state.data.id
@@ -78,18 +80,30 @@ class LoginFragment : Fragment() {
                             .commit()
                     } else {
                         // Đã có đôi → vào MainActivity
+
+                        // tao public key
+                        CryptoHelper.ensureKeyPair(requireContext())
+                        // lấy public key dạng Base64
+                        val myPub = CryptoHelper.getMyPublicKey(requireContext())
+                        // gui key di
+                        viewModel.sendPublicKey(myPub)
+                        Log.d("LoginFragment", "My public key: $myPub")
+                        // luu myLovePubKey
+                        viewModel.getCoupleProfile()
+
+                        // check myLoveId
+                        val idUserA = state.data.couple.userA.id
+                        val idUserB = state.data.couple.userB.id
+                        val myLoveId = if (myUserId == idUserA) idUserB else idUserA
+                        prefs.edit().putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId).apply()
+
                         startActivity(Intent(requireContext(), MainActivity::class.java))
                         requireActivity().finish()
                     }
                 }
 
-                is UiState.Error -> {
-                    // Nếu cần xử lý lỗi khi check couple
-                }
-
-                else -> {
-                    // Idle/Loading bỏ qua
-                }
+                is UiState.Error -> {}
+                else -> {}
             }
         }
 
@@ -151,15 +165,36 @@ class LoginFragment : Fragment() {
                         .show()
 
                     // Sau khi login thành công, check tiếp couple
-                    viewModel.checkCouple()
-
-                    // Reset loginState để tránh lặp lại
+                    viewModel.checkProfile()
                     viewModel.clearLoginState()
                 }
 
-                else -> {
-                    // Idle bỏ qua
+                else -> {}
+            }
+        }
+
+        viewModel.coupleProfile.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    val myLovePubKey = state.data.myLovePubKey
+                    if (myLovePubKey != null) {
+                        CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
+                        CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
+                    }
+                    Log.d("LoginFragment", "My love public key: $myLovePubKey")
                 }
+            }
+        }
+
+        viewModel.publicKeyState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {}
             }
         }
 

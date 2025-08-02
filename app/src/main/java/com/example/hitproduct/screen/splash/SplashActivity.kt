@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
@@ -27,6 +28,7 @@ import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.screen.authentication.login.LoginActivity
@@ -96,6 +98,11 @@ class SplashActivity : AppCompatActivity() {
                     .start()
             }
         }
+
+        val myPub = CryptoHelper.getMyPublicKey(this)
+        val myLovePub = CryptoHelper.getPeerPublicKey(this)
+        Log.d("SplashActivity", "My Public Key: $myPub")
+        Log.d("SplashActivity", "My Love Public Key: $myLovePub")
 
     }
 

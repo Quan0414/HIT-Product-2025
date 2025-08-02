@@ -7,8 +7,9 @@ import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.ErrorMessageMapper
-import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.CoupleProfile
+import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.repository.AuthRepository
 import kotlinx.coroutines.launch
 
@@ -19,8 +20,14 @@ class LoginViewModel(
     private val _loginState = MutableLiveData<UiState<ApiResponse<String>>>(UiState.Idle)
     val loginState: LiveData<UiState<ApiResponse<String>>> = _loginState
 
-    private val _coupleState = MutableLiveData<UiState<User>>(UiState.Idle)
-    val coupleState: LiveData<UiState<User>> = _coupleState
+    private val _profileState = MutableLiveData<UiState<User>>(UiState.Idle)
+    val profileState: LiveData<UiState<User>> = _profileState
+
+    private val _coupleProfile = MutableLiveData<UiState<CoupleProfile>>(UiState.Idle)
+    val coupleProfile: LiveData<UiState<CoupleProfile>> = _coupleProfile
+
+    private val _publicKeyState = MutableLiveData<UiState<String>>(UiState.Idle)
+    val publicKeyState: LiveData<UiState<String>> = _publicKeyState
 
     fun clearLoginState() {
         _loginState.value = UiState.Idle
@@ -57,16 +64,46 @@ class LoginViewModel(
         }
     }
 
-    fun checkCouple() {
+    fun checkProfile() {
         viewModelScope.launch {
-            _coupleState.value = UiState.Loading
+            _profileState.value = UiState.Loading
             when (val res = authRepository.fetchProfile()) {
                 is DataResult.Success ->
                     // res.data: UserProfile
-                    _coupleState.value = UiState.Success(res.data)
+                    _profileState.value = UiState.Success(res.data)
 
                 is DataResult.Error ->
-                    _coupleState.value = UiState.Error(res.error)
+                    _profileState.value = UiState.Error(res.error)
+            }
+        }
+    }
+
+    fun getCoupleProfile() {
+        _coupleProfile.value = UiState.Loading
+        viewModelScope.launch {
+            when (val result = authRepository.getCouple()) {
+                is DataResult.Success -> {
+                    _coupleProfile.value = UiState.Success(result.data)
+                }
+
+                is DataResult.Error -> {
+                    _coupleProfile.value = UiState.Error(result.error)
+                }
+            }
+        }
+    }
+
+    fun sendPublicKey(publicKey: String) {
+        _publicKeyState.value = UiState.Loading
+        viewModelScope.launch {
+            when (val result = authRepository.sendPublicKey(publicKey)) {
+                is DataResult.Success -> {
+                    _publicKeyState.value = UiState.Success(result.data)
+                }
+
+                is DataResult.Error -> {
+                    _publicKeyState.value = UiState.Error(result.error)
+                }
             }
         }
     }

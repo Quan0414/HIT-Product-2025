@@ -14,17 +14,16 @@ class MyApp : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
 
         SocketManager.init(this)
-
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
-
         if (!token.isNullOrEmpty()) {
             SocketManager.connect(token)
             registerSocketListeners()
         }
 
-        AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
     }
 
     private fun registerSocketListeners() {

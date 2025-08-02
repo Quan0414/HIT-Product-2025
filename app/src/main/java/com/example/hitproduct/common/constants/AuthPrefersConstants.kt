@@ -9,6 +9,4 @@ object AuthPrefersConstants {
     const val ID_ROOM_CHAT = "id_room_chat"
     const val MY_USER_ID = "my_user_id"
     const val MY_LOVE_ID = "user_a_id"
-    const val USER_A_ID = "user_a_id"
-    const val USER_B_ID = "user_b_id"
 }

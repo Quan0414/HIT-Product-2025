@@ -27,9 +27,7 @@ class DialogDisconnectFragment(
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogDisconnectBinding.inflate(
-            LayoutInflater.from(requireContext())
-        )
+        _binding = DialogDisconnectBinding.inflate(LayoutInflater.from(requireContext()))
         val dialog = Dialog(requireContext()).apply {
             // Xoá vùng title mặc định
             requestWindowFeature(Window.FEATURE_NO_TITLE)

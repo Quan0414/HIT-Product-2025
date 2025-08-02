@@ -82,6 +82,11 @@ object SocketManager {
     }
 
     /**
+     * Kiểm tra trạng thái kết nối hiện tại
+     */
+    fun isConnected(): Boolean = ::socket.isInitialized && socket.connected()
+
+    /**
      * Ngắt kết nối và xóa listeners
      */
     fun disconnect() {
@@ -382,53 +387,60 @@ object SocketManager {
     /**
      * Lắng nghe sự kiện gửi tin nhắn từ server
      */
-    fun onMessageReceived(listener: (ChatItem) -> Unit): Emitter =
+    fun onMessageReceived(listener: (JSONObject) -> Unit): Emitter =
         socket.on("SERVER_RETURN_MESSAGE") { args ->
             (args.firstOrNull() as? JSONObject)?.let { data ->
-                Handler(Looper.getMainLooper()).post {
-                    val senderId = data.optString("senderId", "")
-                    val content = data.optString("content", "")
-                    val imagesArr = data.optJSONArray("images")
-                    val imageUrl = imagesArr?.takeIf { it.length() > 0 }?.getString(0)
-
-                    val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
-                    val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
-                    Log.d(
-                        "SocketManager",
-                        "Received message from $senderId: content='$content', imageUrl='$imageUrl'"
-                    )
-
-                    val fromMe = senderId == myUserId
-
-                    val id = data.optString("messageId", UUID.randomUUID().toString())
-                    val timestamp = data.optLong("timestamp", System.currentTimeMillis())
-                    val sentAt = SimpleDateFormat("HH:mm", Locale("vi", "VN"))
-                        .format(Date(timestamp))
-
-                    val item = if (!imageUrl.isNullOrBlank()) {
-                        ChatItem.ImageMessage(
-                            id = id,
-                            senderId = senderId,
-                            avatarUrl = null,
-                            imageUrl = imageUrl,
-                            sentAt = sentAt,
-                            fromMe = fromMe
-                        )
-                    } else {
-                        ChatItem.TextMessage(
-                            id = id,
-                            senderId = senderId,
-                            avatarUrl = null,
-                            text = content,
-                            sentAt = sentAt,
-                            fromMe = fromMe
-                        )
-                    }
-
-                    listener(item)
-                }
+                Handler(Looper.getMainLooper()).post { listener(data) }
             }
         }
+
+//    fun onMessageReceived(listener: (ChatItem) -> Unit): Emitter =
+//        socket.on("SERVER_RETURN_MESSAGE") { args ->
+//            (args.firstOrNull() as? JSONObject)?.let { data ->
+//                Handler(Looper.getMainLooper()).post {
+//                    val senderId = data.optString("senderId", "")
+//                    val content = data.optString("content", "")
+//                    val imagesArr = data.optJSONArray("images")
+//                    val imageUrl = imagesArr?.takeIf { it.length() > 0 }?.getString(0)
+//
+//                    val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+//                    val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
+//                    Log.d(
+//                        "SocketManager",
+//                        "Received message from $senderId: content='$content', imageUrl='$imageUrl'"
+//                    )
+//
+//                    val fromMe = senderId == myUserId
+//
+//                    val id = data.optString("messageId", UUID.randomUUID().toString())
+//                    val timestamp = data.optLong("timestamp", System.currentTimeMillis())
+//                    val sentAt = SimpleDateFormat("HH:mm", Locale("vi", "VN"))
+//                        .format(Date(timestamp))
+//
+//                    val item = if (!imageUrl.isNullOrBlank()) {
+//                        ChatItem.ImageMessage(
+//                            id = id,
+//                            senderId = senderId,
+//                            avatarUrl = null,
+//                            imageUrl = imageUrl,
+//                            sentAt = sentAt,
+//                            fromMe = fromMe
+//                        )
+//                    } else {
+//                        ChatItem.TextMessage(
+//                            id = id,
+//                            senderId = senderId,
+//                            avatarUrl = null,
+//                            text = content,
+//                            sentAt = sentAt,
+//                            fromMe = fromMe
+//                        )
+//                    }
+//
+//                    listener(item)
+//                }
+//            }
+//        }
 
     fun onTypingReceived(listener: (senderId: String) -> Unit) {
         socket.on("SERVER_RETURN_TYPING") { args ->
@@ -442,9 +454,6 @@ object SocketManager {
         }
     }
 
-    /**
-     * Kiểm tra trạng thái kết nối hiện tại
-     */
-    fun isConnected(): Boolean = ::socket.isInitialized && socket.connected()
+
 
 }

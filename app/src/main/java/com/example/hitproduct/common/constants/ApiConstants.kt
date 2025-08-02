@@ -47,4 +47,7 @@ object ApiConstants {
     // Mess
     const val GET_MESSAGE = "api/v1/chat/{roomChatId}"
 
+    // Public key
+    const val PUBLIC_KEY = "api/v1/users/public-key"
+
 }

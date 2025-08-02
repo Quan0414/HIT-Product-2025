@@ -68,7 +68,11 @@ class HomeViewModel(
         }
     }
 
-    fun listenToSocket() {
+    init {
+        listenToSocket()
+    }
+
+    private fun listenToSocket() {
         // Khi pet active
         SocketManager.onListenForPetActive { data ->
             val key = data.optString("active")

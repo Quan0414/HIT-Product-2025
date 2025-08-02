@@ -4,34 +4,35 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <com.example.hitproduct.common.util.OutlinedTextView
-        android:id="@+id/imageView7"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="40dp"
-        android:adjustViewBounds="true"
-        android:fontFamily="@font/f900"
-        android:gravity="center"
-        android:src="@drawable/tv_couple_header2"
-        android:text="Hai bạn đã bên nhau"
-        android:textColor="@color/white"
-        android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:strokeColor="@color/borderBrown"
-        app:strokeWidth="4dp" />
+<!--    <com.example.hitproduct.common.util.OutlinedTextView-->
+<!--        android:id="@+id/imageView7"-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_marginHorizontal="40dp"-->
+<!--        android:adjustViewBounds="true"-->
+<!--        android:fontFamily="@font/f900"-->
+<!--        android:gravity="center"-->
+<!--        android:src="@drawable/tv_couple_header2"-->
+<!--        android:text="Hai bạn đã bên nhau"-->
+<!--        android:textColor="@color/white"-->
+<!--        android:textSize="20dp"-->
+<!--        app:layout_constraintEnd_toEndOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:strokeColor="@color/borderBrown"-->
+<!--        app:strokeWidth="4dp" />-->
 
     <ImageView
         android:id="@+id/bgYear"
         android:layout_width="0dp"
-        android:layout_height="70dp"
+        android:layout_height="66dp"
         android:layout_marginTop="20dp"
+        android:layout_marginStart="40dp"
         android:src="@drawable/bg_days_in_couple"
         app:layout_constraintEnd_toStartOf="@+id/bgMonth"
         app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="@+id/imageView7"
-        app:layout_constraintTop_toBottomOf="@id/imageView7" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- 1st item of the vertical chain: -->
     <com.example.hitproduct.common.util.OutlinedTextView
@@ -165,8 +166,9 @@
         android:id="@+id/bgDay"
         android:layout_width="0dp"
         android:layout_height="66dp"
+        android:layout_marginEnd="40dp"
         android:src="@drawable/bg_days_in_couple"
-        app:layout_constraintEnd_toEndOf="@+id/imageView7"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/bgWeek"
         app:layout_constraintTop_toTopOf="@id/bgWeek" />
 
@@ -221,7 +223,7 @@
         android:id="@+id/tvInloveStatus"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_margin="12dp"
+        android:layout_margin="14dp"
         android:fontFamily="@font/f900"
         android:text="Inlove status:"
         android:textColor="@color/textBrown"
@@ -235,12 +237,12 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="24dp"
+        android:layout_marginBottom="20dp"
         android:background="@drawable/bg_orange_border"
         android:ellipsize="end"
         android:fontFamily="@font/f700"
         android:paddingHorizontal="10dp"
-        android:paddingVertical="6dp"
+        android:paddingVertical="10dp"
         android:textColor="@color/textBrown"
         android:textSize="16dp"
         app:actionClickColor="@color/textBrown"

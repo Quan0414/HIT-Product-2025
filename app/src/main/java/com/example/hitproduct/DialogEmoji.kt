@@ -21,19 +21,6 @@ class DialogEmoji(
 
     private lateinit var adapter: EmojiAdapter
 
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.apply {
-            // full-width, wrap-content height, đẩy xuống đáy
-            setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            setGravity(Gravity.BOTTOM)
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
-    }
-
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,

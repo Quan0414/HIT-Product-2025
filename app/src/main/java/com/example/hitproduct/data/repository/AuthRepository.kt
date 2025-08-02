@@ -9,6 +9,7 @@ import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
@@ -379,6 +380,17 @@ class AuthRepository(
                 DataResult.Success(items)
             }
 
+            is DataResult.Error -> result
+        }
+    }
+
+
+    suspend fun sendPublicKey(
+        publicKey: String
+    ): DataResult<String> {
+        return when (val result =
+            getResult { api.sendPublicKey(SendPublicKeyRequest(publicKey)) }) {
+            is DataResult.Success -> DataResult.Success(result.data.data)
             is DataResult.Error -> result
         }
     }

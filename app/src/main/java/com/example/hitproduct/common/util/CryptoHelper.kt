@@ -1,66 +1,141 @@
-// CryptoHelper.kt
-package com.example.hitproduct.utils
+package com.example.hitproduct.common.util
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.util.Base64
-import java.nio.charset.Charset
+import androidx.security.crypto.EncryptedSharedPreferences
+import androidx.security.crypto.MasterKey
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import java.security.KeyFactory
+import java.security.KeyPairGenerator
+import java.security.MessageDigest
 import java.security.SecureRandom
+import java.security.spec.ECGenParameterSpec
+import java.security.spec.PKCS8EncodedKeySpec
+import java.security.spec.X509EncodedKeySpec
 import javax.crypto.Cipher
+import javax.crypto.KeyAgreement
 import javax.crypto.SecretKey
 import javax.crypto.spec.GCMParameterSpec
 import javax.crypto.spec.SecretKeySpec
 
 /**
- * Helper object for AES/GCM encryption & decryption of String messages.
- * Use a 128- or 256-bit secret key. IV is randomly generated per message.
+ * CryptoHelper tương thích Android 8+ với ECDH (secp256r1) + AES/GCM:
+ * - Sinh cặp EC keypair P-256
+ * - Trao đổi public key
+ * - Derive shared AES key
+ * - AES-GCM encrypt/decrypt
+ * - Lưu/xóa keypair, peer public và shared key trong EncryptedSharedPreferences
  */
 object CryptoHelper {
-    private const val TRANSFORMATION = "AES/GCM/NoPadding"
-    private const val KEY_ALGORITHM = "AES"
-    private const val TAG_LENGTH_BIT = 128 // authentication tag length
-    private const val IV_LENGTH_BYTE = 12 // recommended IV length for GCM
+    private const val PREFS_NAME = AuthPrefersConstants.PREFS_NAME
+    private const val KEY_PRIV = "ecdh_priv"
+    private const val KEY_PUB = "ecdh_pub"
+    private const val KEY_PEER_PUB = "ecdh_peer_pub"
+    private const val KEY_SHARED_AES = "ecdh_shared_aes"
 
-    /**
-     * Create a SecretKey from a raw byte array. Ensure keyBytes length is 16 (128-bit)
-     * or 32 (256-bit) depending on your target.
-     */
-    fun getSecretKey(keyBytes: ByteArray): SecretKey {
-        require(keyBytes.size == 16 || keyBytes.size == 32) {
-            "Key must be 128 or 256 bits (16 or 32 bytes)"
+    private const val AES_TRANSFORMATION = "AES/GCM/NoPadding"
+    private const val IV_LENGTH = 12
+    private const val TAG_LENGTH_BITS = 128
+
+    private const val EC_ALGORITHM = "EC"
+    private const val EC_CURVE_NAME = "secp256r1"
+    private const val KEY_AGREEMENT_ALGO = "ECDH"
+
+    private const val MASTER_KEY_ALIAS = MasterKey.DEFAULT_MASTER_KEY_ALIAS
+
+    private fun getPrefs(ctx: Context): SharedPreferences {
+        val masterKey = MasterKey.Builder(ctx, MASTER_KEY_ALIAS)
+            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
+            .build()
+        return EncryptedSharedPreferences.create(
+            ctx, PREFS_NAME, masterKey,
+            EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+            EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
+        )
+    }
+
+    /** Sinh EC keypair P-256 một lần */
+    fun ensureKeyPair(ctx: Context) {
+        val prefs = getPrefs(ctx)
+        if (prefs.getString(KEY_PRIV, null) == null) {
+            val kpg = KeyPairGenerator.getInstance(EC_ALGORITHM)
+            kpg.initialize(ECGenParameterSpec(EC_CURVE_NAME))
+            val pair = kpg.generateKeyPair()
+            prefs.edit().apply {
+                putString(KEY_PRIV, Base64.encodeToString(pair.private.encoded, Base64.NO_WRAP))
+                putString(KEY_PUB, Base64.encodeToString(pair.public.encoded, Base64.NO_WRAP))
+                apply()
+            }
         }
-        return SecretKeySpec(keyBytes, KEY_ALGORITHM)
     }
 
-    /**
-     * Encrypt plaintext (UTF-8) to Base64( IV + ciphertext ).
-     */
-    fun encrypt(plainText: String, secretKey: SecretKey): String {
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        // Generate random IV
-        val iv = ByteArray(IV_LENGTH_BYTE)
-        SecureRandom().nextBytes(iv)
-        val spec = GCMParameterSpec(TAG_LENGTH_BIT, iv)
-        cipher.init(Cipher.ENCRYPT_MODE, secretKey, spec)
+    /** Lấy public key Base64 */
+    fun getMyPublicKey(ctx: Context): String =
+        getPrefs(ctx).getString(KEY_PUB, "").orEmpty()
 
-        val cipherText = cipher.doFinal(plainText.toByteArray(Charset.forName("UTF-8")))
-        // Prepend IV to cipherText
-        val ivAndCipher = iv + cipherText
-        // Return as Base64 string
-        return Base64.encodeToString(ivAndCipher, Base64.NO_WRAP)
+    /** Lưu public key peer */
+    fun storePeerPublicKey(ctx: Context, peerPubB64: String) {
+        getPrefs(ctx).edit().putString(KEY_PEER_PUB, peerPubB64).apply()
     }
 
-    /**
-     * Decrypt Base64( IV + ciphertext ) back to plaintext.
-     */
-    fun decrypt(base64IvAndCipher: String, secretKey: SecretKey): String {
-        val ivAndCipher = Base64.decode(base64IvAndCipher, Base64.NO_WRAP)
-        require(ivAndCipher.size > IV_LENGTH_BYTE) { "Invalid input data" }
-        val iv = ivAndCipher.copyOfRange(0, IV_LENGTH_BYTE)
-        val cipherBytes = ivAndCipher.copyOfRange(IV_LENGTH_BYTE, ivAndCipher.size)
+    /** Lấy public key peer */
+    fun getPeerPublicKey(ctx: Context): String? =
+        getPrefs(ctx).getString(KEY_PEER_PUB, null)
 
-        val cipher = Cipher.getInstance(TRANSFORMATION)
-        val spec = GCMParameterSpec(TAG_LENGTH_BIT, iv)
-        cipher.init(Cipher.DECRYPT_MODE, secretKey, spec)
-        val plainBytes = cipher.doFinal(cipherBytes)
-        return String(plainBytes, Charset.forName("UTF-8"))
+    /** Derive và lưu shared AES key */
+    fun deriveAndStoreSharedAesKey(ctx: Context) {
+        val peerB64 = getPeerPublicKey(ctx)
+            ?: error("Peer public key missing")
+        // parse keys
+        val prefs = getPrefs(ctx)
+        val privBytes = Base64.decode(prefs.getString(KEY_PRIV, ""), Base64.NO_WRAP)
+        val pubBytes = Base64.decode(peerB64, Base64.NO_WRAP)
+        val kf = KeyFactory.getInstance(EC_ALGORITHM)
+        val privateKey = kf.generatePrivate(PKCS8EncodedKeySpec(privBytes))
+        val publicKey = kf.generatePublic(X509EncodedKeySpec(pubBytes))
+        // agree
+        val ka = KeyAgreement.getInstance(KEY_AGREEMENT_ALGO)
+        ka.init(privateKey)
+        ka.doPhase(publicKey, true)
+        val sharedSecret = ka.generateSecret()
+        val aesKeyBytes = MessageDigest.getInstance("SHA-256").digest(sharedSecret)
+        val aesKey = SecretKeySpec(aesKeyBytes, "AES")
+        prefs.edit().putString(KEY_SHARED_AES, Base64.encodeToString(aesKeyBytes, Base64.NO_WRAP))
+            .apply()
+    }
+
+    /** Lấy AES key đã lưu */
+    fun getSharedAesKey(ctx: Context): SecretKey? {
+        val b64 = getPrefs(ctx).getString(KEY_SHARED_AES, null) ?: return null
+        val bytes = Base64.decode(b64, Base64.NO_WRAP)
+        return SecretKeySpec(bytes, "AES")
+    }
+
+    /** Mã hóa AES-GCM */
+    fun encrypt(aesKey: SecretKey, plaintext: ByteArray): ByteArray {
+        val cipher = Cipher.getInstance(AES_TRANSFORMATION)
+        val iv = ByteArray(IV_LENGTH).apply { SecureRandom().nextBytes(this) }
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, GCMParameterSpec(TAG_LENGTH_BITS, iv))
+        val ciphertext = cipher.doFinal(plaintext)
+        return iv + ciphertext
+    }
+
+    /** Giải mã AES-GCM */
+    fun decrypt(aesKey: SecretKey, data: ByteArray): ByteArray {
+        val iv = data.copyOfRange(0, IV_LENGTH)
+        val ct = data.copyOfRange(IV_LENGTH, data.size)
+        val cipher = Cipher.getInstance(AES_TRANSFORMATION)
+        cipher.init(Cipher.DECRYPT_MODE, aesKey, GCMParameterSpec(TAG_LENGTH_BITS, iv))
+        return cipher.doFinal(ct)
+    }
+
+    /** Xóa keypair, peer pub và shared AES */
+    fun deleteAllKeys(ctx: Context) {
+        getPrefs(ctx).edit().apply {
+            remove(KEY_PRIV); remove(KEY_PUB)
+            remove(KEY_PEER_PUB); remove(KEY_SHARED_AES)
+            apply()
+        }
     }
 }
