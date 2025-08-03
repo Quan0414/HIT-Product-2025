@@ -108,6 +108,8 @@ class SendInviteCodeFragment : Fragment() {
         // 2. Fetch initial list từ API
         viewModel.checkInvite()
         viewModel2.checkProfile()
+        registerSocketListeners()
+
 
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             if (result is DataResult.Success) {
@@ -157,21 +159,18 @@ class SendInviteCodeFragment : Fragment() {
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
+                    Log.d("SendInvite", "Couple profile loaded: ${state.data}")
                     val myLovePubKey = state.data.myLovePubKey
+                    Log.d("SendInvite", "My love public key: $myLovePubKey")
                     if (myLovePubKey != null) {
                         CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
                         CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
                         val key = CryptoHelper.getSharedAesKey(requireContext())
                         Log.d("SendInvite", "Shared AES key: $key")
                     }
-                    Log.d("SendInvite", "My love public key: $myLovePubKey")
                 }
             }
         }
-
-
-
-        registerSocketListeners()
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -329,7 +328,8 @@ class SendInviteCodeFragment : Fragment() {
         }
         SocketManager.onError { message ->
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                Log.e("SendInvite", "Socket error: $message")
             }
         }
         SocketManager.onRequestSent { data ->
@@ -446,16 +446,8 @@ class SendInviteCodeFragment : Fragment() {
                     .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
                     .apply()
 
-                // tao public key
-                CryptoHelper.ensureKeyPair(requireContext())
-                // lấy public key dạng Base64
-                val myPub = CryptoHelper.getMyPublicKey(requireContext())
-                Log.d("SendInvite", "My public key: $myPub")
-                viewModel.sendPublicKey(myPub)
-                Handler(Looper.getMainLooper()).postDelayed({
-                    viewModel2.getCoupleProfile()
-                    goHomeActivity()
-                }, 100)
+                viewModel2.getCoupleProfile()
+                goHomeActivity()
 
             }
         }

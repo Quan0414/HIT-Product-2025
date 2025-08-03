@@ -15,7 +15,8 @@ data class CoupleProfile(
     @SerializedName("loveStartedAt") val loveStartedAt: String,
     @SerializedName("createdAt") val createdAt: String,
     @SerializedName("updatedAt") val updatedAt: String,
-    @SerializedName("public_key_my_love") val myLovePubKey: String?
+    @SerializedName("public_key_my_love") val myLovePubKey: String?,
+    @SerializedName("private_key_user") val myPrivateKey: String?
 )
 
 data class User(

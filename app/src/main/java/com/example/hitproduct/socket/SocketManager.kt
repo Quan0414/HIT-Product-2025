@@ -241,15 +241,6 @@ object SocketManager {
         }
     }
 
-    fun onListenRoomChatId(listener: (data: JSONObject) -> Unit) {
-        socket.on("SERVER_RETURN_ROOM_CHAT_ID") { args ->
-            (args.getOrNull(0) as? JSONObject)?.let { data ->
-                Log.d("SocketManager", "Received roomChatId: $data")
-                Handler(Looper.getMainLooper()).post { listener(data) }
-            }
-        }
-    }
-
     fun onListenCouple(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_RETURN_COUPLE") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
@@ -348,13 +339,6 @@ object SocketManager {
 
     //=====================================================
     // Message
-    fun joinRoom(roomId: String) {
-        val payload = JSONObject().apply {
-            put("roomChatId", roomId)
-        }
-        socket.emit("JOIN_ROOM", payload)
-        Log.d("SocketManager", "Joining room: $roomId")
-    }
 
     fun sendRoomChatId(roomId: String) {
         val payload = JSONObject().apply {
@@ -366,8 +350,10 @@ object SocketManager {
 
     fun sendMessage(content: String, images: List<String> = emptyList()) {
         val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+        val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
         val payload = JSONObject().apply {
             put("senderId", myUserId)
+            put("toUserId", myLoveId)
             put("content", content)
             put("images", JSONArray(images))
         }

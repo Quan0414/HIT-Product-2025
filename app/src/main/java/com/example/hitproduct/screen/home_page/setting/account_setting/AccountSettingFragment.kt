@@ -18,6 +18,7 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentAccountSettingBinding
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate.ValidationResult
+import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.textfield.TextInputLayout
 import io.getstream.avatarview.glide.loadImage
 import java.text.SimpleDateFormat
@@ -84,32 +85,31 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
 
     override fun initListener() {
         binding.btnEditProfile.setOnClickListener {
-            isEditMode = !isEditMode
-            toggleFields(enabled = isEditMode)
-
-            // Đổi text nút
-            binding.btnEditProfile.text = if (isEditMode) "Lưu" else "Sửa thông tin"
-
-            if (isEditMode) {
-                //api
+            if (!isEditMode) {
+                // Chuyển từ view-only sang edit mode
+                isEditMode = true
                 toggleFields(enabled = true)
                 binding.btnEditProfile.text = "Lưu"
-            } else {
-                binding.btnEditProfile.text = "Sửa thông tin"
-                toggleFields(enabled = false)
-
-                val firstName = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
-                val lastName = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
-                val nickname = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
-                val gender = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
-                val birthday = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
-                val avatarUri = selectedAvatarUri
-
-                viewModel.updateProfile(
-                    firstName, lastName, nickname,
-                    gender, birthday, avatarUri, requireContext()
-                )
+                return@setOnClickListener
             }
+            val birthday = binding.edtBirthday.text.toString().takeIf { it.isNotBlank() }
+            val validationResult = birthday?.let { validateDate(it) }
+            if (validationResult != null && !validationResult.isValid) {
+                Toast.makeText(requireContext(), validationResult.errorMessage, Toast.LENGTH_SHORT).show()
+                // Giữ nguyên edit mode
+                return@setOnClickListener
+            }
+            val firstName  = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
+            val lastName   = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
+            val nickname   = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
+            val gender     = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
+            val avatarUri  = selectedAvatarUri
+
+            viewModel.updateProfile(
+                firstName, lastName, nickname,
+                gender, birthday, avatarUri, requireContext()
+            )
+
         }
 
         binding.btnEditAvatar.setOnClickListener {
@@ -119,6 +119,26 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
 
         binding.btnBack.setOnClickListener {
             parentFragmentManager.popBackStack()
+        }
+
+        binding.edtBirthday.setOnClickListener {
+
+            val datePicker = MaterialDatePicker.Builder.datePicker()
+                .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
+                .build()
+
+            datePicker.show(childFragmentManager, "love_date_picker")
+
+            datePicker.addOnPositiveButtonClickListener { selection: Long ->
+                val cal = Calendar.getInstance().apply {
+                    timeInMillis = selection
+                }
+                val day = cal.get(Calendar.DAY_OF_MONTH)
+                val month = cal.get(Calendar.MONTH) + 1
+                val year = cal.get(Calendar.YEAR)
+                val formatted = String.format("%02d/%02d/%04d", day, month, year)
+                binding.edtBirthday.text = formatted
+            }
         }
 
     }
@@ -155,7 +175,7 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                     binding.edtEmail.setText(user.email)
                     binding.edtNickname.setText(user.nickname)
                     binding.actvGender.setText(user.gender)
-                    binding.edtBirthday.setText(user.dateOfBirth.toDisplayDate())
+                    binding.edtBirthday.text = user.dateOfBirth.toDisplayDate()
 
                     val avatarUrl = user.avatar
                         ?.takeIf { it.isNotBlank() }
@@ -177,15 +197,16 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     Toast.makeText(
                         requireContext(),
                         "Cập nhật thông tin thành công",
                         Toast.LENGTH_SHORT
                     ).show()
+                    isEditMode = false
+                    toggleFields(enabled = false)
+                    binding.btnEditProfile.text = "Sửa thông tin"
                     selectedAvatarUri = null
-
-                    binding.loadingProgressBar.visibility = View.GONE
-
                 }
 
                 is UiState.Error -> {
@@ -261,7 +282,7 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         return FragmentAccountSettingBinding.inflate(inflater, container, false)
     }
 
-    fun String?.toDisplayDate(): String {
+    private fun String?.toDisplayDate(): String {
         if (this.isNullOrBlank()) return ""
         return try {
             // parser chuỗi UTC
@@ -278,24 +299,16 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
     }
 
     private fun validateDate(dateString: String): ValidationResult {
-//        if (dateString.isBlank()) {
-//            return ValidationResult(
-//                false,
-//                "Ê ê! Nhập ngày đi bạn ơi,  bộ bạn không nhớ ngày bắt đầu yêu nhau hả :)))"
-//            )
-//        }
-
-//        if (dateString.length != 10) {
-//            return ValidationResult(false, "Vui lòng nhập đầy đủ ngày theo định dạng dd/MM/yyyy")
-//        }
-
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             val inputDate =
-                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
+                inputFormat.parse(dateString) ?: return ValidationResult(
+                    false,
+                    "Ngày sinh không hợp lệ"
+                )
 
             // Tính toán ngày giới hạn (200 năm trước)
             val calendar = Calendar.getInstance()
@@ -309,12 +322,12 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                 inputDate.before(minDate) -> {
                     ValidationResult(
                         false,
-                        "Ôi dồi ôi! Bạn sinh ra từ thời khủng long à? Chọn ngày gần đây hơn đi!"
+                        "Ngày sinh không hợp lệ"
                     )
                 }
 
                 inputDate.after(today) -> {
-                    ValidationResult(false, "Chưa đến ngày đó mà! Chọn lại đi bạn ơi~")
+                    ValidationResult(false, "Ngày sinh không hợp lệ")
                 }
 
                 else -> ValidationResult(true)

@@ -50,6 +50,12 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
         binding.tvAccountManagement.setOnClickListener {
             val accountSettingFragment = AccountSettingFragment()
             parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
                 .replace(R.id.fragmentHomeContainer, accountSettingFragment)
                 .addToBackStack(null)
                 .commit()
@@ -63,7 +69,6 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
             DialogDisconnectFragment {
                 // callback khi bấm "Đồng ý"
                 viewModel.disconnectCouple()
-                CryptoHelper.deleteAllKeys(requireContext())
             }.show(parentFragmentManager, "disconnect_dialog")
         }
 
@@ -79,7 +84,7 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                     .apply()
 
                 // Xoa key pair ECDH
-                CryptoHelper.deleteAllKeys(requireContext())
+//                CryptoHelper.deleteAllKeys(requireContext())
 
                 val intent = Intent(requireContext(), SplashActivity::class.java).apply {
                     flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
@@ -150,14 +155,16 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                         requireContext(),
                         "Bạn đã chia tay với cậu ấy.",
                         Toast.LENGTH_SHORT
-                    )
-                        .show()
+                    ).show()
 
                     val onboardingDone =
                         prefs.getBoolean(AuthPrefersConstants.ON_BOARDING_DONE, false)
                     prefs.edit().clear().apply()
                     prefs.edit().putBoolean(AuthPrefersConstants.ON_BOARDING_DONE, onboardingDone)
                         .apply()
+
+//                    CryptoHelper.deleteAllKeys(requireContext())
+
                     // Chuyển về Splash và clear toàn bộ stack
                     val intent = Intent(requireContext(), LoginActivity::class.java).apply {
                         flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK

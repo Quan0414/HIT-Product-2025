@@ -28,8 +28,10 @@ class MessageViewModel(
     private val authRepository: AuthRepository
 ) : AndroidViewModel(application) {
 
-    private val sharedKey: SecretKey? =
-        CryptoHelper.getSharedAesKey(getApplication())
+    // Không cache sharedKey lúc init, luôn đọc mới giúp bắt kịp khi derive xong
+    private val context get() = getApplication<Application>()
+    private val sharedKey: SecretKey?
+        get() = CryptoHelper.getSharedAesKey(context)
 
     companion object {
         private const val PAGE_SIZE = 20
@@ -61,20 +63,20 @@ class MessageViewModel(
     private fun setupSocketListeners() {
         SocketManager.onMessageReceived { data ->
             val senderId = data.optString("senderId", "")
-            val encoded = data.optString("content", "")
+            val text = data.optString("content", "")
             val imagesArr = data.optJSONArray("images")
             val imageUrl = imagesArr?.takeIf { it.length() > 0 }?.getString(0)
-            Log.d("MessageViewModel", "Nhận tin nhắn: $encoded")
+            Log.d("MessageViewModel", "Nhận tin nhắn: $text")
 
-            val text = if (encoded.isNotBlank()) {
-                val cipher = Base64.decode(encoded, Base64.NO_WRAP)
-                val key = sharedKey
-                    ?: throw IllegalStateException("Shared key chưa derive!")
-                val plain = CryptoHelper.decrypt(key, cipher)
-                String(plain, Charsets.UTF_8)
-            } else {
-                ""
-            }
+//            val text = if (encoded.isNotBlank()) {
+//                val cipher = Base64.decode(encoded, Base64.NO_WRAP)
+//                val key = sharedKey
+//                    ?: throw IllegalStateException("Shared key chưa derive!")
+//                val plain = CryptoHelper.decrypt(key, cipher)
+//                String(plain, Charsets.UTF_8)
+//            } else {
+//                ""
+//            }
 
             val myUserId = authRepository.getMyUserId()
             val fromMe = senderId == myUserId
@@ -128,7 +130,8 @@ class MessageViewModel(
         viewModelScope.launch {
             when (val result = authRepository.getMessages(roomId, before = null)) {
                 is DataResult.Success -> {
-                    val decrypted = decryptItems(result.data)
+//                    val decrypted = decryptItems(result.data)
+                    val decrypted = result.data
                     oldestSentAt = decrypted.firstOrNull()?.sentAt
                     hasMore = decrypted.size >= PAGE_SIZE
                     _messagesState.value = UiState.Success(decrypted)
@@ -150,7 +153,8 @@ class MessageViewModel(
             when (val result = authRepository.getMessages(roomId, before = oldestSentAt)) {
                 is DataResult.Success -> {
                     // 1. Decrypt list mới
-                    val decryptedNew = decryptItems(result.data)
+//                    val decryptedNew = decryptItems(result.data)
+                    val decryptedNew = result.data
                     // 2. Ghép vào đầu, cập nhật sentAt & hasMore
                     val current = (_messagesState.value as? UiState.Success)?.data.orEmpty()
                     if (decryptedNew.isNotEmpty()) {
@@ -189,12 +193,12 @@ class MessageViewModel(
         _sendState.value = UiState.Loading
 
         try {
-            val key = sharedKey
-                ?: throw IllegalStateException("Shared key chưa derive!")
-            val cipher = CryptoHelper.encrypt(key, text.toByteArray(Charsets.UTF_8))
-            val encoded = Base64.encodeToString(cipher, Base64.NO_WRAP)
-            SocketManager.sendMessage(encoded, images)
-            Log.d("MessageViewModel", "Gửi tin nhắn: $encoded, images: $images")
+//            val key = sharedKey
+//                ?: throw IllegalStateException("Shared key chưa derive!")
+//            val cipher = CryptoHelper.encrypt(key, text.toByteArray(Charsets.UTF_8))
+//            val encoded = Base64.encodeToString(cipher, Base64.NO_WRAP)
+            SocketManager.sendMessage(text, images)
+            Log.d("MessageViewModel", "Gửi tin nhắn: $text, images: $images")
             _sendState.value = UiState.Success(Unit)
             resetSendState()
         } catch (e: Exception) {

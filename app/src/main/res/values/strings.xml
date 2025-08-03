@@ -14,7 +14,7 @@
 
     <!--    Dialog Mission  -->
     <string name="login">Đăng nhập</string>
-    <string name="mess">Nhắn tin (%1$d/3)</string>
+    <string name="mess">Nhắn tin (%1$d/2)</string>
     <string name="feed_pet">Cho pet ăn (%1$d/1)</string>
     <string name="daily_question">Trả lời câu hỏi (%1$d/2)</string>
 

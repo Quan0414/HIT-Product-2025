@@ -26,9 +26,6 @@ class LoginViewModel(
     private val _coupleProfile = MutableLiveData<UiState<CoupleProfile>>(UiState.Idle)
     val coupleProfile: LiveData<UiState<CoupleProfile>> = _coupleProfile
 
-    private val _publicKeyState = MutableLiveData<UiState<String>>(UiState.Idle)
-    val publicKeyState: LiveData<UiState<String>> = _publicKeyState
-
     fun clearLoginState() {
         _loginState.value = UiState.Idle
     }
@@ -88,21 +85,6 @@ class LoginViewModel(
 
                 is DataResult.Error -> {
                     _coupleProfile.value = UiState.Error(result.error)
-                }
-            }
-        }
-    }
-
-    fun sendPublicKey(publicKey: String) {
-        _publicKeyState.value = UiState.Loading
-        viewModelScope.launch {
-            when (val result = authRepository.sendPublicKey(publicKey)) {
-                is DataResult.Success -> {
-                    _publicKeyState.value = UiState.Success(result.data)
-                }
-
-                is DataResult.Error -> {
-                    _publicKeyState.value = UiState.Error(result.error)
                 }
             }
         }

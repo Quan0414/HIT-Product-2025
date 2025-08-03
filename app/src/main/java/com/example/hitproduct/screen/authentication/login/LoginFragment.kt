@@ -80,17 +80,6 @@ class LoginFragment : Fragment() {
                             .commit()
                     } else {
                         // Đã có đôi → vào MainActivity
-
-                        // tao public key
-                        CryptoHelper.ensureKeyPair(requireContext())
-                        // lấy public key dạng Base64
-                        val myPub = CryptoHelper.getMyPublicKey(requireContext())
-                        // gui key di
-                        viewModel.sendPublicKey(myPub)
-                        Log.d("LoginFragment", "My public key: $myPub")
-                        // luu myLovePubKey
-                        viewModel.getCoupleProfile()
-
                         // check myLoveId
                         val idUserA = state.data.couple.userA.id
                         val idUserB = state.data.couple.userB.id
@@ -186,15 +175,6 @@ class LoginFragment : Fragment() {
                     }
                     Log.d("LoginFragment", "My love public key: $myLovePubKey")
                 }
-            }
-        }
-
-        viewModel.publicKeyState.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Error -> {}
-                UiState.Idle -> {}
-                UiState.Loading -> {}
-                is UiState.Success -> {}
             }
         }
 

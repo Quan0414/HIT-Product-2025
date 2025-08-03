@@ -33,6 +33,11 @@ object CryptoHelper {
     private const val KEY_PUB = "ecdh_pub"
     private const val KEY_PEER_PUB = "ecdh_peer_pub"
     private const val KEY_SHARED_AES = "ecdh_shared_aes"
+    private const val KEY_PRIV_ENC = "ecdh_priv_enc"
+    private const val SALT_LENGTH = 16
+    private const val PIN_KDF_ALGO = "PBKDF2WithHmacSHA256"
+    private const val PIN_KDF_ITERATIONS = 200_000
+    private const val PIN_KEY_LENGTH = 256 // bits
 
     private const val AES_TRANSFORMATION = "AES/GCM/NoPadding"
     private const val IV_LENGTH = 12
@@ -135,7 +140,67 @@ object CryptoHelper {
         getPrefs(ctx).edit().apply {
             remove(KEY_PRIV); remove(KEY_PUB)
             remove(KEY_PEER_PUB); remove(KEY_SHARED_AES)
+            remove(KEY_PRIV_ENC)
             apply()
         }
+    }
+
+
+    /** Helper private: derive AES key từ PIN + salt bằng PBKDF2 */
+    private fun deriveKeyFromPin(pin: CharArray, salt: ByteArray): SecretKey {
+        val spec = javax.crypto.spec.PBEKeySpec(pin, salt, PIN_KDF_ITERATIONS, PIN_KEY_LENGTH)
+        val factory = javax.crypto.SecretKeyFactory.getInstance(PIN_KDF_ALGO)
+        val keyBytes = factory.generateSecret(spec).encoded
+        return SecretKeySpec(keyBytes, "AES")
+    }
+
+    /**
+     * Encrypt private key đã lưu (KEY_PRIV) bằng PIN 6 số,
+     * lưu blob = salt || iv || ciphertext vào EncryptedSharedPreferences
+     */
+    fun encryptPrivateKeyWithPin(ctx: Context, pin: String) {
+        val prefs = getPrefs(ctx)
+        // 1. Lấy private key gốc (Base64)
+        val privB64 = prefs.getString(KEY_PRIV, null)
+            ?: error("Private key missing")
+        val privBytes = Base64.decode(privB64, Base64.NO_WRAP)
+
+        // 2. Sinh salt & derive AES key
+        val salt = ByteArray(SALT_LENGTH).also { SecureRandom().nextBytes(it) }
+        val aesKey = deriveKeyFromPin(pin.toCharArray(), salt)
+
+        // 3. Encrypt với AES/GCM
+        val cipher = Cipher.getInstance(AES_TRANSFORMATION)
+        val iv = ByteArray(IV_LENGTH).also { SecureRandom().nextBytes(it) }
+        cipher.init(Cipher.ENCRYPT_MODE, aesKey, GCMParameterSpec(TAG_LENGTH_BITS, iv))
+        val ciphertext = cipher.doFinal(privBytes)
+
+        // 4. Gộp blob và lưu Base64
+        val blob = salt + iv + ciphertext
+        prefs.edit()
+            .putString(KEY_PRIV_ENC, Base64.encodeToString(blob, Base64.NO_WRAP))
+            .apply()
+    }
+
+    /**
+     * Decrypt blob đã lưu (KEY_PRIV_ENC) với PIN,
+     * trả về đúng byte[] của private key
+     */
+    fun decryptPrivateKeyWithPin(ctx: Context, pin: String): ByteArray {
+        val prefs = getPrefs(ctx)
+        val blobB64 = prefs.getString(KEY_PRIV_ENC, null)
+            ?: error("Encrypted private key missing")
+        val blob = Base64.decode(blobB64, Base64.NO_WRAP)
+
+        // Tách salt, iv, ciphertext
+        val salt = blob.copyOfRange(0, SALT_LENGTH)
+        val iv = blob.copyOfRange(SALT_LENGTH, SALT_LENGTH + IV_LENGTH)
+        val ct = blob.copyOfRange(SALT_LENGTH + IV_LENGTH, blob.size)
+
+        // Derive lại key & decrypt
+        val aesKey = deriveKeyFromPin(pin.toCharArray(), salt)
+        val cipher = Cipher.getInstance(AES_TRANSFORMATION)
+        cipher.init(Cipher.DECRYPT_MODE, aesKey, GCMParameterSpec(TAG_LENGTH_BITS, iv))
+        return cipher.doFinal(ct) // chính là privateKey bytes
     }
 }

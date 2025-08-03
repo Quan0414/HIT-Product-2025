@@ -33,6 +33,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
+import java.util.Locale
 
 class NoteFragment : BaseFragment<FragmentNoteBinding>() {
 
@@ -79,15 +80,15 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
         viewModel.fetchNotes()
 
         // Disable horizontal swipe on the calendar
-        binding.cvCalendar.apply {
-            // find the internal RecyclerView
-            val rv = (this as ViewGroup)
-                .findViewById<RecyclerView>(R.id.cvCalendar)
-            rv?.setOnTouchListener { _, _ ->
-                // Trả về true để consume mọi touch, chặn swipe
-                true
-            }
-        }
+//        binding.cvCalendar.apply {
+//            // find the internal RecyclerView
+//            val rv = (this as ViewGroup)
+//                .findViewById<RecyclerView>(R.id.cvCalendar)
+//            rv?.setOnTouchListener { _, _ ->
+//                // Trả về true để consume mọi touch, chặn swipe
+//                true
+//            }
+//        }
     }
 
     private fun setupCalendar() {
@@ -103,10 +104,10 @@ class NoteFragment : BaseFragment<FragmentNoteBinding>() {
         binding.cvCalendar.dayBinder = object : MonthDayBinder<DayContainer> {
             override fun create(view: View) = DayContainer(view)
 
-            @SuppressLint("DefaultLocale")
             override fun bind(container: DayContainer, data: CalendarDay) {
                 container.day = data
-                container.tvDay.text = String.format("%02d", data.date.dayOfMonth)
+                container.tvDay.text =
+                    String.format(Locale("vi", "VN"), "%02d", data.date.dayOfMonth)
 
                 container.ivNote.visibility = if (
                     data.position == DayPosition.MonthDate
