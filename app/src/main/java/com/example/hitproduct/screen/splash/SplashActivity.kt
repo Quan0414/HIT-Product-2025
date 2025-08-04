@@ -126,14 +126,24 @@ class SplashActivity : AppCompatActivity() {
                     is DataResult.Success -> {
                         val myUserId = res.data.id
                         prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
-                        val idRoomChat = res.data.roomChatId
-                        prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
-                            .apply()
 
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {
                             // Đã có đôi → vào Main
+                            val idRoomChat = res.data.roomChatId
+                            val myLoveId = if (coupleOjb.userA.id == myUserId) {
+                                coupleOjb.userB.id
+                            } else {
+                                coupleOjb.userA.id
+                            }
+                            val coupleId = coupleOjb.id
+                            prefs.edit()
+                                .putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
+                                .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                                .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
+                                .apply()
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
+
                         } else {
                             // Chưa có đôi → xoá token, notify, về Login
                             prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()

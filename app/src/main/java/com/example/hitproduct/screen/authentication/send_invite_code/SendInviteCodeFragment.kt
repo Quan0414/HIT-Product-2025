@@ -308,7 +308,8 @@ class SendInviteCodeFragment : Fragment() {
         }
         SocketManager.onError { message ->
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                Log.e("SendInvite", "Socket error: $message")
             }
         }
         SocketManager.onRequestSent { data ->
@@ -421,12 +422,14 @@ class SendInviteCodeFragment : Fragment() {
             Log.d("SendInvite", "Received couple data: $data")
             Handler(Looper.getMainLooper()).post {
                 val roomId = data.optString("roomChatId")
+                val coupleId = data.optString("coupleId")
                 val myUserId = data.optString("myUserId")
                 val myLoveId = data.optString("myLoveId")
                 prefs.edit()
                     .putString(AuthPrefersConstants.ID_ROOM_CHAT, roomId)
                     .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
                     .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                    .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
                     .apply()
             }
             goHomeActivity()

@@ -67,8 +67,7 @@ class LoginFragment : Fragment() {
                 is UiState.Success -> {
                     val myUserId = state.data.id
                     prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
-                    val idRoomChat = state.data.roomChatId
-                    prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat).apply()
+
 
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment
@@ -78,6 +77,19 @@ class LoginFragment : Fragment() {
                             .commit()
                     } else {
                         // Đã có đôi → vào MainActivity
+                        val idRoomChat = state.data.roomChatId
+                        val myLoveId = if (state.data.couple.userA.id == myUserId) {
+                            state.data.couple.userB.id
+                        } else {
+                            state.data.couple.userA.id
+                        }
+                        val coupleId = state.data.couple.id
+                        prefs.edit()
+                            .putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
+                            .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                            .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
+                            .apply()
+
                         startActivity(Intent(requireContext(), MainActivity::class.java))
                         requireActivity().finish()
                     }

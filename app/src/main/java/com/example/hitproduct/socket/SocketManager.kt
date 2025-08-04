@@ -361,10 +361,14 @@ object SocketManager {
 
     fun sendMessage(content: String, images: List<String> = emptyList()) {
         val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+        val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
+        val coupleId = prefs.getString(AuthPrefersConstants.COUPLE_ID, "") ?: ""
         val payload = JSONObject().apply {
             put("senderId", myUserId)
+            put("toUserId", myLoveId)
             put("content", content)
             put("images", JSONArray(images))
+            put("coupleId", coupleId)
         }
         Log.d("SocketManager", "Sending message: $payload")
         socket.emit("USER_SEND_MESSAGE", payload)
