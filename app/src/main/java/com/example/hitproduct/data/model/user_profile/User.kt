@@ -21,7 +21,11 @@ data class User(
     val tokenOtp: String?,
     @SerializedName("coupleId")
     val couple: Couple?,
-    val roomChatId: String?
+    val roomChatId: String?,
+    @SerializedName("private_key")
+    val privateKey: String?,
+    @SerializedName("public_key")
+    val publicKey: String?
 ) : Serializable
 
 data class Couple(
@@ -45,5 +49,9 @@ data class UserSummary(
     val coupleCode: String,
     @SerializedName("__v") val v: Int,
     val tokenOtp: String?,
-    val coupleId: String?
+    val coupleId: String?,
+    @SerializedName("private_key")
+    val privateKey: String?,
+    @SerializedName("public_key")
+    val publicKey: String?
 )

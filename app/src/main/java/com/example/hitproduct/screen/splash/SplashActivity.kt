@@ -19,6 +19,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -133,13 +134,44 @@ class SplashActivity : AppCompatActivity() {
                     is DataResult.Success -> {
                         val myUserId = res.data.id
                         prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
-                        val idRoomChat = res.data.roomChatId
-                        prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
-                            .apply()
 
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {
                             // Đã có đôi → vào Main
+                            val idRoomChat = res.data.roomChatId
+                            val myLoveId = if (coupleOjb.userA.id == myUserId) {
+                                coupleOjb.userB.id
+                            } else {
+                                coupleOjb.userA.id
+                            }
+                            val coupeId = coupleOjb.id
+                            prefs.edit().apply {
+                                putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
+                                putString(AuthPrefersConstants.COUPLE_ID, coupeId)
+                                putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                            }.apply()
+
+                            // Lưu public key
+                            val myLovePubKey = if (coupleOjb.userA.id == myUserId) {
+                                coupleOjb.userB.publicKey
+                            } else {
+                                coupleOjb.userA.publicKey
+                            }
+                            val blobB64 =
+                                CryptoHelper.getEncryptedPrivateKeyB64(this@SplashActivity)
+                            val hasBlob = blobB64.isNotEmpty()
+                            val hasRaw = CryptoHelper.hasRawPrivateKey(this@SplashActivity)
+                            if (myLovePubKey != null && hasBlob && hasRaw) {
+                                val currentStoredPubKey = CryptoHelper.getPeerPublicKey(this@SplashActivity)
+                                if (myLovePubKey != currentStoredPubKey) {
+                                    CryptoHelper.storePeerPublicKey(this@SplashActivity, myLovePubKey)
+                                    CryptoHelper.deriveAndStoreSharedAesKey(this@SplashActivity)
+                                    Log.d("SplashActivity", "Updated peer public key & derived shared AES key")
+                                } else {
+                                    Log.d("SplashActivity", "Peer public key unchanged, skip derive")
+                                }
+                            }
+
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                         } else {
                             // Chưa có đôi → xoá token, notify, về Login

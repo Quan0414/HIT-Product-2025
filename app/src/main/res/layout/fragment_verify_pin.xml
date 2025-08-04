@@ -64,7 +64,7 @@
     <LinearLayout
         android:id="@+id/Register"
         android:layout_width="350dp"
-        android:layout_height="250dp"
+        android:layout_height="230dp"
         android:background="@drawable/bg_rounded"
         android:fontFamily="@font/f800"
         android:orientation="vertical"
@@ -84,7 +84,7 @@
             android:layout_marginBottom="2dp"
             android:fontFamily="@font/f800"
             android:gravity="center"
-            android:text="Tạo mã PIN"
+            android:text="Nhập mã PIN"
             android:textSize="20dp"
             android:textStyle="bold" />
 
@@ -96,7 +96,7 @@
             android:fontFamily="@font/f500"
             android:gravity="center"
             android:paddingHorizontal="18dp"
-            android:text="Mã PIN giúp bảo mật những thông tin của bạn và người ấy"
+            android:text="Nhập mã PIN của bạn"
             android:textColor="@color/grayText"
             android:textSize="14dp" />
 

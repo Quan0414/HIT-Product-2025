@@ -440,10 +440,12 @@ class SendInviteCodeFragment : Fragment() {
                 val roomId = data.optString("roomChatId")
                 val myUserId = data.optString("myUserId")
                 val myLoveId = data.optString("myLoveId")
+                val coupleId = data.optString("coupleId")
                 prefs.edit()
                     .putString(AuthPrefersConstants.ID_ROOM_CHAT, roomId)
                     .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
                     .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                    .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
                     .apply()
 
                 viewModel2.getCoupleProfile()

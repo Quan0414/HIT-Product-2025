@@ -1,6 +1,7 @@
 package com.example.hitproduct.screen.authentication.create_pin
 
 import android.content.Context
+import android.content.Intent
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Log
@@ -22,6 +23,7 @@ import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCreatePinBinding
+import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
 
 class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
@@ -37,6 +39,10 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
     }
     private val viewModel by viewModels<CreatePinViewModel> {
         CreatePinViewModelFactory(authRepo)
+    }
+
+    private val flow by lazy {
+        arguments?.getString("flow") ?: throw IllegalArgumentException("Flow argument is required")
     }
 
     // 1. Tạo list chứa 6 EditText
@@ -95,31 +101,37 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
 
         // 3. Xử lý nút Continue
         binding.tvContinue.setOnClickListener {
-            DialogConfirmPin {
-                // Callback khi bấm "Đồng ý"
-                val myPub = CryptoHelper.getMyPublicKey(requireContext())
-                Log.d("CreatePinFragment", "My Public Key: $myPub")
-                val pin = codes.joinToString("") { it.text.toString() }
-                CryptoHelper.encryptPrivateKeyWithPin(requireContext(), pin)
-                val masterKey =
-                    MasterKey.Builder(requireContext(), MasterKey.DEFAULT_MASTER_KEY_ALIAS)
-                        .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-                        .build()
-                val encryptedPrefs = EncryptedSharedPreferences.create(
-                    requireContext(),
-                    AuthPrefersConstants.PREFS_NAME,
-                    masterKey,
-                    EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
-                    EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
-                )
-                val encryptedB64 = encryptedPrefs
-                    .getString("ecdh_priv_enc", "")
-                    .orEmpty()
-                Log.d("CreatePinFragment", "Encrypted Private Key: $encryptedB64")
-                // send key to server
-                viewModel.sendKey(myPub, encryptedB64)
+            if (flow == "reset-pin") {
+                DialogConfirmPin {
+                    // Sinh key pair mới
+                    CryptoHelper.ensureKeyPair(requireContext())
+                    val myPub = CryptoHelper.getMyPublicKey(requireContext())
+                    Log.d("CreatePinFragment", "Reset - My public key: $myPub")
 
-            }.show(parentFragmentManager, "confirm_pin_dialog")
+                    val pin = codes.joinToString("") { it.text.toString() }
+                    CryptoHelper.encryptPrivateKeyWithPin(requireContext(), pin)
+
+                    val encryptedB64 = CryptoHelper.getEncryptedPrivateKeyB64(requireContext())
+                    Log.d("CreatePinFragment", "Reset - Encrypted Private Key: $encryptedB64")
+                    viewModel.sendKey(myPub, encryptedB64)
+                }.show(parentFragmentManager, "confirm_reset_pin_dialog")
+            } else {
+                DialogConfirmPin {
+                    // Callback khi bấm "Đồng ý"
+                    val myPub = CryptoHelper.getMyPublicKey(requireContext())
+                    Log.d("CreatePinFragment", "My Public Key: $myPub")
+
+                    val pin = codes.joinToString("") { it.text.toString() }
+                    CryptoHelper.encryptPrivateKeyWithPin(requireContext(), pin)
+
+                    val encryptedB64 = CryptoHelper.getEncryptedPrivateKeyB64(requireContext())
+                    Log.d("CreatePinFragment", "Encrypted Private Key: $encryptedB64")
+                    viewModel.sendKey(myPub, encryptedB64)
+
+
+                }.show(parentFragmentManager, "confirm_pin_dialog")
+            }
+
         }
     }
 
@@ -151,21 +163,35 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
                 is UiState.Success -> {
                     binding.loadingProgressBar.visibility = View.GONE
                     binding.tvContinue.isEnabled = true
-                    Toast.makeText(
-                        requireContext(),
-                        "Tạo mã pin thành công",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    val sendInviteCodeFragment = SendInviteCodeFragment()
-                    parentFragmentManager.beginTransaction()
-                        .setCustomAnimations(
-                            R.anim.slide_in_right,
-                            R.anim.slide_out_left,
-                            R.anim.slide_in_left,
-                            R.anim.slide_out_right
-                        )
-                        .replace(R.id.fragmentStart, sendInviteCodeFragment)
-                        .commit()
+
+                    if (flow == "reset-pin") {
+                        Toast.makeText(
+                            requireContext(),
+                            "Đặt lại mã pin thành công. Vui lòng đăng nhập lại.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val intent = Intent(requireContext(), LoginActivity::class.java)
+                        startActivity(intent)
+                        requireActivity().finish()
+                    }
+                    else{
+                        Toast.makeText(
+                            requireContext(),
+                            "Tạo mã pin thành công",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        val sendInviteCodeFragment = SendInviteCodeFragment()
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left,
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right
+                            )
+                            .replace(R.id.fragmentStart, sendInviteCodeFragment)
+                            .commit()
+                    }
+
                 }
             }
         }

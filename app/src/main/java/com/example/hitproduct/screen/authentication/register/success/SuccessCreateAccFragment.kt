@@ -8,6 +8,7 @@ import androidx.fragment.app.Fragment
 import com.example.hitproduct.R
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
 import com.example.hitproduct.databinding.FragmentSuccessCreateAccBinding
+import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 
 
 class SuccessCreateAccFragment : Fragment() {
@@ -28,7 +29,7 @@ class SuccessCreateAccFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.tvContinue.setOnClickListener {
-            val sendInviteCodeFragment = SendInviteCodeFragment()
+            val createPinFragment = CreatePinFragment()
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(
                     R.anim.slide_in_right,
@@ -36,7 +37,7 @@ class SuccessCreateAccFragment : Fragment() {
                     R.anim.slide_in_left,
                     R.anim.slide_out_right
                 )
-                .replace(R.id.fragmentStart, sendInviteCodeFragment)
+                .replace(R.id.fragmentStart, createPinFragment)
                 .commit()
         }
 

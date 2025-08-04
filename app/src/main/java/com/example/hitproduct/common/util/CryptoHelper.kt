@@ -5,7 +5,6 @@ import android.content.SharedPreferences
 import android.util.Base64
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.example.hitproduct.common.constants.AuthPrefersConstants
 import java.security.KeyFactory
 import java.security.KeyPairGenerator
 import java.security.MessageDigest
@@ -28,7 +27,7 @@ import javax.crypto.spec.SecretKeySpec
  * - Lưu/xóa keypair, peer public và shared key trong EncryptedSharedPreferences
  */
 object CryptoHelper {
-    private const val PREFS_NAME = AuthPrefersConstants.PREFS_NAME
+    private const val CRYPTO_PREFS_NAME = "crypto_prefs"
     private const val KEY_PRIV = "ecdh_priv"
     private const val KEY_PUB = "ecdh_pub"
     private const val KEY_PEER_PUB = "ecdh_peer_pub"
@@ -54,7 +53,7 @@ object CryptoHelper {
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()
         return EncryptedSharedPreferences.create(
-            ctx, PREFS_NAME, masterKey,
+            ctx, CRYPTO_PREFS_NAME, masterKey,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
@@ -202,5 +201,45 @@ object CryptoHelper {
         val cipher = Cipher.getInstance(AES_TRANSFORMATION)
         cipher.init(Cipher.DECRYPT_MODE, aesKey, GCMParameterSpec(TAG_LENGTH_BITS, iv))
         return cipher.doFinal(ct) // chính là privateKey bytes
+    }
+
+    /**
+     * Lưu blob Base64 (salt‖iv‖ciphertext) mà bạn lấy về từ server
+     */
+    fun storeEncryptedPrivateKeyBlob(ctx: Context, blobB64: String) {
+        getPrefs(ctx).edit()
+            .putString(KEY_PRIV_ENC, blobB64)
+            .apply()
+    }
+
+    /**
+     * Lấy blob Base64 của private key đã mã hoá (ecdh_priv_enc) từ crypto_prefs
+     */
+    fun getEncryptedPrivateKeyB64(ctx: Context): String =
+        getPrefs(ctx).getString(KEY_PRIV_ENC, "").orEmpty()
+
+    /**
+     * Restore raw private key (đã giải mã) vào EncryptedSharedPreferences
+     * để dùng cho các thao tác ECDH tiếp theo.
+     */
+    fun restorePrivateKey(ctx: Context, rawPrivBytes: ByteArray) {
+        // Mã hoá lại thành Base64
+        val b64 = Base64.encodeToString(rawPrivBytes, Base64.NO_WRAP)
+        // Lưu vào prefs dưới KEY_PRIV
+        getPrefs(ctx).edit()
+            .putString(KEY_PRIV, b64)
+            .apply()
+    }
+
+
+    fun hasRawPrivateKey(ctx: Context): Boolean =
+        getPrefs(ctx).contains(KEY_PRIV)
+
+    fun clearPairingData(ctx: Context) {
+        getPrefs(ctx).edit().apply {
+            remove(KEY_PEER_PUB)
+            remove(KEY_SHARED_AES)
+            apply()
+        }
     }
 }
