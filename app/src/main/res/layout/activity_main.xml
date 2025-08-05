@@ -80,13 +80,13 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:elevation="8dp"
-                    android:translationY="-18dp"
+                    android:translationY="-30dp"
                     android:visibility="gone">
 
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:src="@drawable/ic_mess_selected" />
+                        android:layout_height="88dp"
+                        android:src="@drawable/ic_mess_selected2" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -126,13 +126,13 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:elevation="8dp"
-                    android:translationY="-18dp"
-                    android:visibility="visible">
+                    android:translationY="-30dp"
+                    android:visibility="gone">
 
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:src="@drawable/ic_note_selected" />
+                        android:layout_height="88dp"
+                        android:src="@drawable/ic_note_selected2" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -172,13 +172,13 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:elevation="8dp"
-                    android:translationY="-18dp"
+                    android:translationY="-30dp"
                     android:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:src="@drawable/ic_home_selected" />
+                        android:layout_height="88dp"
+                        android:src="@drawable/ic_home_selected2" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -218,13 +218,13 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:elevation="8dp"
-                    android:translationY="-18dp"
-                    android:visibility="visible">
+                    android:translationY="-30dp"
+                    android:visibility="gone">
 
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:src="@drawable/ic_couple_selected" />
+                        android:layout_height="88dp"
+                        android:src="@drawable/ic_couple_selected2" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -265,13 +265,13 @@
                     android:clipChildren="false"
                     android:clipToPadding="false"
                     android:elevation="8dp"
-                    android:translationY="-18dp"
+                    android:translationY="-30dp"
                     android:visibility="visible">
 
                     <ImageView
                         android:layout_width="wrap_content"
-                        android:layout_height="80dp"
-                        android:src="@drawable/ic_setting_selected" />
+                        android:layout_height="88dp"
+                        android:src="@drawable/ic_setting_selected2" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
