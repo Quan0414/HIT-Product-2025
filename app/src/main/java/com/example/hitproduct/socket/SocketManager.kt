@@ -382,54 +382,6 @@ object SocketManager {
             }
         }
 
-//    fun onMessageReceived(listener: (ChatItem) -> Unit): Emitter =
-//        socket.on("SERVER_RETURN_MESSAGE") { args ->
-//            (args.firstOrNull() as? JSONObject)?.let { data ->
-//                Handler(Looper.getMainLooper()).post {
-//                    val senderId = data.optString("senderId", "")
-//                    val content = data.optString("content", "")
-//                    val imagesArr = data.optJSONArray("images")
-//                    val imageUrl = imagesArr?.takeIf { it.length() > 0 }?.getString(0)
-//
-//                    val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
-//                    val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
-//                    Log.d(
-//                        "SocketManager",
-//                        "Received message from $senderId: content='$content', imageUrl='$imageUrl'"
-//                    )
-//
-//                    val fromMe = senderId == myUserId
-//
-//                    val id = data.optString("messageId", UUID.randomUUID().toString())
-//                    val timestamp = data.optLong("timestamp", System.currentTimeMillis())
-//                    val sentAt = SimpleDateFormat("HH:mm", Locale("vi", "VN"))
-//                        .format(Date(timestamp))
-//
-//                    val item = if (!imageUrl.isNullOrBlank()) {
-//                        ChatItem.ImageMessage(
-//                            id = id,
-//                            senderId = senderId,
-//                            avatarUrl = null,
-//                            imageUrl = imageUrl,
-//                            sentAt = sentAt,
-//                            fromMe = fromMe
-//                        )
-//                    } else {
-//                        ChatItem.TextMessage(
-//                            id = id,
-//                            senderId = senderId,
-//                            avatarUrl = null,
-//                            text = content,
-//                            sentAt = sentAt,
-//                            fromMe = fromMe
-//                        )
-//                    }
-//
-//                    listener(item)
-//                }
-//            }
-//        }
-
     fun onTypingReceived(listener: (senderId: String) -> Unit) {
         socket.on("SERVER_RETURN_TYPING") { args ->
             (args.firstOrNull() as? JSONObject)?.let { data ->
@@ -442,6 +394,24 @@ object SocketManager {
         }
     }
 
+    //=======================================================
+    // AES
+    fun sendNewPubKey(pubKey: String, myLoveId: String) {
+        val payload = JSONObject().apply {
+            put("public_key", pubKey)
+            put("myLoveId", myLoveId)
+        }
+        socket.emit("USER_SEND_PUBLIC_KEY", payload)
+        Log.d("SocketManager", "Sending key: $pubKey, to: $myLoveId")
+    }
 
+    fun onNewPubKeyReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_PUBLIC_KEY") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received new public key: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
 
 }

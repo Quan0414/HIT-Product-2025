@@ -1,11 +1,13 @@
 package com.example.hitproduct.screen.home_page.home
 
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.model.couple.CoupleProfile
 import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
 import com.example.hitproduct.data.model.pet.Pet
@@ -94,6 +96,8 @@ class HomeViewModel(
         SocketManager.onMissionCompleted { data ->
             _coin.postValue(data.optInt("coin"))
         }
+
+
     }
 
 

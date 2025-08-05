@@ -128,6 +128,20 @@ class SplashActivity : AppCompatActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         } else {
+            val blobB64 = CryptoHelper.getEncryptedPrivateKeyB64(this)
+            val hasBlob = blobB64.isNotEmpty()
+            val hasRaw = CryptoHelper.hasRawPrivateKey(this)
+            if (!hasBlob || !hasRaw) {
+                prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
+                Toast.makeText(
+                    this@SplashActivity,
+                    "Vui lòng đăng nhập lại",
+                    Toast.LENGTH_SHORT
+                ).show()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+                return
+            }
             // Đã có token → check couple
             lifecycleScope.launch {
                 when (val res = authRepo.fetchProfile()) {

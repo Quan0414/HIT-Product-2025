@@ -123,6 +123,8 @@ class MessageViewModel(
                 _typingState.postValue(false)
             }, 3000)
         }
+
+
     }
 
     fun fetchInitialMessages(roomId: String) {

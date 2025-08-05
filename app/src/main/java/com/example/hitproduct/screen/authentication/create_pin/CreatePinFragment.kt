@@ -12,9 +12,6 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.viewModels
-import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
-import com.example.hitproduct.screen.dialog.confirm_pin.DialogConfirmPin
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -25,6 +22,7 @@ import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCreatePinBinding
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
+import com.example.hitproduct.screen.dialog.confirm_pin.DialogConfirmPin
 
 class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
 
@@ -49,6 +47,10 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
     private lateinit var codes: List<EditText>
 
     override fun initView() {
+
+        // kiem tra myLoveId
+        viewModel.checkProfile()
+
         // Khởi tạo list
         codes = listOf(
             binding.edtCode1, binding.edtCode2, binding.edtCode3,
@@ -114,6 +116,11 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
                     val encryptedB64 = CryptoHelper.getEncryptedPrivateKeyB64(requireContext())
                     Log.d("CreatePinFragment", "Reset - Encrypted Private Key: $encryptedB64")
                     viewModel.sendKey(myPub, encryptedB64)
+
+                    val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null)
+                    if (myLoveId != null) {
+                        viewModel.sendNewKey(myPub, myLoveId)
+                    }
                 }.show(parentFragmentManager, "confirm_reset_pin_dialog")
             } else {
                 DialogConfirmPin {
@@ -173,8 +180,7 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
                         val intent = Intent(requireContext(), LoginActivity::class.java)
                         startActivity(intent)
                         requireActivity().finish()
-                    }
-                    else{
+                    } else {
                         Toast.makeText(
                             requireContext(),
                             "Tạo mã pin thành công",
@@ -192,6 +198,25 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
                             .commit()
                     }
 
+                }
+            }
+        }
+
+        viewModel.profileState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    val myUserId = state.data.id
+                    if (state.data.couple == null) {
+                        return@observe
+                    } else {
+                        val idUserA = state.data.couple.userA.id
+                        val idUserB = state.data.couple.userB.id
+                        val myLoveId = if (myUserId == idUserA) idUserB else idUserA
+                        prefs.edit().putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId).apply()
+                    }
                 }
             }
         }

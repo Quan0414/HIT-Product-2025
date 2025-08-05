@@ -21,7 +21,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
-import com.example.hitproduct.VerifyPinFragment
+import com.example.hitproduct.screen.authentication.verify_pin.VerifyPinFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper

@@ -1,7 +1,6 @@
-package com.example.hitproduct
+package com.example.hitproduct.screen.authentication.verify_pin
 
 import android.content.Context
-import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -11,6 +10,7 @@ import android.view.ViewGroup
 import android.widget.EditText
 import android.widget.Toast
 import androidx.fragment.app.viewModels
+import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.util.CryptoHelper
@@ -18,7 +18,6 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentVerifyPinBinding
 import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
-import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.authentication.login.LoginViewModel
 import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 

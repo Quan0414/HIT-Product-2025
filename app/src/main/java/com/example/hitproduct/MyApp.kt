@@ -4,7 +4,10 @@ import android.app.Application
 import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.createNotificationChannel
 import com.example.hitproduct.socket.SocketManager
+import com.google.firebase.FirebaseApp
 
 class MyApp : Application() {
 
@@ -15,6 +18,9 @@ class MyApp : Application() {
     override fun onCreate() {
         super.onCreate()
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+
+        FirebaseApp.initializeApp(this)
+        createNotificationChannel()
 
         SocketManager.init(this)
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
@@ -29,6 +35,13 @@ class MyApp : Application() {
     private fun registerSocketListeners() {
         SocketManager.onNotificationReceived { data ->
             Log.d("MyApp", "$data")
+        }
+
+        SocketManager.onNewPubKeyReceived { data ->
+            val newPubKey = data.optString("public_key", "")
+            Log.d("MyApp", "New pubkey receive: $newPubKey")
+            CryptoHelper.storePeerPublicKey(this, newPubKey)
+            CryptoHelper.deriveAndStoreSharedAesKey(this)
         }
     }
 }
