@@ -441,7 +441,6 @@ class SendInviteCodeFragment : Fragment() {
                 val coupleId = data.optString("coupleId")
                 val myUserId = data.optString("myUserId")
                 val myLoveId = data.optString("myLoveId")
-                val coupleId = data.optString("coupleId")
                 prefs.edit()
                     .putString(AuthPrefersConstants.ID_ROOM_CHAT, roomId)
                     .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
