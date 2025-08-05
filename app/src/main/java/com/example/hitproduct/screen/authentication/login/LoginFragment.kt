@@ -25,6 +25,7 @@ import com.example.hitproduct.screen.authentication.verify_pin.VerifyPinFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.TopicManager
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
@@ -72,8 +73,13 @@ class LoginFragment : Fragment() {
         viewModel.profileState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
+                    val oldUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
                     val myUserId = state.data.id
+                    if (oldUserId != null && oldUserId != myUserId) {
+                        TopicManager.unsubscribeFromTopic(oldUserId)
+                    }
                     prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                    TopicManager.subscribeToOwnTopic(requireContext())
                     // A) Nếu chưa có publicKey → user này CHƯA tạo PIN bao giờ
                     if (state.data.privateKey == null) {
                         parentFragmentManager.beginTransaction()

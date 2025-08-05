@@ -13,6 +13,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogStartDateBinding
@@ -135,6 +137,20 @@ class DialogStartDate : DialogFragment() {
                     ).show()
                     dismiss()
                     parentFragmentManager.setFragmentResult("update_start_date", Bundle())
+
+                    val myLoveId = authRepo.getMyLoveId()
+                    val chosenDate = binding.etStartDate.text.toString()
+                    val payload = mapOf(
+                        "type" to "start_date_selected",
+                        "startDate" to chosenDate
+                    )
+                    val tpl = NotificationConfig.getTemplate("start_date_selected", payload)
+                    FcmClient.sendToTopic(
+                        receiverUserId = myLoveId,
+                        title = tpl.title,
+                        body = tpl.body,
+                        data = payload
+                    )
                 }
             }
         }
