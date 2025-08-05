@@ -15,11 +15,11 @@ class SendInviteCodeViewModel(
     private val _inviteResult = MutableLiveData<DataResult<InviteData>>()
     val inviteResult: LiveData<DataResult<InviteData>> = _inviteResult
 
+
     fun checkInvite() {
         viewModelScope.launch {
             val result = authRepository.checkInvite()
             _inviteResult.value = result
         }
     }
-
 }

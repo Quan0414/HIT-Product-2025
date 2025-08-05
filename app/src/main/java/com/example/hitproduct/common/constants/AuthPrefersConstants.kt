@@ -5,6 +5,7 @@ object AuthPrefersConstants {
     const val PREFS_NAME = "hitproduct_prefs"
     const val ACCESS_TOKEN = "access_token"
     const val ON_BOARDING_DONE = "onboarding_done"
+    const val LAST_USER_ID = "last_user_id"
 
     const val ID_ROOM_CHAT = "id_room_chat"
     const val COUPLE_ID = "couple_id"

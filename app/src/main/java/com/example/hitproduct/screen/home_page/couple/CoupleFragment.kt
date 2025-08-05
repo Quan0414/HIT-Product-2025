@@ -186,8 +186,8 @@ class CoupleFragment : BaseFragment<FragmentCoupleBinding>() {
 
         binding.l2.tvStatus.apply {
             text = statusText
-//            tag = statusText // Lưu text gốc vào tag
-            tag = "Thời gian trôi nhanh như chó chạy ngoài đồng."
+            tag = statusText // Lưu text gốc vào tag
+//            tag = "Thời gian trôi nhanh như chó chạy ngoài đồng."
             onClickExpand {
                 val originalText = tag as String
                 DialogInloveStatus().apply {

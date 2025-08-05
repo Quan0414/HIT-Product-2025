@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.repository.AuthRepository
+import com.example.hitproduct.socket.SocketManager
 import kotlinx.coroutines.launch
 
 class DialogStartDateViewModel(
@@ -14,6 +15,9 @@ class DialogStartDateViewModel(
 ) : ViewModel() {
     private val _chooseStartDateState = MutableLiveData<UiState<String>>()
     val chooseStartDateState: LiveData<UiState<String>> = _chooseStartDateState
+
+    private val _dismissDialog = MutableLiveData<Unit>()
+    val dismissDialog: LiveData<Unit> = _dismissDialog
 
     fun chooseStartDate(startDate: String) {
         _chooseStartDateState.value = UiState.Loading
@@ -31,7 +35,10 @@ class DialogStartDateViewModel(
         }
     }
 
-    fun resetChooseStartDateState() {
-        _chooseStartDateState.value = UiState.Idle
+    init {
+        SocketManager.onCheckStartDate {
+            _dismissDialog.postValue(Unit)
+        }
     }
+
 }

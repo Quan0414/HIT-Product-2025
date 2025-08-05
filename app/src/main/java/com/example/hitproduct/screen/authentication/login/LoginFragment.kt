@@ -11,6 +11,7 @@ import android.text.TextWatcher
 import android.text.method.LinkMovementMethod
 import android.text.method.PasswordTransformationMethod
 import android.text.style.ClickableSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,11 +21,14 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
+import com.example.hitproduct.screen.authentication.verify_pin.VerifyPinFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
+import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
@@ -62,13 +66,34 @@ class LoginFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // 1. Quan sát kết quả checkCouple
-        viewModel.coupleState.observe(viewLifecycleOwner) { state ->
+        viewModel.profileState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
                     val myUserId = state.data.id
                     prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
-
-
+                    // A) Nếu chưa có publicKey → user này CHƯA tạo PIN bao giờ
+                    if (state.data.privateKey == null) {
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentStart, CreatePinFragment())
+                            .addToBackStack(null)
+                            .commit()
+                        return@observe
+                    }
+                    // B) Đã có publicKey → tài khoản này đã tạo PIN rồi
+                    // Get blob key từ server
+                    val blobKey = state.data.privateKey
+                    CryptoHelper.storeEncryptedPrivateKeyBlob(requireContext(), blobKey)
+                    // → kiểm tra xem có raw key local không, hoặc user có đổi chưa
+                    val lastUserId = prefs.getString(AuthPrefersConstants.LAST_USER_ID, null)
+                    val hasRawKey = CryptoHelper.hasRawPrivateKey(requireContext())
+                    if (lastUserId != myUserId || !hasRawKey) {
+                        // chuyen sang man verify pin
+                        parentFragmentManager.beginTransaction()
+                            .replace(R.id.fragmentStart, VerifyPinFragment())
+                            .addToBackStack(null)
+                            .commit()
+                        return@observe
+                    }
                     if (state.data.couple == null) {
                         // Chưa có đôi → chuyển sang SendInviteCodeFragment
                         parentFragmentManager.beginTransaction()
@@ -77,31 +102,36 @@ class LoginFragment : Fragment() {
                             .commit()
                     } else {
                         // Đã có đôi → vào MainActivity
+                        // check myLoveId
+                        val idUserA = state.data.couple.userA.id
+                        val idUserB = state.data.couple.userB.id
+                        val myLoveId = if (myUserId == idUserA) idUserB else idUserA
                         val idRoomChat = state.data.roomChatId
-                        val myLoveId = if (state.data.couple.userA.id == myUserId) {
-                            state.data.couple.userB.id
-                        } else {
-                            state.data.couple.userA.id
-                        }
                         val coupleId = state.data.couple.id
                         prefs.edit()
-                            .putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
                             .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                            .putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
                             .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
                             .apply()
+
+                        val myLovePubKey = if (myUserId == idUserA) {
+                            state.data.couple.userB.publicKey
+                        } else {
+                            state.data.couple.userA.publicKey
+                        }
+                        if (myLovePubKey != null) {
+                            CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
+                        }
+                        CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
 
                         startActivity(Intent(requireContext(), MainActivity::class.java))
                         requireActivity().finish()
                     }
+
                 }
 
-                is UiState.Error -> {
-                    // Nếu cần xử lý lỗi khi check couple
-                }
-
-                else -> {
-                    // Idle/Loading bỏ qua
-                }
+                is UiState.Error -> {}
+                else -> {}
             }
         }
 
@@ -163,14 +193,26 @@ class LoginFragment : Fragment() {
                         .show()
 
                     // Sau khi login thành công, check tiếp couple
-                    viewModel.checkCouple()
-
-                    // Reset loginState để tránh lặp lại
+                    viewModel.checkProfile()
                     viewModel.clearLoginState()
                 }
 
-                else -> {
-                    // Idle bỏ qua
+                else -> {}
+            }
+        }
+
+        viewModel.coupleProfile.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    val myLovePubKey = state.data.myLovePubKey
+                    if (myLovePubKey != null) {
+                        CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
+                        CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
+                    }
+                    Log.d("LoginFragment", "My love public key: $myLovePubKey")
                 }
             }
         }

@@ -9,6 +9,7 @@ import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
 import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
@@ -39,6 +40,7 @@ import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.security.PrivateKey
 
 class AuthRepository(
     private val api: ApiService,
@@ -379,6 +381,18 @@ class AuthRepository(
                 DataResult.Success(items)
             }
 
+            is DataResult.Error -> result
+        }
+    }
+
+
+    suspend fun sendPublicKey(
+        publicKey: String,
+        privateKey: String
+    ): DataResult<String> {
+        return when (val result =
+            getResult { api.sendPublicKey(SendPublicKeyRequest(publicKey, privateKey)) }) {
+            is DataResult.Success -> DataResult.Success(result.data.data)
             is DataResult.Error -> result
         }
     }

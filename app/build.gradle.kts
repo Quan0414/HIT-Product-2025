@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -46,10 +47,15 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-config-ktx")
 
     //auto resize
     implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
@@ -117,5 +123,7 @@ dependencies {
     implementation("com.vanniktech:emoji-material:0.21.0")
 
     implementation("com.cloudinary:cloudinary-android:3.0.2")
+
+    implementation("androidx.security:security-crypto:1.1.0-alpha07")
 
 }

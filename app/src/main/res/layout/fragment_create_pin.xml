@@ -42,13 +42,13 @@
 
     <net.orandja.shadowlayout.ShadowLayout
         android:id="@+id/shadow_bg"
-        android:layout_width="350dp"
-        android:layout_height="365dp"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
         android:background="@drawable/bg_rounded"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="@+id/Register"
+        app:layout_constraintEnd_toEndOf="@+id/Register"
+        app:layout_constraintStart_toStartOf="@+id/Register"
+        app:layout_constraintTop_toTopOf="@+id/Register"
         app:shadow_cast_only_background="true"
         app:shadow_color="#33FFC09C"
         app:shadow_radius="8"
@@ -64,7 +64,7 @@
     <LinearLayout
         android:id="@+id/Register"
         android:layout_width="350dp"
-        android:layout_height="365dp"
+        android:layout_height="250dp"
         android:background="@drawable/bg_rounded"
         android:fontFamily="@font/f800"
         android:orientation="vertical"
@@ -84,7 +84,7 @@
             android:layout_marginBottom="2dp"
             android:fontFamily="@font/f800"
             android:gravity="center"
-            android:text="Nhập mã xác nhận"
+            android:text="Tạo mã PIN"
             android:textSize="20dp"
             android:textStyle="bold" />
 
@@ -95,7 +95,8 @@
             android:layout_marginBottom="16dp"
             android:fontFamily="@font/f500"
             android:gravity="center"
-            android:text="@string/verify_code_to"
+            android:paddingHorizontal="18dp"
+            android:text="Mã PIN giúp bảo mật những thông tin của bạn và người ấy"
             android:textColor="@color/grayText"
             android:textSize="14dp" />
 
@@ -104,7 +105,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="16dp"
+            android:layout_marginBottom="24dp"
             android:orientation="horizontal"
             android:weightSum="4">
 
@@ -113,82 +114,83 @@
             <!-- EditText 2 -->
             <EditText
                 android:id="@+id/edtCode1"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_confirm_code"
+                android:background="@drawable/bg_pin"
                 android:gravity="center"
-                android:inputType="number"
+                android:inputType="numberPassword"
                 android:maxLength="1"
                 android:textSize="18dp" />
 
             <EditText
                 android:id="@+id/edtCode2"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_confirm_code"
+                android:background="@drawable/bg_pin"
                 android:gravity="center"
-                android:inputType="number"
+                android:inputType="numberPassword"
                 android:maxLength="1"
                 android:textSize="18dp" />
 
             <!-- EditText 3 -->
             <EditText
                 android:id="@+id/edtCode3"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_confirm_code"
+                android:background="@drawable/bg_pin"
                 android:gravity="center"
-                android:inputType="number"
+                android:inputType="numberPassword"
                 android:maxLength="1"
                 android:textSize="18dp" />
 
             <!-- EditText 4 -->
             <EditText
                 android:id="@+id/edtCode4"
-                android:layout_width="48dp"
-                android:layout_height="48dp"
-                android:layout_margin="8dp"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
                 android:layout_weight="1"
-                android:background="@drawable/bg_confirm_code"
+                android:background="@drawable/bg_pin"
                 android:gravity="center"
-                android:inputType="number"
+                android:inputType="numberPassword"
+                android:maxLength="1"
+                android:textSize="18dp" />
+
+            <EditText
+                android:id="@+id/edtCode5"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pin"
+                android:gravity="center"
+                android:inputType="numberPassword"
+                android:maxLength="1"
+                android:textSize="18dp" />
+
+            <EditText
+                android:id="@+id/edtCode6"
+                android:layout_width="36dp"
+                android:layout_height="36dp"
+                android:layout_margin="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/bg_pin"
+                android:gravity="center"
+                android:inputType="numberPassword"
                 android:maxLength="1"
                 android:textSize="18dp" />
         </LinearLayout>
 
         <TextView
-            android:id="@+id/tvTime"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="42dp"
-            android:fontFamily="@font/f500"
-            android:gravity="center"
-            android:text="@string/code_expired"
-            android:textColor="@color/grayText"
-            android:textSize="14dp" />
-
-        <TextView
-            android:id="@+id/tvSendCode"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/f700"
-            android:gravity="center"
-            android:text="Gửi lại mã"
-            android:enabled="false"
-            android:textColor="@color/grayText"
-            android:textSize="14dp" />
-
-        <TextView
             android:id="@+id/tvContinue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
             android:background="@drawable/bg_disable_btn"
             android:fontFamily="@font/f900"
             android:gravity="center"

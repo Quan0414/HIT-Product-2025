@@ -5,7 +5,7 @@
     android:layout_height="wrap_content"
     android:layout_marginBottom="10dp"
     android:background="@drawable/bg_item_notification"
-    android:paddingHorizontal="16dp"
+    android:paddingHorizontal="10dp"
     android:paddingVertical="8dp">
 
     <ImageView
@@ -21,7 +21,7 @@
         android:id="@+id/tvContent"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginStart="12dp"
+        android:layout_marginStart="10dp"
         android:layout_marginEnd="10dp"
         android:fontFamily="@font/f900"
         android:text="Cậu ấy đã gửi 3 tin nhắn"

@@ -109,7 +109,7 @@ class SetUpInformationFragment : Fragment() {
             datePicker.show(childFragmentManager, "love_date_picker")
 
             datePicker.addOnPositiveButtonClickListener { selection: Long ->
-                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                val cal = Calendar.getInstance().apply {
                     timeInMillis = selection
                 }
                 val day = cal.get(Calendar.DAY_OF_MONTH)
@@ -118,7 +118,6 @@ class SetUpInformationFragment : Fragment() {
                 val formatted = String.format("%02d/%02d/%04d", day, month, year)
                 binding.tvBirthday.text = formatted
             }
-
         }
 
 
@@ -174,42 +173,6 @@ class SetUpInformationFragment : Fragment() {
             binding.actvGender.setText(selected, false)
         }
 
-
-        //ngày sinh
-        val editText = binding.tvBirthday
-
-//        editText.addTextChangedListener(object : TextWatcher {
-//            private var isUpdating = false
-//
-//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-//            override fun afterTextChanged(s: Editable) {}
-//
-//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-//                if (isUpdating) {
-//                    isUpdating = false
-//                    return
-//                }
-//
-//                // Lọc chỉ giữ chữ số
-//                val digits = s.toString().filter { it.isDigit() }
-//                val sb = StringBuilder()
-//
-//                for ((index, char) in digits.withIndex()) {
-//                    sb.append(char)
-//                    // chèn "/" sau 2 và 4 chữ số
-//                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
-//                        sb.append('/')
-//                    }
-//                    // giới hạn max dd/MM/yyyy = 10 ký tự
-//                    if (sb.length >= 10) break
-//                }
-//
-//                isUpdating = true
-//                editText.setText(sb)
-//            }
-//        })
-
-
         //skip button
         binding.tvSkip.setOnClickListener {
             val successCreateAccFragment = SuccessCreateAccFragment()
@@ -227,24 +190,13 @@ class SetUpInformationFragment : Fragment() {
     }
 
     private fun validateDate(dateString: String): ValidationResult {
-//        if (dateString.isBlank()) {
-//            return ValidationResult(
-//                false,
-//                "Ê ê! Nhập ngày đi bạn ơi,  bộ bạn không nhớ ngày bắt đầu yêu nhau hả :)))"
-//            )
-//        }
-
-//        if (dateString.length != 10) {
-//            return ValidationResult(false, "Vui lòng nhập đầy đủ ngày theo định dạng dd/MM/yyyy")
-//        }
-
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             val inputDate =
-                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
+                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày sinh không hợp lệ")
 
             // Tính toán ngày giới hạn (200 năm trước)
             val calendar = Calendar.getInstance()
@@ -258,12 +210,12 @@ class SetUpInformationFragment : Fragment() {
                 inputDate.before(minDate) -> {
                     ValidationResult(
                         false,
-                        "Ôi dồi ôi! Bạn sinh ra từ thời khủng long à? Chọn ngày gần đây hơn đi!"
+                        "Ngày sinh không hợp lệ"
                     )
                 }
 
                 inputDate.after(today) -> {
-                    ValidationResult(false, "Chưa đến ngày đó mà! Chọn lại đi bạn ơi~")
+                    ValidationResult(false, "Ngày sinh không hợp lệ")
                 }
 
                 else -> ValidationResult(true)
@@ -276,7 +228,7 @@ class SetUpInformationFragment : Fragment() {
         }
     }
 
-    fun String?.toSendDate(): String {
+    private fun String?.toSendDate(): String {
         if (this.isNullOrBlank()) return ""
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

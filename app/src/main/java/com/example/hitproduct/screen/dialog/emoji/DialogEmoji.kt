@@ -1,9 +1,6 @@
-package com.example.hitproduct
+package com.example.hitproduct.screen.dialog.emoji
 
-import android.graphics.Color
-import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -20,19 +17,6 @@ class DialogEmoji(
     private val binding get() = _binding!!
 
     private lateinit var adapter: EmojiAdapter
-
-    override fun onStart() {
-        super.onStart()
-        dialog?.window?.apply {
-            // full-width, wrap-content height, đẩy xuống đáy
-            setLayout(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT
-            )
-            setGravity(Gravity.BOTTOM)
-            setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater,

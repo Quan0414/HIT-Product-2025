@@ -89,13 +89,12 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
     private val shopDialog by lazy { ShopDialogFragment() }
     private val questionDialog by lazy { YourDailyQuestionDialogFragment() }
 
+    private val myLoveId by lazy {
+        prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null)
+    }
+
     override fun initView() {
-
-        val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null)
         Log.d("HomeFragment", "My love ID: $myLoveId")
-
-        viewModel.listenToSocket()
-
         childFragmentManager.setFragmentResultListener(
             "update_start_date",
             viewLifecycleOwner
@@ -105,7 +104,7 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
             Log.d("HomeFragment", "Start date updated, fetching couple profile again")
         }
 
-        binding.gifCat.visibility = View.GONE
+        binding.gifCat.visibility = View.VISIBLE
         binding.gifCat.apply {
             speed = 1.0f
             repeatCount = 0
@@ -138,9 +137,6 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
 
 
         SocketManager.notifications.observe(viewLifecycleOwner) {
-            //mo dialog thông báo
-
-            // khi có thông báo mới, đổi icon
             binding.btnNotification.setImageResource(R.drawable.ic_new_noti)
         }
 
