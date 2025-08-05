@@ -32,6 +32,7 @@ import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
+import com.example.hitproduct.socket.SocketManager
 
 class LoginFragment : Fragment() {
 
@@ -64,6 +65,8 @@ class LoginFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
 
         // 1. Quan sát kết quả checkCouple
         viewModel.profileState.observe(viewLifecycleOwner) { state ->
@@ -191,6 +194,10 @@ class LoginFragment : Fragment() {
                     binding.tvLogin.isEnabled = true
                     Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT)
                         .show()
+                    val token = state.data.data
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+                        .apply()
 
                     // Sau khi login thành công, check tiếp couple
                     viewModel.checkProfile()
