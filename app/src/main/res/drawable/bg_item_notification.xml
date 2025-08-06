@@ -10,7 +10,7 @@
         android:width="2dp"
         android:color="@color/borderBrown"
         android:dashWidth="10dp"
-        android:dashGap="10dp" />
+        android:dashGap="6dp" />
 
     <!-- Tùy chọn bo góc -->
     <corners android:radius="12dp" />

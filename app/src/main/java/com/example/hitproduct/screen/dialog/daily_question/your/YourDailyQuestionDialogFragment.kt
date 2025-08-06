@@ -105,6 +105,7 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                     viewModel.resetSaveQuestionState()
+                    dismiss()
                 }
             }
         }

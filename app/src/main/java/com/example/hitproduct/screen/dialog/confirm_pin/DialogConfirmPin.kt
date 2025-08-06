@@ -1,4 +1,4 @@
-package com.example.hitproduct.screen.dialog.disconnect
+package com.example.hitproduct.screen.dialog.confirm_pin
 
 import android.app.Dialog
 import android.graphics.Color
@@ -8,14 +8,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.view.Window
 import androidx.fragment.app.DialogFragment
-import com.example.hitproduct.databinding.DialogDisconnectBinding
+import com.example.hitproduct.databinding.DialogConfirmPinBinding
 
 
-class DialogDisconnectFragment(
+class DialogConfirmPin(
     private val onConfirm: () -> Unit
 ) : DialogFragment() {
-
-    private var _binding: DialogDisconnectBinding? = null
+    private var _binding: DialogConfirmPinBinding? = null
     private val binding get() = _binding!!
 
     override fun onStart() {
@@ -27,7 +26,7 @@ class DialogDisconnectFragment(
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        _binding = DialogDisconnectBinding.inflate(LayoutInflater.from(requireContext()))
+        _binding = DialogConfirmPinBinding.inflate(LayoutInflater.from(requireContext()))
         val dialog = Dialog(requireContext()).apply {
             // Xoá vùng title mặc định
             requestWindowFeature(Window.FEATURE_NO_TITLE)
@@ -39,11 +38,9 @@ class DialogDisconnectFragment(
 
         dialog.setCanceledOnTouchOutside(false)
 
-        // Nút huỷ
         binding.btnClose.setOnClickListener {
             dialog.dismiss()
         }
-        // Nút đồng ý
         binding.btnLogout.setOnClickListener {
             dialog.dismiss()
             onConfirm()

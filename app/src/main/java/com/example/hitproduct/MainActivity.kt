@@ -14,6 +14,7 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.databinding.ActivityMainBinding
 import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.couple.CoupleFragment
@@ -61,6 +62,12 @@ class MainActivity : AppCompatActivity() {
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
         SocketManager.connect(token ?: "")
         SocketManager.onNotificationReceived {}
+        SocketManager.onNewPubKeyReceived { data ->
+            val newPubKey = data.optString("public_key", "")
+            Log.d("MainActivity", "New pubkey receive: $newPubKey")
+            CryptoHelper.storePeerPublicKey(this, newPubKey)
+            CryptoHelper.deriveAndStoreSharedAesKey(this)
+        }
 
         // 1) Pre-add all fragments, hide trừ Home (index 2)
         supportFragmentManager.beginTransaction().apply {

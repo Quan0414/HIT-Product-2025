@@ -10,6 +10,7 @@ import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.View
 import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
@@ -18,6 +19,7 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -27,6 +29,7 @@ import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.screen.authentication.login.LoginActivity
@@ -97,6 +100,11 @@ class SplashActivity : AppCompatActivity() {
             }
         }
 
+        val myPub = CryptoHelper.getMyPublicKey(this)
+        val myLovePub = CryptoHelper.getPeerPublicKey(this)
+        Log.d("SplashActivity", "My Public Key: $myPub")
+        Log.d("SplashActivity", "My Love Public Key: $myLovePub")
+
     }
 
     private fun routeNext() {
@@ -120,19 +128,64 @@ class SplashActivity : AppCompatActivity() {
             startActivity(Intent(this, LoginActivity::class.java))
             finish()
         } else {
+            val blobB64 = CryptoHelper.getEncryptedPrivateKeyB64(this)
+            val hasBlob = blobB64.isNotEmpty()
+            val hasRaw = CryptoHelper.hasRawPrivateKey(this)
+            if (!hasBlob || !hasRaw) {
+                prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
+                Toast.makeText(
+                    this@SplashActivity,
+                    "Vui lòng đăng nhập lại",
+                    Toast.LENGTH_SHORT
+                ).show()
+                startActivity(Intent(this, LoginActivity::class.java))
+                finish()
+                return
+            }
             // Đã có token → check couple
             lifecycleScope.launch {
                 when (val res = authRepo.fetchProfile()) {
                     is DataResult.Success -> {
                         val myUserId = res.data.id
                         prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
-                        val idRoomChat = res.data.roomChatId
-                        prefs.edit().putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
-                            .apply()
 
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {
                             // Đã có đôi → vào Main
+                            val idRoomChat = res.data.roomChatId
+                            val myLoveId = if (coupleOjb.userA.id == myUserId) {
+                                coupleOjb.userB.id
+                            } else {
+                                coupleOjb.userA.id
+                            }
+                            val coupeId = coupleOjb.id
+                            prefs.edit().apply {
+                                putString(AuthPrefersConstants.ID_ROOM_CHAT, idRoomChat)
+                                putString(AuthPrefersConstants.COUPLE_ID, coupeId)
+                                putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                            }.apply()
+
+                            // Lưu public key
+                            val myLovePubKey = if (coupleOjb.userA.id == myUserId) {
+                                coupleOjb.userB.publicKey
+                            } else {
+                                coupleOjb.userA.publicKey
+                            }
+                            val blobB64 =
+                                CryptoHelper.getEncryptedPrivateKeyB64(this@SplashActivity)
+                            val hasBlob = blobB64.isNotEmpty()
+                            val hasRaw = CryptoHelper.hasRawPrivateKey(this@SplashActivity)
+                            if (myLovePubKey != null && hasBlob && hasRaw) {
+                                val currentStoredPubKey = CryptoHelper.getPeerPublicKey(this@SplashActivity)
+                                if (myLovePubKey != currentStoredPubKey) {
+                                    CryptoHelper.storePeerPublicKey(this@SplashActivity, myLovePubKey)
+                                    CryptoHelper.deriveAndStoreSharedAesKey(this@SplashActivity)
+                                    Log.d("SplashActivity", "Updated peer public key & derived shared AES key")
+                                } else {
+                                    Log.d("SplashActivity", "Peer public key unchanged, skip derive")
+                                }
+                            }
+
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                         } else {
                             // Chưa có đôi → xoá token, notify, về Login

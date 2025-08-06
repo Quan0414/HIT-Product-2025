@@ -8,6 +8,7 @@ import android.text.Spanned
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.text.style.ForegroundColorSpan
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
@@ -133,6 +135,11 @@ class RegisterFragment : Fragment() {
                     binding.tvRegister.isEnabled = true
                     Toast.makeText(requireContext(), "Đăng ký thành công", Toast.LENGTH_SHORT)
                         .show()
+
+                    //sinh key pair
+                    CryptoHelper.ensureKeyPair(requireContext())
+                    val myPub = CryptoHelper.getMyPublicKey(requireContext())
+                    Log.d("Register", "My public key: $myPub")
 
                     // Navigate to VerifyCodeFragment
                     val verifyCodeFragment = VerifyCodeFragment().apply {

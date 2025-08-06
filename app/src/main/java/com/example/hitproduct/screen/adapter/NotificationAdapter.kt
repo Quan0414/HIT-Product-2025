@@ -3,6 +3,7 @@ package com.example.hitproduct.screen.adapter
 import android.text.format.DateUtils
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.hitproduct.R
@@ -20,17 +21,17 @@ class NotificationAdapter(
     }
 
     inner class NotificationViewHolder(view: View) : RecyclerView.ViewHolder(view) {
-        private val type = view.findViewById<View>(R.id.ivNotiType)
+        private val type = view.findViewById<ImageView>(R.id.ivNotiType)
         private val content = view.findViewById<TextView>(R.id.tvContent)
         private val time = view.findViewById<TextView>(R.id.tvTime)
 
         fun bind(notification: Notification) {
             when (notification.type) {
-                "feed_pet" -> type.setBackgroundResource(R.drawable.ic_noti_home)
-                "love_note" -> type.setBackgroundResource(R.drawable.ic_noti_note)
-                "chat_message" -> type.setBackgroundResource(R.drawable.ic_noti_mess)
-                "answer_question" -> type.setBackgroundResource(R.drawable.ic_noti_home)
-                else -> type.setBackgroundResource(R.drawable.ic_noti_setting)
+                "feed_pet" -> type.setImageResource(R.drawable.ic_noti_home)
+                "love_note" -> type.setImageResource(R.drawable.ic_noti_note)
+                "chat_message" -> type.setImageResource(R.drawable.ic_noti_mess)
+                "answer_question" -> type.setImageResource(R.drawable.ic_noti_home)
+                else -> type.setImageResource(R.drawable.ic_noti_setting)
             }
 
             content.text = notification.content
