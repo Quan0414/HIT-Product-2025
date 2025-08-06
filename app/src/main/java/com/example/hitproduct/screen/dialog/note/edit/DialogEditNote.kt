@@ -18,6 +18,8 @@ import com.example.hitproduct.data.model.calendar.Note
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogEditNoteBinding
 import com.example.hitproduct.common.util.Constant.ARG_NOTES
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 
 
 class DialogEditNote : DialogFragment() {
@@ -99,6 +101,18 @@ class DialogEditNote : DialogFragment() {
                     requireActivity().supportFragmentManager.setFragmentResult("refresh_notes", Bundle())
                     requireActivity().supportFragmentManager.setFragmentResult("dismiss_dialog_note", Bundle())
                     dismiss()
+
+                    val myLoveId = authRepo.getMyLoveId()
+                    val payload = mapOf(
+                        "type" to "note_updated",
+                    )
+                    val tpl = NotificationConfig.getTemplate("note_updated", payload)
+                    FcmClient.sendToTopic(
+                        receiverUserId = myLoveId,
+                        title = tpl.title,
+                        body = tpl.body,
+                        data = payload
+                    )
                 }
             }
         }

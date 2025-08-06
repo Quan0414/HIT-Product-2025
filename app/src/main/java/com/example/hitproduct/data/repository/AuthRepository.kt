@@ -8,6 +8,7 @@ import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.auth.request.ResestPasswordRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
@@ -133,6 +134,22 @@ class AuthRepository(
                 DataResult.Success(token)
             }
 
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun resetPassword(
+        email: String,
+        newPassword: String,
+        repeatNewPassword: String,
+        token: String
+    ): DataResult<ApiResponse<String>> {
+        return when (val result = getResult {
+            api.resetPassword(
+                ResestPasswordRequest(email, newPassword, repeatNewPassword, token)
+            )
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }

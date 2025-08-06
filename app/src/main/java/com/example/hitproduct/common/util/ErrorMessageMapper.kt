@@ -12,7 +12,8 @@ data class MappedError(
 object ErrorMessageMapper {
     fun fromBackend(raw: String): MappedError {
 
-        val serverError = raw.contains("Cannot read properties of null (reading 'id')", ignoreCase = true)
+        val serverError =
+            raw.contains("Cannot read properties of null (reading 'id')", ignoreCase = true)
 
         val tokenExpired = raw.contains("token hết hạn!", ignoreCase = true)
 
@@ -30,6 +31,9 @@ object ErrorMessageMapper {
         val wrongAccount = raw.contains("Email hoặc Password không chính xác.", ignoreCase = true)
         val unauthorized = raw.contains("Tài khoản chưa được xác nhận.", ignoreCase = true)
 
+        val duplicateOldPassword =
+            raw.contains("Vui lòng không sử dụng mật khẩu trước đó.", ignoreCase = true)
+
         val otpError = raw.contains("Nhập mã OTP sai.", ignoreCase = true)
         val otpExprired =
             raw.contains("OTP hết hạn.", ignoreCase = true)
@@ -45,7 +49,10 @@ object ErrorMessageMapper {
         val answer_question_error2 =
             raw.contains("Bạn đã trả lời rồi.", ignoreCase = true)
         val answer_question_error3 =
-            raw.contains("Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy.", ignoreCase = true)
+            raw.contains(
+                "Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy.",
+                ignoreCase = true
+            )
 
         val emtyNote = raw.contains("Nội dung ghi chú không được để trống.", ignoreCase = true)
 
@@ -80,6 +87,9 @@ object ErrorMessageMapper {
 
             otpExprired ->
                 "Mã OTP hết hạn!"
+
+            duplicateOldPassword ->
+                "Vui lòng không sử dụng mật khẩu cũ!"
 
             petFullHungry ->
                 "Pet của bạn đã no, không thể ăn nữa!"

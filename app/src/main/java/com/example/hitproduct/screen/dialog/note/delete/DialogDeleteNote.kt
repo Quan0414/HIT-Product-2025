@@ -104,17 +104,17 @@ class DialogDeleteNote : DialogFragment() {
                     )
                     dismiss()
 
-                    val myLoveId = authRepo.getMyLoveId()
-                    val payload = mapOf(
-                        "type" to "note_deleted",
-                    )
-                    val tpl = NotificationConfig.getTemplate("note_deleted", payload)
-                    FcmClient.sendToTopic(
-                        receiverUserId = myLoveId,
-                        title = tpl.title,
-                        body = tpl.body,
-                        data = payload
-                    )
+//                    val myLoveId = authRepo.getMyLoveId()
+//                    val payload = mapOf(
+//                        "type" to "note_deleted",
+//                    )
+//                    val tpl = NotificationConfig.getTemplate("note_deleted", payload)
+//                    FcmClient.sendToTopic(
+//                        receiverUserId = myLoveId,
+//                        title = tpl.title,
+//                        body = tpl.body,
+//                        data = payload
+//                    )
                 }
             }
         }

@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_login"
     android:fillViewport="true"
-    android:paddingTop="40dp"
+    android:paddingTop="60dp"
     tools:context=".screen.home_page.setting.account_setting.AccountSettingFragment">
 
     <LinearLayout
