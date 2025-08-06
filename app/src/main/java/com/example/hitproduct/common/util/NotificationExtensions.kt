@@ -39,7 +39,7 @@ object NotificationConfig {
                 val date = data?.get("startDate") ?: ""
                 Template(
                     title = "Ngày bắt đầu đã được chọn 🌅",
-                    body  = if (date.isNotBlank())
+                    body = if (date.isNotBlank())
                         "Hãy nhớ: ngày khởi hành là $date"
                     else
                         "Mở ứng dụng để xem ngày khởi hành"
@@ -49,37 +49,38 @@ object NotificationConfig {
             // 4. Cho pet ăn
             "pet_fed" -> Template(
                 title = "Pet vừa được cho ăn 🍲",
-                body  = "Mở ứng dụng để kiểm tra tình trạng pet nhé!"
+                body = "Mở ứng dụng để kiểm tra tình trạng pet nhé!"
             )
 
             // 5a. Thêm ghi chú
             "note_added" -> Template(
                 title = "Có kỷ niệm mới ✨",
-                body  = "Mở ứng dụng để xem ghi chú vừa thêm"
+                body = "Mở ứng dụng để xem ghi chú vừa thêm"
             )
             // 5b. Cập nhật ghi chú
             "note_updated" -> Template(
                 title = "Ghi chú vừa được chỉnh sửa ✍️",
-                body  = "Mở ứng dụng để xem nội dung cập nhật"
+                body = "Mở ứng dụng để xem nội dung cập nhật"
             )
             // 5c. Xoá ghi chú
             "note_deleted" -> Template(
                 title = "Ghi chú đã bị xoá 💔",
-                body  = "Ghi chú đó đã bị xoá nhưng kỷ niệm vẫn còn"
+                body = "Ghi chú đó đã bị xoá nhưng kỷ niệm vẫn còn"
             )
 
             // 6. Tin nhắn mới
             "chat_message" -> Template(
                 title = "Bạn có tin nhắn mới 💬",
-                body  = "Mở ứng dụng để đọc tin nhắn"
+                body = "Mở ứng dụng để đọc tin nhắn"
             )
 
             // Mặc định
             else -> Template(
                 title = "Thông báo mới 🍯",
-                body  = "Mở ứng dụng để xem chi tiết"
+                body = "Mở ứng dụng để xem chi tiết"
             )
-        }    }
+        }
+    }
 }
 
 // Extensions for NotificationManager and creating a default channel

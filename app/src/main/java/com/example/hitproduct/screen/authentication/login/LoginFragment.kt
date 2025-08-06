@@ -67,7 +67,6 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
 
         // 1. Quan sát kết quả checkCouple
         viewModel.profileState.observe(viewLifecycleOwner) { state ->
@@ -80,6 +79,7 @@ class LoginFragment : Fragment() {
                     }
                     prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
                     TopicManager.subscribeToOwnTopic(requireContext())
+
                     // A) Nếu chưa có publicKey → user này CHƯA tạo PIN bao giờ
                     if (state.data.privateKey == null) {
                         parentFragmentManager.beginTransaction()
@@ -204,6 +204,8 @@ class LoginFragment : Fragment() {
                     prefs.edit()
                         .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
                         .apply()
+                    SocketManager.disconnect()
+                    SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
 
                     // Sau khi login thành công, check tiếp couple
                     viewModel.checkProfile()
