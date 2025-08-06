@@ -15,6 +15,8 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.message.ChatItem
 import com.example.hitproduct.data.repository.AuthRepository
@@ -86,6 +88,18 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             if (text.isNotEmpty()) {
                 viewModel.sendMessage(text)
                 binding.etMessage.text?.clear()
+
+                val myLoveId = authRepo.getMyLoveId()
+                val payload = mapOf(
+                    "type" to "chat_message",
+                )
+                val tpl = NotificationConfig.getTemplate("chat_message", payload)
+                FcmClient.sendToTopic(
+                    receiverUserId = myLoveId,
+                    title = tpl.title,
+                    body = tpl.body,
+                    data = payload
+                )
             }
         }
 

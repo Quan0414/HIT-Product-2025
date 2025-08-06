@@ -25,6 +25,7 @@ import com.example.hitproduct.screen.authentication.verify_pin.VerifyPinFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.TopicManager
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentLoginBinding
@@ -32,6 +33,7 @@ import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
+import com.example.hitproduct.socket.SocketManager
 
 class LoginFragment : Fragment() {
 
@@ -65,12 +67,19 @@ class LoginFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+
         // 1. Quan sát kết quả checkCouple
         viewModel.profileState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Success -> {
+                    val oldUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
                     val myUserId = state.data.id
+                    if (oldUserId != null && oldUserId != myUserId) {
+                        TopicManager.unsubscribeFromTopic(oldUserId)
+                    }
                     prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                    TopicManager.subscribeToOwnTopic(requireContext())
+
                     // A) Nếu chưa có publicKey → user này CHƯA tạo PIN bao giờ
                     if (state.data.privateKey == null) {
                         parentFragmentManager.beginTransaction()
@@ -191,6 +200,12 @@ class LoginFragment : Fragment() {
                     binding.tvLogin.isEnabled = true
                     Toast.makeText(requireContext(), "Đăng nhập thành công", Toast.LENGTH_SHORT)
                         .show()
+                    val token = state.data.data
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+                        .apply()
+                    SocketManager.disconnect()
+                    SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
 
                     // Sau khi login thành công, check tiếp couple
                     viewModel.checkProfile()

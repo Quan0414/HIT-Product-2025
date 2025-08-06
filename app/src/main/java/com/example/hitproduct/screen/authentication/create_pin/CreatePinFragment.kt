@@ -23,6 +23,7 @@ import com.example.hitproduct.databinding.FragmentCreatePinBinding
 import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
 import com.example.hitproduct.screen.dialog.confirm_pin.DialogConfirmPin
+import com.example.hitproduct.socket.SocketManager
 
 class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
 
@@ -47,6 +48,7 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
     private lateinit var codes: List<EditText>
 
     override fun initView() {
+        SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
 
         // kiem tra myLoveId
         viewModel.checkProfile()

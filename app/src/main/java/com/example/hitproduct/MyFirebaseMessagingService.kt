@@ -3,6 +3,7 @@ package com.example.hitproduct
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import com.example.hitproduct.common.util.notificationManager
@@ -46,7 +47,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
         val notification = NotificationCompat.Builder(context, "default_channel")
             .setContentTitle(title)
             .setContentText(message)
-            .setSmallIcon(R.drawable.ic_new_noti) // thay icon phù hợp
+            .setSmallIcon(R.drawable.app_icon)
             .setAutoCancel(true)
             .setContentIntent(pendingIntent)
             .build()

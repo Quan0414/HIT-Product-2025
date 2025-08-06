@@ -11,6 +11,7 @@ import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.TopicManager
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSettingBinding
@@ -76,6 +77,8 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
         binding.btnLogout.setOnClickListener {
             DialogLogout {
+                TopicManager.unsubscribeFromOwnTopic(requireContext())
+
                 // 1) Xoá tất cả crypto-keys
                 CryptoHelper.deleteAllKeys(requireContext())
                 // 2) Ngắt socket

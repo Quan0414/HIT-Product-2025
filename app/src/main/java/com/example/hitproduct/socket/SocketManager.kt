@@ -408,6 +408,7 @@ object SocketManager {
 
     fun onNewPubKeyReceived(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_RETURN_PUBLIC_KEY") { args ->
+            Log.d("SocketManager", "onNewPubKeyReceived called")
             (args.getOrNull(0) as? JSONObject)?.let { data ->
                 Log.d("SocketManager", "Received new public key: $data")
                 Handler(Looper.getMainLooper()).post { listener(data) }

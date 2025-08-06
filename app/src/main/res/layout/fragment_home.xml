@@ -7,7 +7,7 @@
     android:background="@drawable/bg_home"
     android:clipChildren="false"
     android:clipToPadding="false"
-    android:paddingBottom="100dp"
+    android:paddingBottom="120dp"
     tools:context=".screen.home_page.home.HomeFragment">
 
     <ImageView
