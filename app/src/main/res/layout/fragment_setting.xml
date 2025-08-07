@@ -36,7 +36,7 @@
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/f800"
                 android:text="Cài đặt"
-                android:textSize="16sp"
+                android:textSize="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -114,7 +114,7 @@
                     android:fontFamily="@font/f700"
                     android:padding="16dp"
                     android:text="Quản lý tài khoản"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
 
 <!--                <View-->
 <!--                    android:layout_width="match_parent"-->
@@ -129,7 +129,7 @@
 <!--                    android:fontFamily="@font/f700"-->
 <!--                    android:padding="16dp"-->
 <!--                    android:text="Thống kê"-->
-<!--                    android:textSize="16sp" />-->
+<!--                    android:textSize="16dp" />-->
 
                 <View
                     android:layout_width="match_parent"
@@ -144,7 +144,7 @@
                     android:fontFamily="@font/f700"
                     android:padding="16dp"
                     android:text="Quyền riêng tư và Bảo mật"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
 
             </LinearLayout>
 
@@ -170,7 +170,7 @@
                     android:padding="12dp"
                     android:text="Hủy kết nối"
                     android:textColor="@color/orange"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
 
                 <Space
                     android:layout_width="16dp"
@@ -188,7 +188,7 @@
                     android:padding="12dp"
                     android:text="Đăng xuất"
                     android:textColor="@color/white"
-                    android:textSize="16sp" />
+                    android:textSize="16dp" />
 
             </LinearLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

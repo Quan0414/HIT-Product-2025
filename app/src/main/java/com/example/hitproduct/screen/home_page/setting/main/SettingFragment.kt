@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import com.example.hitproduct.R
+import com.example.hitproduct.screen.home_page.setting.policy.SecurityFragment
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
@@ -59,6 +60,20 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                     R.anim.slide_out_right
                 )
                 .replace(R.id.fragmentHomeContainer, accountSettingFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
+        binding.tvSecurity.setOnClickListener {
+            val securityFragment = SecurityFragment()
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentHomeContainer, securityFragment)
                 .addToBackStack(null)
                 .commit()
         }

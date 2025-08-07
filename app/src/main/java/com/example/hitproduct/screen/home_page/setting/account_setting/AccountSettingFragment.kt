@@ -225,8 +225,8 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         (requireActivity() as? MainActivity)?.hideBottomNav()
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onDestroyView() {
+        super.onDestroyView()
         (requireActivity() as? MainActivity)?.showBottomNav()
     }
 

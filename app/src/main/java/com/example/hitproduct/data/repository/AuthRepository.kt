@@ -5,6 +5,7 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.auth.request.ChangePasswordRequest
 import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
@@ -196,6 +197,19 @@ class AuthRepository(
             is DataResult.Success ->
                 DataResult.Success(result.data.data)
 
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        repeatNewPassword: String
+    ): DataResult<ApiResponse<String>> {
+        return when (val result = getResult {
+            api.changePassword(ChangePasswordRequest(oldPassword, newPassword, repeatNewPassword))
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }

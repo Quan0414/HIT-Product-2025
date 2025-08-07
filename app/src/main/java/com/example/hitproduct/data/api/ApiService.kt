@@ -1,6 +1,7 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
+import com.example.hitproduct.data.model.auth.request.ChangePasswordRequest
 import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
@@ -111,6 +112,11 @@ interface ApiService {
     suspend fun getProfile(
 //        @Header("Authorization") bearerToken: String
     ): Response<ApiResponse<User>>
+
+    @POST(ApiConstants.AUTH_CHANGE_PASSWORD)
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequest
+    ): Response<ApiResponse<String>>
 
     @DELETE(ApiConstants.DISCONNECT_COUPLE)
     suspend fun disconnectCouple(

@@ -206,10 +206,10 @@ class LoginFragment : Fragment() {
                         .apply()
                     SocketManager.disconnect()
                     SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
+                    viewModel.clearLoginState()
 
                     // Sau khi login thành công, check tiếp couple
                     viewModel.checkProfile()
-                    viewModel.clearLoginState()
                 }
 
                 else -> {}

@@ -120,16 +120,6 @@ class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>
 
             override fun afterTextChanged(s: Editable?) {
                 updateCreateNewPasswordButtonState()
-
-                val pwd1 = binding.edtPassword1.text.toString().trim()
-                val pwd2 = binding.edtPassword2.text.toString().trim()
-
-                // Hiển thị error real-time
-//                if (pwd1.isNotEmpty() && pwd2.isNotEmpty() && pwd1 != pwd2) {
-//                    binding.edtPassword2.error = "Mật khẩu không khớp"
-//                } else {
-//                    binding.edtPassword2.error = null
-//                }
             }
 
         }
@@ -153,10 +143,11 @@ class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>
                 return@setOnClickListener
             }
 
+            binding.loadingProgressBar.visibility = View.VISIBLE
             lifecycleScope.launch {
                 when (val res = authRepo.resetPassword(email, pwd1, pwd2, token)) {
                     is DataResult.Error -> {
-//                        binding.loadingProgressBar.visibility = View.GONE
+                        binding.loadingProgressBar.visibility = View.GONE
 
                         Toast.makeText(
                             requireContext(),
@@ -166,7 +157,7 @@ class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>
                     }
 
                     is DataResult.Success -> {
-//                        binding.loadingProgressBar.visibility = View.GONE
+                        binding.loadingProgressBar.visibility = View.GONE
 
                         Toast.makeText(
                             requireContext(),

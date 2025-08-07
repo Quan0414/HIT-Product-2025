@@ -16,7 +16,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
-import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
+import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate.ValidationResult
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
@@ -85,8 +85,12 @@ class SetUpInformationFragment : Fragment() {
                         "Cập nhật thông tin thành công",
                         Toast.LENGTH_SHORT
                     ).show()
-                    // Chuyển đến SuccessCreateAccFragment
-                    val successCreateAccFragment = SuccessCreateAccFragment()
+
+                    val createPinFragment = CreatePinFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("flow", "create-pin")
+                        }
+                    }
                     parentFragmentManager.beginTransaction()
                         .setCustomAnimations(
                             R.anim.slide_in_right,
@@ -94,7 +98,7 @@ class SetUpInformationFragment : Fragment() {
                             R.anim.slide_in_left,
                             R.anim.slide_out_right
                         )
-                        .replace(R.id.fragmentStart, successCreateAccFragment)
+                        .replace(R.id.fragmentStart, createPinFragment)
                         .commit()
                 }
             }
@@ -175,9 +179,15 @@ class SetUpInformationFragment : Fragment() {
 
         //skip button
         binding.tvSkip.setOnClickListener {
-            val successCreateAccFragment = SuccessCreateAccFragment()
+            val createPinFragment = CreatePinFragment()
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentStart, successCreateAccFragment)
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentStart, createPinFragment)
                 .commit()
         }
 
