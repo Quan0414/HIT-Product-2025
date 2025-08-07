@@ -513,21 +513,4 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
         "curious_key" to R.raw.meo_nhay4,
         "eating_key" to R.raw.meo_an
     )
-
-//    private fun checkMyLoveId() {
-//        val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
-//        val userA = prefs.getString(AuthPrefersConstants.USER_A_ID, null)
-//        val userB = prefs.getString(AuthPrefersConstants.USER_B_ID, null)
-//        Log.d("HomeFragment", "My ID: $myId, User A: $userA, User B: $userB")
-//
-//        if (myId == null || userA == null || userB == null) return
-//
-//        val loveId = if (myId == userA) userB else userA
-//        Log.d("HomeFragment", "Setting MY_LOVE_ID to: $loveId")
-//
-//        prefs.edit()
-//            .putString(AuthPrefersConstants.MY_LOVE_ID, loveId)
-//            .apply()
-//    }
-
 }

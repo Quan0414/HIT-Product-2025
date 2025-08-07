@@ -19,7 +19,6 @@ import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContentProviderCompat.requireContext
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
@@ -30,6 +29,7 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.TopicManager
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.screen.authentication.login.LoginActivity
@@ -146,8 +146,13 @@ class SplashActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 when (val res = authRepo.fetchProfile()) {
                     is DataResult.Success -> {
+                        val oldUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, null)
                         val myUserId = res.data.id
+                        if (oldUserId != null && oldUserId != myUserId) {
+                            TopicManager.unsubscribeFromTopic(oldUserId)
+                        }
                         prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                        TopicManager.subscribeToOwnTopic(this@SplashActivity)
 
                         val coupleOjb = res.data.couple
                         if (coupleOjb != null) {
@@ -188,8 +193,7 @@ class SplashActivity : AppCompatActivity() {
 
                             startActivity(Intent(this@SplashActivity, MainActivity::class.java))
                         } else {
-                            // Chưa có đôi → xoá token, notify, về Login
-                            prefs.edit().remove(AuthPrefersConstants.ACCESS_TOKEN).apply()
+                            // Chưa có đôi về Login
                             Toast.makeText(
                                 this@SplashActivity,
                                 "Bạn chưa có đôi, vui lòng đăng nhập lại",

@@ -5,9 +5,11 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.auth.request.ChangePasswordRequest
 import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.auth.request.ResestPasswordRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
 import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
@@ -137,6 +139,22 @@ class AuthRepository(
         }
     }
 
+    suspend fun resetPassword(
+        email: String,
+        newPassword: String,
+        repeatNewPassword: String,
+        token: String
+    ): DataResult<ApiResponse<String>> {
+        return when (val result = getResult {
+            api.resetPassword(
+                ResestPasswordRequest(email, newPassword, repeatNewPassword, token)
+            )
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
     /**
      * Gọi API chỉnh sửa thông tin cá nhân, nếu thành công sẽ trả về EditProfileResponse
      * @param fields là Map<String, RequestBody> chứa các trường cần chỉnh sửa
@@ -179,6 +197,19 @@ class AuthRepository(
             is DataResult.Success ->
                 DataResult.Success(result.data.data)
 
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        repeatNewPassword: String
+    ): DataResult<ApiResponse<String>> {
+        return when (val result = getResult {
+            api.changePassword(ChangePasswordRequest(oldPassword, newPassword, repeatNewPassword))
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }

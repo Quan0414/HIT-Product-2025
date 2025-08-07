@@ -38,6 +38,10 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+    }
 }
 
 dependencies {
@@ -56,6 +60,16 @@ dependencies {
     implementation("com.google.firebase:firebase-analytics-ktx")
     implementation("com.google.firebase:firebase-messaging-ktx")
     implementation("com.google.firebase:firebase-config-ktx")
+
+    // Google OAuth2 helper library
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+    // (tùy chọn) JSON parser cho Google HTTP client
+    implementation("com.google.http-client:google-http-client-jackson2:1.40.0")
+    // OkHttp để gọi HTTP
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    // JSON
+    implementation("com.squareup.moshi:moshi:1.14.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
 
     //auto resize
     implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")

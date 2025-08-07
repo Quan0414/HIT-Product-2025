@@ -7,10 +7,12 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import com.example.hitproduct.R
+import com.example.hitproduct.screen.home_page.setting.policy.SecurityFragment
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.TopicManager
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSettingBinding
@@ -62,6 +64,20 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
                 .commit()
         }
 
+        binding.tvSecurity.setOnClickListener {
+            val securityFragment = SecurityFragment()
+            parentFragmentManager.beginTransaction()
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentHomeContainer, securityFragment)
+                .addToBackStack(null)
+                .commit()
+        }
+
 //        binding.btnBack.setOnClickListener {
 //            (requireActivity() as? MainActivity)?.goToHomeTab()
 //        }
@@ -76,6 +92,8 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
         binding.btnLogout.setOnClickListener {
             DialogLogout {
+                TopicManager.unsubscribeFromOwnTopic(requireContext())
+
                 // 1) Xoá tất cả crypto-keys
                 CryptoHelper.deleteAllKeys(requireContext())
                 // 2) Ngắt socket

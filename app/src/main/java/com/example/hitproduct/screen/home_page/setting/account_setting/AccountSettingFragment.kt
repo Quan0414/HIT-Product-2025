@@ -77,10 +77,10 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
             binding.actvGender.showDropDown()
         }
 
-        binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
-            val selected = parent.getItemAtPosition(position) as String
-            binding.actvGender.setText(selected, false)
-        }
+//        binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
+//            val selected = parent.getItemAtPosition(position) as String
+//            binding.actvGender.setText(selected, false)
+//        }
     }
 
     override fun initListener() {
@@ -174,7 +174,7 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
                     binding.edtTen.setText(user.lastName)
                     binding.edtEmail.setText(user.email)
                     binding.edtNickname.setText(user.nickname)
-                    binding.actvGender.setText(user.gender)
+                    binding.actvGender.setText(user.gender, false)
                     binding.edtBirthday.text = user.dateOfBirth.toDisplayDate()
 
                     val avatarUrl = user.avatar
@@ -225,8 +225,8 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         (requireActivity() as? MainActivity)?.hideBottomNav()
     }
 
-    override fun onPause() {
-        super.onPause()
+    override fun onDestroyView() {
+        super.onDestroyView()
         (requireActivity() as? MainActivity)?.showBottomNav()
     }
 

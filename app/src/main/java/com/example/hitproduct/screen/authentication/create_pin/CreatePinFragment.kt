@@ -21,6 +21,7 @@ import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCreatePinBinding
 import com.example.hitproduct.screen.authentication.login.LoginActivity
+import com.example.hitproduct.screen.authentication.login.LoginFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
 import com.example.hitproduct.screen.dialog.confirm_pin.DialogConfirmPin
 import com.example.hitproduct.socket.SocketManager
@@ -41,7 +42,7 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
     }
 
     private val flow by lazy {
-        arguments?.getString("flow") ?: throw IllegalArgumentException("Flow argument is required")
+        arguments?.getString("flow")
     }
 
     // 1. Tạo list chứa 6 EditText
@@ -142,6 +143,10 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
             }
 
         }
+
+        binding.backIcon.setOnClickListener {
+            parentFragmentManager.popBackStack()
+        }
     }
 
     override fun initData() {
@@ -179,9 +184,17 @@ class CreatePinFragment : BaseFragment<FragmentCreatePinBinding>() {
                             "Đặt lại mã pin thành công. Vui lòng đăng nhập lại.",
                             Toast.LENGTH_SHORT
                         ).show()
-                        val intent = Intent(requireContext(), LoginActivity::class.java)
-                        startActivity(intent)
-                        requireActivity().finish()
+                        val loginFragment = LoginFragment()
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left,
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right
+                            )
+                            .replace(R.id.fragmentStart, loginFragment)
+                            .commit()
+
                     } else {
                         Toast.makeText(
                             requireContext(),

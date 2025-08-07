@@ -28,6 +28,8 @@ import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
@@ -328,8 +330,8 @@ class SendInviteCodeFragment : Fragment() {
         }
         SocketManager.onError { message ->
             Handler(Looper.getMainLooper()).post {
-//                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-                Log.e("SendInvite", "Socket error: $message")
+                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+//                Log.e("SendInvite", "Socket error: $message")
             }
         }
         SocketManager.onRequestSent { data ->
@@ -352,6 +354,18 @@ class SendInviteCodeFragment : Fragment() {
                 if (inviteDialog?.isShowing != true) {
                     showInviteDialog()
                 }
+
+                // Gửi thông báo đến người nhận
+                val payload = mapOf(
+                    "type" to "pair_request"
+                )
+                val tpl = NotificationConfig.getTemplate("pair_request", payload)
+                FcmClient.sendToTopic(
+                    receiverUserId = receiverId,
+                    title = tpl.title,
+                    body = tpl.body,
+                    data = payload
+                )
             }
         }
 
@@ -447,6 +461,17 @@ class SendInviteCodeFragment : Fragment() {
                     .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
                     .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
                     .apply()
+
+                val payload = mapOf(
+                    "type" to "pair_request",
+                )
+                val tpl = NotificationConfig.getTemplate("pair_success", payload)
+                FcmClient.sendToTopic(
+                    receiverUserId = myLoveId,
+                    title = tpl.title,
+                    body = tpl.body,
+                    data = payload
+                )
 
                 viewModel2.getCoupleProfile()
                 goHomeActivity()

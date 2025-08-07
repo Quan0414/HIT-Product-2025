@@ -94,21 +94,6 @@ class DialogNote : DialogFragment() {
             dismiss()
         }
 
-//        requireActivity().supportFragmentManager.setFragmentResultListener(
-//            "refresh_notes", viewLifecycleOwner
-//        ) { _, _ ->
-//            lifecycleScope.launch {
-//                val result = authRepo.fetchNote()
-//                if (result is DataResult.Success) {
-//                    val list = result.data
-//                    val filtered = list.data.notes.filter { it.date.startsWith(selectedDate.toString()) }
-//                    adapter.submitList(filtered)
-//                }
-//                binding.rvNote.scrollToPosition(0)
-//            }
-//        }
-
-
         // Lấy notes an toàn từ args
         val notes = (arguments?.getSerializable(ARG_NOTES) as? ArrayList<Note>)
             .orEmpty()
