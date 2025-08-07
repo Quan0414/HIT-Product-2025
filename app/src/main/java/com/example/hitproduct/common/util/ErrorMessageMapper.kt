@@ -59,58 +59,58 @@ object ErrorMessageMapper {
 
         val message = when {
             serverError ->
-                "Lỗi máy chủ!"
+                "Máy chủ đang gặp chút vấn đề, bạn vui lòng thử lại sau nhé."
 
             tokenExpired ->
-                "Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại!"
+                "Phiên đăng nhập đã kết thúc, mời bạn đăng nhập lại."
 
             unauthorized ->
-                "Tài khoản chưa được xác nhận!"
+                "Bạn chưa được cấp quyền, hãy kiểm tra email xác thực."
 
             accountExits ->
-                "Tên người dùng hoặc email đã tồn tại!"
+                "Email hoặc tên người dùng đã tồn tại, chọn cái khác nha."
 
             emailError ->
-                "Email không hợp lệ!"
+                "Email không đúng định dạng, mời bạn kiểm tra lại."
 
             passwordError ->
-                "Mật khẩu phải tối thiểu 6 ký tự!"
+                "Mật khẩu phải có ít nhất 6 ký tự."
 
             confirmPasswordError ->
-                "Mật khẩu không khớp!"
+                "Mật khẩu xác nhận chưa khớp, bạn kiểm tra lại giúp mình."
 
             wrongAccount ->
-                "Email hoặc mật khẩu không chính xác!"
+                "Email hoặc mật khẩu không khớp, xin bạn thử lại."
 
             otpError ->
-                "Mã OTP không chính xác!"
+                "Mã OTP chưa chính xác, mời bạn kiểm tra lại."
 
             otpExprired ->
-                "Mã OTP hết hạn!"
+                "Mã OTP đã hết hạn, bạn có muốn gửi lại mã mới không?"
 
             duplicateOldPassword ->
-                "Vui lòng không sử dụng mật khẩu cũ!"
+                "Bạn vừa dùng lại mật khẩu cũ rồi, đổi mật khẩu mới nhé."
 
             petFullHungry ->
-                "Pet của bạn đã no, không thể ăn nữa!"
+                "Pet của bạn đã no căng rồi, hãy cho nó đi chơi chút."
 
             notEnoughCoin ->
-                "Bạn không có đủ tiền!"
+                "Bạn đang thiếu coin, tích thêm rồi quay lại tiếp tục nhé."
 
             answer_question_error1 ->
-                "Câu trả lời không được để trống!"
+                "Câu trả lời đang để trống, mời bạn nhập nội dung."
 
             answer_question_error2 ->
                 "Bạn đã trả lời rồi."
 
             answer_question_error3 ->
-                "Bạn cần trả lời câu hỏi trước khi xem câu trả lời của cậu ấy!"
+                "Trả lời câu hỏi trước rồi mới xem đáp án của người ấy được."
 
             emtyNote ->
-                "Nội dung ghi chú không được để trống!"
+                "Ghi chú đang trống, bạn viết vài dòng vào nhé."
 
             else ->
-                "Lỗi chưa xác định, bật logcat lên!!!"
+                "Đã có lỗi xảy ra, vui lòng thử lại sau."
         }
 
         val emailErrorFlag = emailError || wrongAccount

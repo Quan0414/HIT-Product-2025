@@ -3,6 +3,8 @@ package com.example.hitproduct.screen.authentication.register.set_up_infor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -24,18 +26,15 @@ import java.util.Calendar
 import java.util.Locale
 import java.util.TimeZone
 
-
 class SetUpInformationFragment : Fragment() {
 
     private lateinit var binding: FragmentSetUpInformationBinding
 
-    // 1. SharedPreferences
     private val prefs by lazy {
         requireContext()
             .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
     }
 
-    // 2. AuthRepository
     private val authRepo by lazy {
         AuthRepository(
             NetworkClient.provideApiService(requireContext()),
@@ -43,7 +42,6 @@ class SetUpInformationFragment : Fragment() {
         )
     }
 
-    // 3. ViewModel
     private val viewModel by viewModels<SetUpInformationViewModel> {
         SetUpInformationViewModelFactory(authRepo)
     }
@@ -51,7 +49,7 @@ class SetUpInformationFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         binding = FragmentSetUpInformationBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -60,37 +58,17 @@ class SetUpInformationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        //observer viewModel
+        // Observe updateState
         viewModel.updateState.observe(viewLifecycleOwner) { state ->
             when (state) {
-                is UiState.Error -> {
-                    binding.loadingProgressBar.visibility = View.GONE
-                    binding.tvContinue.isEnabled = true
-                    val err = state.error
-                    Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
-                }
-
-                UiState.Idle -> {
-                }
-
-                UiState.Loading -> {
+                is UiState.Loading -> {
                     binding.tvContinue.isEnabled = false
                     binding.loadingProgressBar.visibility = View.VISIBLE
                 }
-
                 is UiState.Success -> {
                     binding.loadingProgressBar.visibility = View.GONE
-                    Toast.makeText(
-                        requireContext(),
-                        "Cập nhật thông tin thành công",
-                        Toast.LENGTH_SHORT
-                    ).show()
-
-                    val createPinFragment = CreatePinFragment().apply {
-                        arguments = Bundle().apply {
-                            putString("flow", "create-pin")
-                        }
-                    }
+                    Toast.makeText(requireContext(), "Cập nhật thông tin thành công", Toast.LENGTH_SHORT)
+                        .show()
                     parentFragmentManager.beginTransaction()
                         .setCustomAnimations(
                             R.anim.slide_in_right,
@@ -98,88 +76,93 @@ class SetUpInformationFragment : Fragment() {
                             R.anim.slide_in_left,
                             R.anim.slide_out_right
                         )
-                        .replace(R.id.fragmentStart, createPinFragment)
+                        .replace(
+                            R.id.fragmentStart,
+                            CreatePinFragment().apply {
+                                arguments = Bundle().apply {
+                                    putString("flow", "create-pin")
+                                }
+                            }
+                        )
                         .commit()
                 }
+                is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
+                    binding.tvContinue.isEnabled = true
+                    Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
+                }
+                UiState.Idle -> { /* no-op */ }
             }
         }
 
-        binding.tvBirthday.setOnClickListener {
+        // TextWatcher for first name, last name, nickname
+        val watcher = object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                updateContinueButtonState()
+            }
+        }
+        binding.edtHo.addTextChangedListener(watcher)
+        binding.edtTen.addTextChangedListener(watcher)
+        binding.edtNickname.addTextChangedListener(watcher)
 
-            val datePicker = MaterialDatePicker.Builder.datePicker()
+        // Gender dropdown
+        val genders = listOf("Nam", "Nữ", "Khác")
+        val genderAdapter = ArrayAdapter(requireContext(), R.layout.dropdown_gender, genders)
+        binding.actvGender.setAdapter(genderAdapter)
+        binding.actvGender.threshold = 0
+        binding.tilGender.setEndIconOnClickListener {
+            binding.actvGender.showDropDown()
+        }
+        binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
+            val selected = parent.getItemAtPosition(position) as String
+            binding.actvGender.setText(selected, false)
+            updateContinueButtonState()
+        }
+
+        // Birthday picker
+        binding.tvBirthday.setOnClickListener {
+            val picker = MaterialDatePicker.Builder.datePicker()
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
                 .build()
-
-            datePicker.show(childFragmentManager, "love_date_picker")
-
-            datePicker.addOnPositiveButtonClickListener { selection: Long ->
-                val cal = Calendar.getInstance().apply {
-                    timeInMillis = selection
-                }
-                val day = cal.get(Calendar.DAY_OF_MONTH)
-                val month = cal.get(Calendar.MONTH) + 1
-                val year = cal.get(Calendar.YEAR)
-                val formatted = String.format("%02d/%02d/%04d", day, month, year)
+            picker.show(childFragmentManager, "date_picker")
+            picker.addOnPositiveButtonClickListener { ts ->
+                val cal = Calendar.getInstance().apply { timeInMillis = ts }
+                val formatted = String.format(
+                    Locale.getDefault(),
+                    "%02d/%02d/%04d",
+                    cal.get(Calendar.DAY_OF_MONTH),
+                    cal.get(Calendar.MONTH) + 1,
+                    cal.get(Calendar.YEAR)
+                )
                 binding.tvBirthday.text = formatted
+                updateContinueButtonState()
             }
         }
 
-
+        // Continue button action
         binding.tvContinue.setOnClickListener {
             val inputDate = binding.tvBirthday.text.toString().takeIf { it.isNotBlank() }
-            val validationResult = inputDate?.let { it1 -> validateDate(it1) }
-            if (validationResult != null) {
-                if (!validationResult.isValid) {
-                    Toast.makeText(
-                        requireContext(),
-                        validationResult.errorMessage,
-                        Toast.LENGTH_SHORT
-                    )
-                        .show()
+            inputDate?.let {
+                val result = validateDate(it)
+                if (!result.isValid) {
+                    Toast.makeText(requireContext(), result.errorMessage, Toast.LENGTH_SHORT).show()
                     return@setOnClickListener
                 }
             }
 
-            val firstName = binding.edtHo.text.toString().takeIf { it.isNotBlank() }
-            val lastName = binding.edtTen.text.toString().takeIf { it.isNotBlank() }
-            val nickName = binding.edtNickname.text.toString().takeIf { it.isNotBlank() }
-            val gender = binding.actvGender.text.toString().takeIf { it.isNotBlank() }
-            val dateOfBirth = inputDate.toSendDate()
-
-            // Gọi updateProfile trong ViewModel
             viewModel.updateProfile(
-                firstName, lastName, nickName,
-                gender, dateOfBirth
+                binding.edtHo.text.toString().takeIf { it.isNotBlank() },
+                binding.edtTen.text.toString().takeIf { it.isNotBlank() },
+                binding.edtNickname.text.toString().takeIf { it.isNotBlank() },
+                binding.actvGender.text.toString().takeIf { it.isNotBlank() },
+                binding.tvBirthday.text.toString().toSendDate()
             )
         }
 
-        //chọn giới tính
-        // 1. Data
-        val genders = listOf("Nam", "Nữ", "Khác")
-
-        // 2. Adapter
-        val adapter = ArrayAdapter(
-            requireContext(),
-            R.layout.dropdown_gender,
-            genders
-        )
-        binding.actvGender.setAdapter(adapter)
-        binding.actvGender.threshold = 0
-
-        // 3. Show dropdown khi click icon
-        binding.tilGender.setEndIconOnClickListener {
-            binding.actvGender.showDropDown()
-        }
-
-        // 4. Đẩy text vào ô sau khi chọn
-        binding.actvGender.setOnItemClickListener { parent, _, position, _ ->
-            val selected = parent.getItemAtPosition(position) as String
-            binding.actvGender.setText(selected, false)
-        }
-
-        //skip button
+        // Skip
         binding.tvSkip.setOnClickListener {
-            val createPinFragment = CreatePinFragment()
             parentFragmentManager.beginTransaction()
                 .setCustomAnimations(
                     R.anim.slide_in_right,
@@ -187,28 +170,42 @@ class SetUpInformationFragment : Fragment() {
                     R.anim.slide_in_left,
                     R.anim.slide_out_right
                 )
-                .replace(R.id.fragmentStart, createPinFragment)
+                .replace(R.id.fragmentStart, CreatePinFragment())
                 .commit()
         }
 
-        //nut back
+        // Back
         binding.backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
 
-
+        // Initialize button state
+        updateContinueButtonState()
     }
 
+    /** Enable Continue only if at least one field is filled */
+    private fun updateContinueButtonState() {
+        val enable = binding.edtHo.text.isNotBlank() ||
+                binding.edtTen.text.isNotBlank() ||
+                binding.edtNickname.text.isNotBlank() ||
+                binding.actvGender.text.isNotBlank() ||
+                binding.tvBirthday.text.isNotBlank()
+        binding.tvContinue.isEnabled = enable
+        binding.tvContinue.setBackgroundResource(
+            if (enable) R.drawable.bg_enable_btn else R.drawable.bg_disable_btn
+        )
+    }
+
+    // Không thay đổi hàm validateDate
     private fun validateDate(dateString: String): ValidationResult {
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
+            inputFormat.isLenient = false
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             val inputDate =
                 inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày sinh không hợp lệ")
 
-            // Tính toán ngày giới hạn (200 năm trước)
             val calendar = Calendar.getInstance()
             calendar.timeZone = TimeZone.getTimeZone("UTC")
             val today = calendar.time
@@ -217,18 +214,12 @@ class SetUpInformationFragment : Fragment() {
             val minDate = calendar.time
 
             when {
-                inputDate.before(minDate) -> {
-                    ValidationResult(
-                        false,
-                        "Ngày sinh không hợp lệ"
-                    )
-                }
-
-                inputDate.after(today) -> {
+                inputDate.before(minDate) ->
                     ValidationResult(false, "Ngày sinh không hợp lệ")
-                }
-
-                else -> ValidationResult(true)
+                inputDate.after(today) ->
+                    ValidationResult(false, "Ngày sinh không hợp lệ")
+                else ->
+                    ValidationResult(true)
             }
         } catch (e: Exception) {
             ValidationResult(
@@ -238,6 +229,7 @@ class SetUpInformationFragment : Fragment() {
         }
     }
 
+    // Không thay đổi hàm toSendDate
     private fun String?.toSendDate(): String {
         if (this.isNullOrBlank()) return ""
         return try {
@@ -248,7 +240,7 @@ class SetUpInformationFragment : Fragment() {
             outputFormat.timeZone = TimeZone.getTimeZone("UTC")
             outputFormat.format(date)
         } catch (e: Exception) {
-            this
+            this ?: ""
         }
     }
 }

@@ -61,6 +61,7 @@ class MainActivity : AppCompatActivity() {
 
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
         SocketManager.connect(token ?: "")
+        Log.d("MainActivity", "Socket connected: ${SocketManager.isConnected()}")
         SocketManager.onNotificationReceived {}
         SocketManager.onNewPubKeyReceived { data ->
             val newPubKey = data.optString("public_key", "")

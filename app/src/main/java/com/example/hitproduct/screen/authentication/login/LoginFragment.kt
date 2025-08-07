@@ -21,7 +21,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
-import com.example.hitproduct.screen.authentication.verify_pin.VerifyPinFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
@@ -33,6 +32,7 @@ import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 import com.example.hitproduct.screen.authentication.forgot_method.find_acc.FindAccFragment
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.send_invite_code.SendInviteCodeFragment
+import com.example.hitproduct.screen.authentication.verify_pin.VerifyPinFragment
 import com.example.hitproduct.socket.SocketManager
 
 class LoginFragment : Fragment() {
@@ -123,6 +123,12 @@ class LoginFragment : Fragment() {
                             .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
                             .apply()
 
+                        SocketManager.sendCoupleId(coupleId)
+                        Log.d(
+                            "LoginFragment",
+                            "SocketManager sendCoupleId: $coupleId, isConnected: ${SocketManager.isConnected()}"
+                        )
+
                         val myLovePubKey = if (myUserId == idUserA) {
                             state.data.couple.userB.publicKey
                         } else {
@@ -137,6 +143,7 @@ class LoginFragment : Fragment() {
                         requireActivity().finish()
                     }
 
+                    viewModel.clearProfileState()
                 }
 
                 is UiState.Error -> {}
@@ -204,8 +211,9 @@ class LoginFragment : Fragment() {
                     prefs.edit()
                         .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
                         .apply()
-                    SocketManager.disconnect()
-                    SocketManager.connect(token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "") ?: "")
+//                    SocketManager.disconnect()
+                    SocketManager.connect(token)
+                    Log.d("LoginFragment", "Socket connected: ${SocketManager.isConnected()}")
                     viewModel.clearLoginState()
 
                     // Sau khi login thành công, check tiếp couple

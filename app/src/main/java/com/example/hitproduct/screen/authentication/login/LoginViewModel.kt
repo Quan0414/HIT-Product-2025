@@ -75,6 +75,10 @@ class LoginViewModel(
         }
     }
 
+    fun clearProfileState() {
+        _profileState.value = UiState.Idle
+    }
+
     fun getCoupleProfile() {
         _coupleProfile.value = UiState.Loading
         viewModelScope.launch {

@@ -24,6 +24,8 @@ import com.example.hitproduct.screen.dialog.profile_detail.DialogProfileDetail
 import com.example.hitproduct.screen.home_page.home.HomeViewModel
 import com.example.hitproduct.screen.home_page.home.HomeViewModelFactory
 import io.getstream.avatarview.glide.loadImage
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.math.abs
 
 
@@ -180,14 +182,41 @@ class CoupleFragment : BaseFragment<FragmentCoupleBinding>() {
     override fun initData() {
         viewModel.getCoupleProfile()
 
-        val statusText =
-            "Mọi khó khăn rồi cũng sẽ qua đi, như cơn mưa rào chạy nhanh qua cửa sổ. " +
-                    "Chỉ cần chúng ta cùng nhau vượt qua, thì mọi thứ sẽ ổn thôi."
+        val statuses = listOf(
+            "Tình yêu giống như một bản nhạc vĩ đại: khi hai trái tim cùng hòa nhịp, giai điệu của hạnh phúc sẽ vang vọng mãi trong tâm hồn.",
+            "Yêu không phải là tìm thấy người hoàn hảo, mà là học cách nhìn thấy sự hoàn hảo trong những khuyết điểm mà cả hai cùng chia sẻ.",
+            "Khi em nắm tay anh, dẫu cả thế giới có đổi thay, anh vẫn cảm nhận được một điểm tựa vững chắc để bước qua mọi bão giông.",
+            "Tình yêu là hành trình khám phá bản thân và người kia: mỗi ngày bên nhau, ta học cách yêu thương sâu hơn, kiên nhẫn hơn và bao dung hơn.",
+            "Chỉ cần hai trái tim đồng điệu, những khoảnh khắc giản đơn như ngắm hoàng hôn hay cùng pha một tách trà cũng trở thành kỷ niệm bất tận.",
+            "Yêu thương không bắt đầu từ những lời hoa mỹ, mà đến từ những cử chỉ nhỏ nhặt hàng ngày, khi ta luôn nhớ nâng niu và trân trọng nhau.",
+            "Tình yêu thật sự là khi ta nhìn vào mắt đối phương và thấy mình trong đó, như để biết rằng mình không còn cô đơn giữa cuộc đời rộng lớn.",
+            "Giữa bộn bề cuộc sống, tình yêu là nơi ta tìm về bình yên, nơi những tiếng cười và nụ hôn xua tan bao lo lắng bộn bề.",
+            "Khi những ngôn từ trở nên bất lực, chỉ cần sự hiện diện bên cạnh, một cái siết tay ấm áp, hai tâm hồn đã khẽ thì thầm lời yêu ngọt ngào.",
+            "Tình yêu chân thành không đo bằng thời gian bên nhau, mà đo bằng những khoảnh khắc ta cùng cố gắng, tha thứ và trưởng thành vì nhau."
+        )
 
+
+        val todayKey = LocalDate.now().format(DateTimeFormatter.BASIC_ISO_DATE) // ví dụ "20250808"
+        val prefs = requireContext().getSharedPreferences(
+            AuthPrefersConstants.DAILY_STATUS,
+            Context.MODE_PRIVATE
+        )
+        var index = prefs.getInt("index", -1)
+        val savedDate = prefs.getString("date", "")
+
+        if (index !in statuses.indices || savedDate != todayKey) {
+            index = statuses.indices.random()
+            prefs.edit()
+                .putInt("index", index)
+                .putString("date", todayKey)
+                .apply()
+        }
+
+        val statusText = statuses[index]
         binding.l2.tvStatus.apply {
             text = statusText
-            tag = statusText // Lưu text gốc vào tag
-//            tag = "Thời gian trôi nhanh như chó chạy ngoài đồng."
+//            tag = statusText // Lưu text gốc vào tag
+            tag = "Thời gian trôi nhanh như chó chạy ngoài đồng."
             onClickExpand {
                 val originalText = tag as String
                 DialogInloveStatus().apply {

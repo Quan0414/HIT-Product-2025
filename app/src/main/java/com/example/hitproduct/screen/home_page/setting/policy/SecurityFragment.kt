@@ -47,15 +47,15 @@ class SecurityFragment : BaseFragment<FragmentSecurityBinding>() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as? MainActivity)?.hideBottomNav()
-    }
-
-    override fun onPause() {
-        super.onPause()
-        (requireActivity() as? MainActivity)?.showBottomNav()
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        (requireActivity() as? MainActivity)?.hideBottomNav()
+//    }
+//
+//    override fun onPause() {
+//        super.onPause()
+//        (requireActivity() as? MainActivity)?.showBottomNav()
+//    }
 
     override fun inflateLayout(
         inflater: LayoutInflater,
