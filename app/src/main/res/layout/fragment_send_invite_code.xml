@@ -9,37 +9,6 @@
     android:clipToPadding="false"
     tools:context=".screen.authentication.login.LoginActivity">
 
-<!--    <net.orandja.shadowlayout.ShadowLayout-->
-<!--        android:id="@+id/shadow_btn_bg"-->
-<!--        android:layout_width="0dp"-->
-<!--        android:layout_height="0dp"-->
-<!--        android:background="@drawable/bg_rounded"-->
-<!--        app:layout_constraintBottom_toBottomOf="@+id/backIcon"-->
-<!--        app:layout_constraintEnd_toEndOf="@+id/backIcon"-->
-<!--        app:layout_constraintStart_toStartOf="@+id/backIcon"-->
-<!--        app:layout_constraintTop_toTopOf="@+id/backIcon"-->
-<!--        app:shadow_cast_only_background="true"-->
-<!--        app:shadow_color="#33FFC09C"-->
-<!--        app:shadow_radius="8"-->
-<!--        app:shadow_with_color="false"-->
-<!--        app:shadow_with_css_scale="true"-->
-<!--        app:shadow_with_dpi_scale="true"-->
-<!--        app:shadow_x_shift="2dp"-->
-<!--        app:shadow_y_shift="2dp">-->
-
-<!--    </net.orandja.shadowlayout.ShadowLayout>-->
-
-<!--    <ImageView-->
-<!--        android:id="@+id/backIcon"-->
-<!--        android:layout_width="40dp"-->
-<!--        android:layout_height="40dp"-->
-<!--        android:layout_marginTop="30dp"-->
-<!--        android:background="@drawable/ic_back_1"-->
-<!--        android:padding="10dp"-->
-<!--        android:src="@drawable/ic_arrow"-->
-<!--        app:layout_constraintStart_toStartOf="@+id/shadow_bg"-->
-<!--        app:layout_constraintTop_toTopOf="parent" />-->
-
     <net.orandja.shadowlayout.ShadowLayout
         android:id="@+id/shadow_bg"
         android:layout_width="0dp"
@@ -112,7 +81,7 @@
             android:textColor="@color/orange"
             android:textSize="16dp"
             android:drawablePadding="4dp"
-            app:drawableEndCompat="@drawable/ic_copy" />
+            app:drawableEndCompat="@drawable/ic_share" />
 
         <TextView
             android:layout_width="wrap_content"
@@ -172,8 +141,22 @@
                 android:src="@drawable/ic_no_request" />
 
         </LinearLayout>
-
-
     </LinearLayout>
+
+    <com.mikhaellopez.circularprogressbar.CircularProgressBar
+        android:id="@+id/loadingProgressBar"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_gravity="center"
+        android:visibility="gone"
+        app:cpb_background_progressbar_color="@android:color/transparent"
+        app:cpb_indeterminate_mode="true"
+        app:cpb_progressbar_color="@color/orange"
+        app:cpb_progressbar_width="6dp"
+        app:cpb_round_border="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

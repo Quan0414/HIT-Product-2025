@@ -3,28 +3,20 @@ package com.example.hitproduct.screen.authentication.register.set_up_infor
 import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
-import android.view.MotionEvent
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ArrayAdapter
-import android.widget.TextView
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
-import com.example.hitproduct.data.api.ApiService
 import com.example.hitproduct.data.api.NetworkClient
-import com.example.hitproduct.data.api.RetrofitClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
-import com.example.hitproduct.screen.authentication.login.LoginViewModel
-import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
-import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
+import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate.ValidationResult
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
@@ -72,34 +64,47 @@ class SetUpInformationFragment : Fragment() {
         viewModel.updateState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Error -> {
+                    binding.loadingProgressBar.visibility = View.GONE
+                    binding.tvContinue.isEnabled = true
                     val err = state.error
                     Toast.makeText(requireContext(), err.message, Toast.LENGTH_SHORT).show()
                 }
 
                 UiState.Idle -> {
-
                 }
 
                 UiState.Loading -> {
-
+                    binding.tvContinue.isEnabled = false
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     Toast.makeText(
                         requireContext(),
                         "Cập nhật thông tin thành công",
                         Toast.LENGTH_SHORT
                     ).show()
-                    // Chuyển đến SuccessCreateAccFragment
-                    val successCreateAccFragment = SuccessCreateAccFragment()
+
+                    val createPinFragment = CreatePinFragment().apply {
+                        arguments = Bundle().apply {
+                            putString("flow", "create-pin")
+                        }
+                    }
                     parentFragmentManager.beginTransaction()
-                        .replace(R.id.fragmentStart, successCreateAccFragment)
+                        .setCustomAnimations(
+                            R.anim.slide_in_right,
+                            R.anim.slide_out_left,
+                            R.anim.slide_in_left,
+                            R.anim.slide_out_right
+                        )
+                        .replace(R.id.fragmentStart, createPinFragment)
                         .commit()
                 }
             }
         }
 
-        binding.tvBirthday.setOnTouchListener { _, _ ->
+        binding.tvBirthday.setOnClickListener {
 
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
@@ -108,7 +113,7 @@ class SetUpInformationFragment : Fragment() {
             datePicker.show(childFragmentManager, "love_date_picker")
 
             datePicker.addOnPositiveButtonClickListener { selection: Long ->
-                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                val cal = Calendar.getInstance().apply {
                     timeInMillis = selection
                 }
                 val day = cal.get(Calendar.DAY_OF_MONTH)
@@ -117,8 +122,6 @@ class SetUpInformationFragment : Fragment() {
                 val formatted = String.format("%02d/%02d/%04d", day, month, year)
                 binding.tvBirthday.text = formatted
             }
-            return@setOnTouchListener true
-
         }
 
 
@@ -174,47 +177,17 @@ class SetUpInformationFragment : Fragment() {
             binding.actvGender.setText(selected, false)
         }
 
-
-        //ngày sinh
-        val editText = binding.tvBirthday
-
-//        editText.addTextChangedListener(object : TextWatcher {
-//            private var isUpdating = false
-//
-//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-//            override fun afterTextChanged(s: Editable) {}
-//
-//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-//                if (isUpdating) {
-//                    isUpdating = false
-//                    return
-//                }
-//
-//                // Lọc chỉ giữ chữ số
-//                val digits = s.toString().filter { it.isDigit() }
-//                val sb = StringBuilder()
-//
-//                for ((index, char) in digits.withIndex()) {
-//                    sb.append(char)
-//                    // chèn "/" sau 2 và 4 chữ số
-//                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
-//                        sb.append('/')
-//                    }
-//                    // giới hạn max dd/MM/yyyy = 10 ký tự
-//                    if (sb.length >= 10) break
-//                }
-//
-//                isUpdating = true
-//                editText.setText(sb)
-//            }
-//        })
-
-
         //skip button
         binding.tvSkip.setOnClickListener {
-            val successCreateAccFragment = SuccessCreateAccFragment()
+            val createPinFragment = CreatePinFragment()
             parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentStart, successCreateAccFragment)
+                .setCustomAnimations(
+                    R.anim.slide_in_right,
+                    R.anim.slide_out_left,
+                    R.anim.slide_in_left,
+                    R.anim.slide_out_right
+                )
+                .replace(R.id.fragmentStart, createPinFragment)
                 .commit()
         }
 
@@ -227,24 +200,13 @@ class SetUpInformationFragment : Fragment() {
     }
 
     private fun validateDate(dateString: String): ValidationResult {
-//        if (dateString.isBlank()) {
-//            return ValidationResult(
-//                false,
-//                "Ê ê! Nhập ngày đi bạn ơi,  bộ bạn không nhớ ngày bắt đầu yêu nhau hả :)))"
-//            )
-//        }
-
-//        if (dateString.length != 10) {
-//            return ValidationResult(false, "Vui lòng nhập đầy đủ ngày theo định dạng dd/MM/yyyy")
-//        }
-
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
             inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
             inputFormat.timeZone = TimeZone.getTimeZone("UTC")
 
             val inputDate =
-                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
+                inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày sinh không hợp lệ")
 
             // Tính toán ngày giới hạn (200 năm trước)
             val calendar = Calendar.getInstance()
@@ -258,12 +220,12 @@ class SetUpInformationFragment : Fragment() {
                 inputDate.before(minDate) -> {
                     ValidationResult(
                         false,
-                        "Ôi dồi ôi! Bạn sinh ra từ thời khủng long à? Chọn ngày gần đây hơn đi!"
+                        "Ngày sinh không hợp lệ"
                     )
                 }
 
                 inputDate.after(today) -> {
-                    ValidationResult(false, "Chưa đến ngày đó mà! Chọn lại đi bạn ơi~")
+                    ValidationResult(false, "Ngày sinh không hợp lệ")
                 }
 
                 else -> ValidationResult(true)
@@ -276,7 +238,7 @@ class SetUpInformationFragment : Fragment() {
         }
     }
 
-    fun String?.toSendDate(): String {
+    private fun String?.toSendDate(): String {
         if (this.isNullOrBlank()) return ""
         return try {
             val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())

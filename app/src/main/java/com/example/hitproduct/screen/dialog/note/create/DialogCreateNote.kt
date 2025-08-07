@@ -16,8 +16,9 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogCreateNoteBinding
-import com.example.hitproduct.screen.dialog.note.get.DialogNote
-import com.example.hitproduct.util.Constant
+import com.example.hitproduct.common.util.Constant
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import java.time.LocalDate
 
 class DialogCreateNote : DialogFragment() {
@@ -99,8 +100,19 @@ class DialogCreateNote : DialogFragment() {
                     ).show()
                     requireActivity().supportFragmentManager.setFragmentResult("refresh_notes", Bundle())
                     requireActivity().supportFragmentManager.setFragmentResult("dismiss_dialog_note", Bundle())
-
                     dismiss()
+
+                    val myLoveId = authRepo.getMyLoveId()
+                    val payload = mapOf(
+                        "type" to "note_added",
+                    )
+                    val tpl = NotificationConfig.getTemplate("note_added", payload)
+                    FcmClient.sendToTopic(
+                        receiverUserId = myLoveId,
+                        title = tpl.title,
+                        body = tpl.body,
+                        data = payload
+                    )
                 }
             }
         }

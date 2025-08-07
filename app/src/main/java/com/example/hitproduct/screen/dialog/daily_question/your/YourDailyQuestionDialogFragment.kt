@@ -105,6 +105,7 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                     viewModel.resetSaveQuestionState()
+                    dismiss()
                 }
             }
         }
@@ -129,6 +130,7 @@ class YourDailyQuestionDialogFragment : DialogFragment() {
                             "Cậu ấy chưa trả lời câu hỏi này!",
                             Toast.LENGTH_SHORT
                         ).show()
+                        viewModel.resetYourLoveAnswerState()
                         return@observe
                     }
                     val answer = state.data.partnerAnswer ?: "(Trống)"

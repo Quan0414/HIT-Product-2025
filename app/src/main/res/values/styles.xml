@@ -31,4 +31,9 @@
         <item name="android:textSize">12dp</item>
     </style>
 
+    <style name="ReadMoreTextStyle">
+        <item name="android:fontFamily">@font/f900</item>
+    </style>
+
+
 </resources>

@@ -2,27 +2,30 @@ package com.example.hitproduct
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.View
+import android.view.Window
 import android.widget.FrameLayout
 import android.widget.ImageView
+import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.ViewCompat
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.databinding.ActivityMainBinding
+import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.couple.CoupleFragment
 import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
-import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
 import com.example.hitproduct.socket.SocketManager
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
-
-    private val prefs by lazy {
-        getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
-    }
-    private lateinit var token: String
 
     // index 0..4 tương đương Message, Note, Home, Couple(Game), Setting
     private val fragments = listOf(
@@ -34,6 +37,9 @@ class MainActivity : AppCompatActivity() {
     )
     private var currentIndex = 2   // mặc định show Home
 
+    private val prefs by lazy {
+        getSharedPreferences(AuthPrefersConstants.PREFS_NAME, MODE_PRIVATE)
+    }
 
     var coin: Int = 0
     var question: String = ""
@@ -42,18 +48,26 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.hide(WindowInsetsCompat.Type.systemBars())
+        controller.systemBarsBehavior =
+            WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
-        SocketManager.connect(token)
-
-        // Hide nav-bar + status-bar, bật immersive sticky
-//        window.decorView.systemUiVisibility =
-//            View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
-//                    View.SYSTEM_UI_FLAG_FULLSCREEN or
-//                    View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-
+        val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
+        SocketManager.connect(token ?: "")
+        SocketManager.onNotificationReceived {}
+        SocketManager.onNewPubKeyReceived { data ->
+            val newPubKey = data.optString("public_key", "")
+            Log.d("MainActivity", "New pubkey receive: $newPubKey")
+            CryptoHelper.storePeerPublicKey(this, newPubKey)
+            CryptoHelper.deriveAndStoreSharedAesKey(this)
+        }
 
         // 1) Pre-add all fragments, hide trừ Home (index 2)
         supportFragmentManager.beginTransaction().apply {
@@ -67,35 +81,48 @@ class MainActivity : AppCompatActivity() {
             }
         }.commitNow()
 
-        // 2) Khởi tạo UI bottom nav
         setupBottomNav()
-
-        // 3) Sau cùng show tab Home overlay
         selectTab(currentIndex)
     }
 
+    override fun onWindowFocusChanged(hasFocus: Boolean) {
+        super.onWindowFocusChanged(hasFocus)
+        if (hasFocus) hideSystemBars(window)
+    }
+
+//    override fun onBackPressed() {
+//        if (currentIndex != 2) {
+//            selectTab(2)
+//        } else {
+//            super.onBackPressed()
+//        }
+//    }
+
+    private fun hideSystemBars(window: Window) {
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+        WindowCompat.getInsetsController(window, window.decorView).apply {
+            hide(WindowInsetsCompat.Type.systemBars())
+            systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+        window.decorView.systemUiVisibility = (
+                View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+                        or View.SYSTEM_UI_FLAG_FULLSCREEN
+                        or View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        or View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                )
+    }
+
     private fun setupBottomNav() {
-        // lấy các default icon và overlay container
-        val defaults = listOf<ImageView>(
+        val defaults = listOf(
             binding.ivMessageDefault,
             binding.ivNoteDefault,
             binding.ivHomeDefault,
             binding.ivCoupleDefault,
             binding.ivSettingDefault
         )
-        val overlays = listOf<FrameLayout>(
-            binding.flMessageOverlay,
-            binding.flNoteOverlay,
-            binding.flHomeOverlay,
-            binding.flCoupleOverlay,
-            binding.flSettingOverlay
-        )
-
-        // gắn click cho từng default icon
         defaults.forEachIndexed { idx, iv ->
-            iv.setOnClickListener {
-                selectTab(idx)
-            }
+            iv.setOnClickListener { selectTab(idx) }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.hitproduct.screen.authentication.forgot_method.find_acc
 
+import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.SpannableString
@@ -11,17 +12,36 @@ import android.text.style.ClickableSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
+import androidx.lifecycle.lifecycleScope
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
+import com.example.hitproduct.base.DataResult
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentFindAccBinding
 import com.example.hitproduct.screen.authentication.register.main.RegisterFragment
 import com.example.hitproduct.screen.authentication.verify_code.VerifyCodeFragment
+import kotlinx.coroutines.launch
 
 
 class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
 
-    // Khai báo ở lớp để các initXxx đều dùng được
+    private val prefs by lazy {
+        requireContext()
+            .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val authRepo by lazy {
+        AuthRepository(
+            NetworkClient.provideApiService(requireContext()),
+            prefs
+        )
+    }
+
     private lateinit var spannableString: SpannableString
     private lateinit var clickableSpan: ClickableSpan
 
@@ -36,6 +56,12 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
             override fun onClick(widget: View) {
 
                 parentFragmentManager.beginTransaction()
+                    .setCustomAnimations(
+                        R.anim.slide_in_right,
+                        R.anim.slide_out_left,
+                        R.anim.slide_in_left,
+                        R.anim.slide_out_right
+                    )
                     .replace(R.id.fragmentStart, RegisterFragment().apply {
                         arguments = Bundle().apply { putString("flow", "register") }
                     })
@@ -46,7 +72,7 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
             override fun updateDrawState(ds: TextPaint) {
                 super.updateDrawState(ds)
                 ds.color = ContextCompat.getColor(requireContext(), R.color.orange)
-                ds.isUnderlineText = false   // tắt gạch chân nếu không muốn
+                ds.isUnderlineText = false
             }
         }
 
@@ -61,15 +87,12 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
     }
 
     override fun initListener() {
-
         binding.backIcon.setOnClickListener {
             parentFragmentManager.popBackStack()
         }
 
         setUpListeners()
         updateFindAccButtonState()
-
-
     }
 
 
@@ -125,17 +148,41 @@ class FindAccFragment : BaseFragment<FragmentFindAccBinding>() {
 
         //chuyen qua verify code
         binding.tvFindAcc.setOnClickListener {
-            val userEmail = binding.edtEmail.text.toString().trim()
-            val fragment = VerifyCodeFragment().apply {
-                arguments = Bundle().apply {
-                    putString("email", userEmail)
-                    putString("flow", "forgot-password")
+            val email = binding.edtEmail.text.toString().trim()
+            binding.loadingProgressBar.visibility = View.VISIBLE
+            binding.tvFindAcc.isEnabled = false
+
+            lifecycleScope.launch {
+                when (val res = authRepo.findAccount(email)) {
+                    is DataResult.Error -> {
+                        binding.loadingProgressBar.visibility = View.GONE
+                        binding.tvFindAcc.isEnabled = true
+                        Toast.makeText(
+                            requireContext(),
+                            res.error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    is DataResult.Success -> {
+                        binding.loadingProgressBar.visibility = View.GONE
+                        binding.tvFindAcc.isEnabled = true
+                        val verifyCodeFragment = VerifyCodeFragment().apply {
+                            arguments = bundleOf("email" to email, "flow" to "forgot-password")
+                        }
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left,
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right
+                            )
+                            .replace(R.id.fragmentStart, verifyCodeFragment)
+                            .addToBackStack("FindAcc")
+                            .commit()
+                    }
                 }
             }
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentStart, fragment)
-                .addToBackStack("EnterEmail")
-                .commit()
         }
 
     }

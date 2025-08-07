@@ -15,10 +15,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import com.example.hitproduct.MainActivity
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogShopBinding
+import com.example.hitproduct.screen.adapter.ShopAdapter
 import com.example.hitproduct.screen.dialog.food_detail.FoodDetailDialogFragment
 
 
@@ -127,6 +130,18 @@ class ShopDialogFragment : DialogFragment() {
                     ).show()
                     viewModel.clearFeedPetState()
                     dismiss()
+
+                    val myLoveId = authRepo.getMyLoveId()
+                    val payload = mapOf(
+                        "type" to "pet_fed",
+                    )
+                    val tpl = NotificationConfig.getTemplate("pet_fed", payload)
+                    FcmClient.sendToTopic(
+                        receiverUserId = myLoveId,
+                        title = tpl.title,
+                        body = tpl.body,
+                        data = payload
+                    )
                 }
             }
         }

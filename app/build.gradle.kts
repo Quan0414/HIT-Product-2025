@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.google.gms.google.services)
 }
 
 android {
@@ -37,6 +38,10 @@ android {
     buildFeatures {
         viewBinding = true
     }
+
+    packagingOptions {
+        exclude("META-INF/DEPENDENCIES")
+    }
 }
 
 dependencies {
@@ -46,40 +51,55 @@ dependencies {
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
+    implementation(libs.firebase.messaging)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
 
+    implementation(platform("com.google.firebase:firebase-bom:32.5.0"))
+    implementation("com.google.firebase:firebase-analytics-ktx")
+    implementation("com.google.firebase:firebase-messaging-ktx")
+    implementation("com.google.firebase:firebase-config-ktx")
+
+    // Google OAuth2 helper library
+    implementation("com.google.auth:google-auth-library-oauth2-http:1.19.0")
+    // (tùy chọn) JSON parser cho Google HTTP client
+    implementation("com.google.http-client:google-http-client-jackson2:1.40.0")
+    // OkHttp để gọi HTTP
+    implementation("com.squareup.okhttp3:okhttp:4.10.0")
+    // JSON
+    implementation("com.squareup.moshi:moshi:1.14.0")
+    implementation("com.squareup.moshi:moshi-kotlin:1.14.0")
 
     //auto resize
-    implementation ("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
+    implementation("com.github.JessYanCoding:AndroidAutoSize:v1.2.1")
 
-    implementation ("com.github.bumptech.glide:glide:4.16.0")
+    implementation("com.github.bumptech.glide:glide:4.16.0")
 
     //retrofit
     implementation("com.squareup.retrofit2:retrofit:2.9.0")
     // https://mvnrepository.com/artifact/com.google.code.gson/gson
     implementation("com.google.code.gson:gson:2.10.1")
-    implementation ("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 
     implementation("net.orandja.shadowlayout:shadowlayout:1.0.1")
 
     // Lifecycle ViewModel + LiveData
     val lifecycle_version = "2.8.7"
-    implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
-    implementation ("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
-    implementation ("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycle_version")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version")
 
     val navigation_version = "2.5.3"
-    implementation ("androidx.navigation:navigation-fragment:${navigation_version}")
-    implementation ("androidx.navigation:navigation-ui:${navigation_version}")
-    implementation ("androidx.navigation:navigation-fragment-ktx:${navigation_version}")
-    implementation ("androidx.navigation:navigation-ui-ktx:${navigation_version}")
+    implementation("androidx.navigation:navigation-fragment:${navigation_version}")
+    implementation("androidx.navigation:navigation-ui:${navigation_version}")
+    implementation("androidx.navigation:navigation-fragment-ktx:${navigation_version}")
+    implementation("androidx.navigation:navigation-ui-ktx:${navigation_version}")
 
-    implementation ("com.squareup.okhttp3:logging-interceptor:4.9.2")
+    implementation("com.squareup.okhttp3:logging-interceptor:4.9.2")
 
     //lottie
-    implementation ("com.airbnb.android:lottie:5.2.0")
+    implementation("com.airbnb.android:lottie:5.2.0")
 
     //socket io
     implementation("io.socket:socket.io-client:2.1.1") {
@@ -90,22 +110,34 @@ dependencies {
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.9")
 
     implementation("com.google.android.material:material:1.12.0")
-    implementation ("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")
 
 
     //avatar
-    implementation ("de.hdodenhof:circleimageview:3.1.0")
-    implementation ("io.getstream:avatarview-glide:1.0.7")
+    implementation("de.hdodenhof:circleimageview:3.1.0")
+    implementation("io.getstream:avatarview-glide:1.0.7")
 
-    implementation ("com.github.Kwasow:BottomNavigationCircles-Android:1.2")
+    implementation("com.github.Kwasow:BottomNavigationCircles-Android:1.2")
 
-    implementation ("nl.joery.animatedbottombar:library:1.1.0")
+    implementation("nl.joery.animatedbottombar:library:1.1.0")
 
-    implementation ("com.mikhaellopez:circularprogressbar:3.1.0")
+    implementation("com.mikhaellopez:circularprogressbar:3.1.0")
 
     implementation("com.github.kizitonwose:CalendarView:2.2.0")
 
-    implementation ("com.github.zyyoona7.WheelPicker:wheelview:2.0.7")
-    implementation ("com.google.android.material:material:1.10.0")
+    implementation("com.github.zyyoona7.WheelPicker:wheelview:2.0.7")
+    implementation("com.google.android.material:material:1.10.0")
+
+    implementation("com.github.eriffanani:TextViewReadMore:4.1.0")
+
+    // DotsIndicator
+    implementation("com.tbuonomo:dotsindicator:5.1.0")
+
+    implementation("com.vanniktech:emoji-google:0.21.0")
+    implementation("com.vanniktech:emoji-material:0.21.0")
+
+    implementation("com.cloudinary:cloudinary-android:3.0.2")
+
+    implementation("androidx.security:security-crypto:1.1.0-alpha07")
 
 }

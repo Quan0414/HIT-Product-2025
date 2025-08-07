@@ -4,9 +4,6 @@ import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
-import android.text.Editable
-import android.text.TextWatcher
-import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -16,10 +13,11 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogStartDateBinding
-import com.example.hitproduct.socket.SocketManager
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
 import java.util.Calendar
@@ -79,46 +77,9 @@ class DialogStartDate : DialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
-        SocketManager.connect(token)
-
-        registerSocketListeners()
-
         val editText = binding.etStartDate
-//        editText.addTextChangedListener(object : TextWatcher {
-//            private var isUpdating = false
-//
-//            override fun beforeTextChanged(s: CharSequence, start: Int, count: Int, after: Int) {}
-//            override fun afterTextChanged(s: Editable) {}
-//
-//            override fun onTextChanged(s: CharSequence, start: Int, before: Int, count: Int) {
-//                if (isUpdating) {
-//                    isUpdating = false
-//                    return
-//                }
-//
-//                // Lọc chỉ giữ chữ số
-//                val digits = s.toString().filter { it.isDigit() }
-//                val sb = StringBuilder()
-//
-//                for ((index, char) in digits.withIndex()) {
-//                    sb.append(char)
-//                    // chèn "/" sau 2 và 4 chữ số
-//                    if ((index == 1 || index == 3) && index != digits.lastIndex) {
-//                        sb.append('/')
-//                    }
-//                    // giới hạn max dd/MM/yyyy = 10 ký tự
-//                    if (sb.length >= 10) break
-//                }
-//
-//                isUpdating = true
-//                editText.setText(sb.toString())
-//                editText.setSelection(sb.length)
-//                isUpdating = false
-//            }
-//        })
 
-        binding.btnArrowDown.setOnClickListener{
+        binding.btnArrowDown.setOnClickListener {
             val datePicker = MaterialDatePicker.Builder.datePicker()
                 .setTitleText("Ngày Bắt Đầu Tình Yêu")
                 .setSelection(MaterialDatePicker.todayInUtcMilliseconds())
@@ -127,12 +88,12 @@ class DialogStartDate : DialogFragment() {
             datePicker.show(childFragmentManager, "love_date_picker")
 
             datePicker.addOnPositiveButtonClickListener { selection: Long ->
-                val cal = Calendar.getInstance(TimeZone.getTimeZone("UTC")).apply {
+                val cal = Calendar.getInstance(TimeZone.getDefault()).apply {
                     timeInMillis = selection
                 }
-                val day   = cal.get(Calendar.DAY_OF_MONTH)
+                val day = cal.get(Calendar.DAY_OF_MONTH)
                 val month = cal.get(Calendar.MONTH) + 1
-                val year  = cal.get(Calendar.YEAR)
+                val year = cal.get(Calendar.YEAR)
                 val formatted = String.format("%02d/%02d/%04d", day, month, year)
                 binding.etStartDate.text = formatted
             }
@@ -176,8 +137,27 @@ class DialogStartDate : DialogFragment() {
                     ).show()
                     dismiss()
                     parentFragmentManager.setFragmentResult("update_start_date", Bundle())
+
+                    val myLoveId = authRepo.getMyLoveId()
+                    val chosenDate = binding.etStartDate.text.toString()
+                    val payload = mapOf(
+                        "type" to "start_date_selected",
+                        "startDate" to chosenDate
+                    )
+                    val tpl = NotificationConfig.getTemplate("start_date_selected", payload)
+                    FcmClient.sendToTopic(
+                        receiverUserId = myLoveId,
+                        title = tpl.title,
+                        body = tpl.body,
+                        data = payload
+                    )
                 }
             }
+        }
+
+        viewModel.dismissDialog.observe(viewLifecycleOwner) {
+            dismiss()
+            parentFragmentManager.setFragmentResult("update_start_date", Bundle())
         }
     }
 
@@ -199,16 +179,16 @@ class DialogStartDate : DialogFragment() {
 //        }
 
         return try {
-            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            inputFormat.isLenient = false // Không cho phép ngày không hợp lệ như 32/13/2023
-            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault()).apply {
+                timeZone = TimeZone.getDefault()
+                isLenient = false
+            }
 
             val inputDate =
                 inputFormat.parse(dateString) ?: return ValidationResult(false, "Ngày không hợp lệ")
 
             // Tính toán ngày giới hạn (200 năm trước)
             val calendar = Calendar.getInstance()
-            calendar.timeZone = TimeZone.getTimeZone("UTC")
             val today = calendar.time
 
             calendar.add(Calendar.YEAR, -200)
@@ -241,23 +221,11 @@ class DialogStartDate : DialogFragment() {
         _binding = null
     }
 
-    fun String?.toSendDate(): String {
-        if (this.isNullOrBlank()) return ""
-        return try {
-            val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
-            inputFormat.timeZone = TimeZone.getTimeZone("UTC")
-            val date = inputFormat.parse(this) ?: return ""
-            val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
-            outputFormat.timeZone = TimeZone.getTimeZone("UTC")
-            outputFormat.format(date)
-        } catch (e: Exception) {
-            this
-        }
-    }
-
-    private fun registerSocketListeners() {
-        SocketManager.onCheckStartDate {
-            dismiss()
-        }
+    private fun String?.toSendDate(): String {
+        if (isNullOrBlank()) return ""
+        val inputFormat = SimpleDateFormat("dd/MM/yyyy", Locale.getDefault())
+        val date = inputFormat.parse(this) ?: return ""
+        val outputFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+        return outputFormat.format(date)
     }
 }

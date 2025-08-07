@@ -16,10 +16,11 @@
     <color name="nav_text_inactive">#A5623D</color>
     <color name="nav_icon_active">#FFFFFF</color>
     <color name="nav_icon_inactive">#A5623D</color>
+    <color name="orange_dialog">#FFEADD</color>
 
 <!--    progressbar-->
-    <color name="status1">#DA9973</color>
-    <color name="status2">#F25F5F</color>
+    <color name="status1">#F25F5F</color>
+    <color name="status2">#DA9973</color>
     <color name="status3">#F0E76F</color>
     <color name="status4">#82DA73</color>
 </resources>

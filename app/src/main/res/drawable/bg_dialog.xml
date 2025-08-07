@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Viền cam ngoài -->
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="@color/orange_dialog" />
+            <stroke
+                android:width="2dp"
+                android:color="@color/borderBrown" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+    <!-- Nền trắng bên trong, inset 2dp để hiện viền -->
+    <item
+        android:bottom="20dp"
+        android:left="2dp"
+        android:right="2dp"
+        android:top="2dp">
+        <shape android:shape="rectangle">
+            <solid android:color="@android:color/white" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+
+</layer-list>

@@ -2,8 +2,6 @@ package com.example.hitproduct.screen.authentication.send_invite_code
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.ClipData
-import android.content.ClipboardManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.Color
@@ -29,13 +27,16 @@ import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.invite.InviteItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSendInviteCodeBinding
+import com.example.hitproduct.screen.adapter.InviteAdapter
 import com.example.hitproduct.screen.authentication.login.LoginViewModel
 import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
-import com.example.hitproduct.screen.authentication.send_invite_code.adapter.InviteAdapter
 import com.example.hitproduct.socket.SocketManager
 
 class SendInviteCodeFragment : Fragment() {
@@ -108,7 +109,9 @@ class SendInviteCodeFragment : Fragment() {
 
         // 2. Fetch initial list từ API
         viewModel.checkInvite()
-        viewModel2.checkCouple()
+        viewModel2.checkProfile()
+        registerSocketListeners()
+
 
         viewModel.inviteResult.observe(viewLifecycleOwner) { result ->
             if (result is DataResult.Success) {
@@ -134,12 +137,17 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
-        viewModel2.coupleState.observe(viewLifecycleOwner) { result ->
+        viewModel2.profileState.observe(viewLifecycleOwner) { result ->
             when (result) {
                 is UiState.Error -> {}
                 UiState.Idle -> {}
                 UiState.Loading -> {}
                 is UiState.Success -> {
+                    val myUserId = result.data.id
+                    prefs.edit()
+                        .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
+                        .apply()
+
                     // Cập nhật mã mời
                     val coupleCode = result.data.coupleCode
                     binding.tvInviteCode.text = coupleCode
@@ -147,7 +155,24 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
-        registerSocketListeners()
+        viewModel2.coupleProfile.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Error -> {}
+                UiState.Idle -> {}
+                UiState.Loading -> {}
+                is UiState.Success -> {
+                    Log.d("SendInvite", "Couple profile loaded: ${state.data}")
+                    val myLovePubKey = state.data.myLovePubKey
+                    Log.d("SendInvite", "My love public key: $myLovePubKey")
+                    if (myLovePubKey != null) {
+                        CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
+                        CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
+                        val key = CryptoHelper.getSharedAesKey(requireContext())
+                        Log.d("SendInvite", "Shared AES key: $key")
+                    }
+                }
+            }
+        }
 
         requireActivity().onBackPressedDispatcher.addCallback(
             viewLifecycleOwner,
@@ -199,6 +224,28 @@ class SendInviteCodeFragment : Fragment() {
 //        }
 //    }
 
+//    @SuppressLint("ClickableViewAccessibility")
+//    private fun setupCopyInviteCode() {
+//        binding.tvInviteCode.setOnTouchListener { _, event ->
+//            if (event.action == MotionEvent.ACTION_UP) {
+//                val drawableEnd = binding.tvInviteCode.compoundDrawablesRelative[2]
+//                    ?: return@setOnTouchListener false
+//                if (event.x >= binding.tvInviteCode.width
+//                    - binding.tvInviteCode.paddingEnd
+//                    - drawableEnd.bounds.width()
+//                ) {
+//                    val code = binding.tvInviteCode.text.toString()
+//                    val cm =
+//                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
+//                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
+//                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
+//                    return@setOnTouchListener true
+//                }
+//            }
+//            false
+//        }
+//    }
+
     @SuppressLint("ClickableViewAccessibility")
     private fun setupCopyInviteCode() {
         binding.tvInviteCode.setOnTouchListener { _, event ->
@@ -209,12 +256,14 @@ class SendInviteCodeFragment : Fragment() {
                     - binding.tvInviteCode.paddingEnd
                     - drawableEnd.bounds.width()
                 ) {
-                    val code = binding.tvInviteCode.text.toString()
-                    val cm =
-                        requireContext().getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
-                    cm.setPrimaryClip(ClipData.newPlainText("invite_code", code))
-                    Toast.makeText(requireContext(), "Copied: $code", Toast.LENGTH_SHORT).show()
-                    return@setOnTouchListener true
+                    val textToShare = binding.tvInviteCode.text.toString().trim()
+
+                    val shareIntent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_TEXT, textToShare)
+                    }
+
+                    startActivity(Intent.createChooser(shareIntent, null))
                 }
             }
             false
@@ -243,7 +292,7 @@ class SendInviteCodeFragment : Fragment() {
         super.onDestroyView()
         _binding = null
         inviteDialog?.dismiss()
-        SocketManager.disconnect()
+//        SocketManager.disconnect()
     }
 
     private fun showInviteDialog() {
@@ -282,6 +331,7 @@ class SendInviteCodeFragment : Fragment() {
         SocketManager.onError { message ->
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+//                Log.e("SendInvite", "Socket error: $message")
             }
         }
         SocketManager.onRequestSent { data ->
@@ -305,6 +355,18 @@ class SendInviteCodeFragment : Fragment() {
                 if (inviteDialog?.isShowing != true) {
                     showInviteDialog()
                 }
+
+                // Gửi thông báo đến người nhận
+                val payload = mapOf(
+                    "type" to "pair_request"
+                )
+                val tpl = NotificationConfig.getTemplate("pair_request", payload)
+                FcmClient.sendToTopic(
+                    receiverUserId = receiverId,
+                    title = tpl.title,
+                    body = tpl.body,
+                    data = payload
+                )
             }
         }
 
@@ -357,7 +419,7 @@ class SendInviteCodeFragment : Fragment() {
             }
         }
 
-        //A gui B, B chap nhan → remove Received, go HomeActivity
+        //A gui B, B chap nhan → remove Received
         SocketManager.onAccepted {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(
@@ -369,12 +431,10 @@ class SendInviteCodeFragment : Fragment() {
                 // Xoá khỏi danh sách Received
                 currentItems.removeAll { it is InviteItem.Received }
                 refreshDialog()
-
-                goHomeActivity()
             }
         }
 
-        // B nhận được A chấp nhận → remove Sent, go HomeActivity
+        // B nhận được A chấp nhận → remove Sent
         SocketManager.onTheyAccept {
             Handler(Looper.getMainLooper()).post {
                 Toast.makeText(
@@ -386,8 +446,37 @@ class SendInviteCodeFragment : Fragment() {
                 // Xoá khỏi danh sách Sent
                 currentItems.removeAll { it is InviteItem.Sent }
                 refreshDialog()
+            }
+        }
 
+        SocketManager.onListenCouple { data ->
+            Log.d("SendInvite", "Received couple data: $data")
+            Handler(Looper.getMainLooper()).post {
+                val roomId = data.optString("roomChatId")
+                val myUserId = data.optString("myUserId")
+                val myLoveId = data.optString("myLoveId")
+                val coupleId = data.optString("coupleId")
+                prefs.edit()
+                    .putString(AuthPrefersConstants.ID_ROOM_CHAT, roomId)
+                    .putString(AuthPrefersConstants.MY_USER_ID, myUserId)
+                    .putString(AuthPrefersConstants.MY_LOVE_ID, myLoveId)
+                    .putString(AuthPrefersConstants.COUPLE_ID, coupleId)
+                    .apply()
+
+                val payload = mapOf(
+                    "type" to "pair_request",
+                )
+                val tpl = NotificationConfig.getTemplate("pair_success", payload)
+                FcmClient.sendToTopic(
+                    receiverUserId = myLoveId,
+                    title = tpl.title,
+                    body = tpl.body,
+                    data = payload
+                )
+
+                viewModel2.getCoupleProfile()
                 goHomeActivity()
+
             }
         }
 

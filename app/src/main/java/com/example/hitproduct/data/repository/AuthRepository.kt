@@ -5,12 +5,18 @@ import com.example.hitproduct.base.BaseRepository
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.data.api.ApiService
+import com.example.hitproduct.data.model.auth.request.ChangePasswordRequest
+import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.auth.request.ResestPasswordRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.auth.response.VerifyCodeResponse
 import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
 import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
 import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
@@ -26,6 +32,9 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
+import com.example.hitproduct.data.model.message.ChatItem
+import com.example.hitproduct.data.model.mission.MissionResponse
+import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.Pet
@@ -33,6 +42,7 @@ import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
+import java.security.PrivateKey
 
 class AuthRepository(
     private val api: ApiService,
@@ -67,6 +77,15 @@ class AuthRepository(
         }
     }
 
+    suspend fun findAccount(
+        email: String
+    ): DataResult<ApiResponse<FindAccResponse>> {
+        return when (val result = getResult { api.findAcc(FindAccRequest(email)) }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
     suspend fun sendOtp(email: String): DataResult<String> {
         val result = getResult { api.sendOtp(SendOtpRequest(email)) }
         return when (result) {
@@ -94,6 +113,44 @@ class AuthRepository(
                 DataResult.Success(token)    // <-- phải return token
             }
 
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun verifyCode2(
+        otp: String,
+        email: String,
+        type: String
+    ): DataResult<String> {
+        return when (val result = getResult {
+            api.verifyCode2(VerifyCodeRequest(otp, email, type))
+        }) {
+            is DataResult.Success -> {
+                val token = result.data.data.token
+//                if (type == "forgot-password") {
+//                    prefs.edit()
+//                        .putString(AuthPrefersConstants.ACCESS_TOKEN, token)
+//                        .apply()
+//                }
+                DataResult.Success(token)
+            }
+
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun resetPassword(
+        email: String,
+        newPassword: String,
+        repeatNewPassword: String,
+        token: String
+    ): DataResult<ApiResponse<String>> {
+        return when (val result = getResult {
+            api.resetPassword(
+                ResestPasswordRequest(email, newPassword, repeatNewPassword, token)
+            )
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }
@@ -140,6 +197,19 @@ class AuthRepository(
             is DataResult.Success ->
                 DataResult.Success(result.data.data)
 
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun changePassword(
+        oldPassword: String,
+        newPassword: String,
+        repeatNewPassword: String
+    ): DataResult<ApiResponse<String>> {
+        return when (val result = getResult {
+            api.changePassword(ChangePasswordRequest(oldPassword, newPassword, repeatNewPassword))
+        }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }
@@ -279,6 +349,85 @@ class AuthRepository(
         }
     }
 
+    suspend fun getNotification(): DataResult<ApiResponse<NotificationResponse>> {
+        return when (val result = getResult { api.getNotifications() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getMissions(): DataResult<ApiResponse<MissionResponse>> {
+        return when (val result = getResult { api.getMissions() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
+            is DataResult.Error -> result
+        }
+    }
+
+
+    companion object {
+        private const val PAGE_SIZE = 20
+    }
+
+    /**
+     * Trả về danh sách ChatItem đã biết fromMe
+     */
+    suspend fun getMessages(
+        roomChatId: String,
+        before: String? = null
+    ): DataResult<List<ChatItem>> {
+        return when (val result = getResult {
+            api.getMessages(roomChatId, PAGE_SIZE, before)
+        }) {
+            is DataResult.Success -> {
+                val resp = result.data.data
+                val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+
+                val items = resp.messages.map { dto ->
+                    // dto.senderId bây giờ là SenderDto, không phải String
+                    val sender = dto.senderId
+                    val fromMe = sender.id == myUserId
+                    val avatarUrl = if (!fromMe) sender.avatar else null
+
+                    if (dto.images.isNotEmpty()) {
+                        ChatItem.ImageMessage(
+                            id = dto.id,
+                            senderId = sender.id,
+                            imageUrl = dto.images.first(),
+                            sentAt = dto.sentAt,
+                            fromMe = fromMe,
+                            avatarUrl = avatarUrl ?: "",
+                        )
+                    } else {
+                        ChatItem.TextMessage(
+                            id = dto.id,
+                            senderId = sender.id,
+                            text = dto.content,
+                            sentAt = dto.sentAt,
+                            fromMe = fromMe,
+                            avatarUrl = avatarUrl ?: "",
+                        )
+                    }
+                }
+
+                DataResult.Success(items)
+            }
+
+            is DataResult.Error -> result
+        }
+    }
+
+
+    suspend fun sendPublicKey(
+        publicKey: String,
+        privateKey: String
+    ): DataResult<String> {
+        return when (val result =
+            getResult { api.sendPublicKey(SendPublicKeyRequest(publicKey, privateKey)) }) {
+            is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
+        }
+    }
+
 
     /**
      * Lấy token đã lưu (hoặc null nếu chưa lưu)
@@ -294,5 +443,11 @@ class AuthRepository(
             .remove(AuthPrefersConstants.ACCESS_TOKEN)
             .apply()
     }
+
+    fun getMyUserId(): String =
+        prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+
+    fun getMyLoveId(): String =
+        prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
 
 }

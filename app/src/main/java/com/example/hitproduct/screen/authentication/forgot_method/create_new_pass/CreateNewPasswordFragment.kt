@@ -1,19 +1,50 @@
 package com.example.hitproduct.screen.authentication.forgot_method.create_new_pass
 
+import android.content.Context
+import android.content.Intent
+import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.text.method.PasswordTransformationMethod
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.lifecycle.lifecycleScope
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
+import com.example.hitproduct.base.DataResult
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.data.api.NetworkClient
+import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentCreateNewPasswordBinding
+import com.example.hitproduct.screen.authentication.login.LoginActivity
 import com.example.hitproduct.screen.authentication.register.success.SuccessCreateAccFragment
+import kotlinx.coroutines.launch
 
 
 class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>() {
 
+    private val prefs by lazy {
+        requireContext()
+            .getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
+    }
+
+    private val authRepo by lazy {
+        AuthRepository(
+            NetworkClient.provideApiService(requireContext()),
+            prefs
+        )
+    }
+
+    private val email by lazy {
+        arguments?.getString("email")
+            ?: throw IllegalArgumentException("Email argument is required")
+    }
+    private val token by lazy {
+        arguments?.getString("token")
+            ?: throw IllegalArgumentException("Token argument is required")
+    }
 
     override fun initView() {
 
@@ -26,8 +57,13 @@ class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>
 
 
         binding.backIcon.setOnClickListener {
-            parentFragmentManager.popBackStack()
+            val intent = Intent(requireContext(), LoginActivity::class.java).apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
+            startActivity(intent)
+            requireActivity().finish()
         }
+
 
 
     }
@@ -84,16 +120,6 @@ class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>
 
             override fun afterTextChanged(s: Editable?) {
                 updateCreateNewPasswordButtonState()
-
-                val pwd1 = binding.edtPassword1.text.toString().trim()
-                val pwd2 = binding.edtPassword2.text.toString().trim()
-
-                // Hiển thị error real-time
-                if (pwd1.isNotEmpty() && pwd2.isNotEmpty() && pwd1 != pwd2) {
-                    binding.edtPassword2.error = "Mật khẩu không khớp"
-                } else {
-                    binding.edtPassword2.error = null
-                }
             }
 
         }
@@ -112,9 +138,50 @@ class CreateNewPasswordFragment : BaseFragment<FragmentCreateNewPasswordBinding>
                 return@setOnClickListener
             }
 
-            parentFragmentManager.beginTransaction()
-                .replace(R.id.fragmentStart, SuccessCreateAccFragment())
-                .commit()
+            if (pwd1.length < 6) {
+                Toast.makeText(requireContext(), "Mật khẩu phải có ít nhất 6 ký tự", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            binding.loadingProgressBar.visibility = View.VISIBLE
+            lifecycleScope.launch {
+                when (val res = authRepo.resetPassword(email, pwd1, pwd2, token)) {
+                    is DataResult.Error -> {
+                        binding.loadingProgressBar.visibility = View.GONE
+
+                        Toast.makeText(
+                            requireContext(),
+                            res.error.message,
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+
+                    is DataResult.Success -> {
+                        binding.loadingProgressBar.visibility = View.GONE
+
+                        Toast.makeText(
+                            requireContext(),
+                            "Đặt lại mật khẩu thành công",
+                            Toast.LENGTH_SHORT
+                        ).show()
+
+                        val successCreateAccFragment = SuccessCreateAccFragment().apply {
+                            arguments = Bundle().apply {
+                                putString("flow", "forgot-password")
+                            }
+                        }
+                        parentFragmentManager.beginTransaction()
+                            .setCustomAnimations(
+                                R.anim.slide_in_right,
+                                R.anim.slide_out_left,
+                                R.anim.slide_in_left,
+                                R.anim.slide_out_right
+                            )
+                            .replace(R.id.fragmentStart, successCreateAccFragment)
+                            .commit()
+                    }
+                }
+            }
         }
 
 

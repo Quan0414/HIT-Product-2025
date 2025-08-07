@@ -1,13 +1,25 @@
 package com.example.hitproduct.socket
 
+import android.content.Context
+import android.content.SharedPreferences
 import android.os.Handler
 import android.os.Looper
 import android.util.Log
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import com.example.hitproduct.common.constants.ApiConstants
+import com.example.hitproduct.common.constants.AuthPrefersConstants
+import com.example.hitproduct.data.model.message.ChatItem
 import io.socket.client.IO
 import io.socket.client.IO.Options
 import io.socket.client.Socket
+import io.socket.emitter.Emitter
+import org.json.JSONArray
 import org.json.JSONObject
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.UUID
 
 /**
  * SocketManager handles real-time friend request events:
@@ -28,6 +40,18 @@ object SocketManager {
     private lateinit var socket: Socket
     private const val SERVER_URL = ApiConstants.BASE_URL
     private var authToken: String? = null
+
+    private lateinit var prefs: SharedPreferences
+    fun init(context: Context) {
+        prefs = context.getSharedPreferences(
+            AuthPrefersConstants.PREFS_NAME,
+            Context.MODE_PRIVATE
+        )
+    }
+
+
+    private val _notifications = MutableLiveData<JSONObject>()
+    val notifications: LiveData<JSONObject> = _notifications
 
     /**
      * Kết nối tới Socket server kèm token (server lấy myUserId từ token)
@@ -56,6 +80,11 @@ object SocketManager {
             Handler(Looper.getMainLooper()).post { listener() }
         }
     }
+
+    /**
+     * Kiểm tra trạng thái kết nối hiện tại
+     */
+    fun isConnected(): Boolean = ::socket.isInitialized && socket.connected()
 
     /**
      * Ngắt kết nối và xóa listeners
@@ -212,6 +241,15 @@ object SocketManager {
         }
     }
 
+    fun onListenCouple(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_COUPLE") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
     //=====================================================
     // Check start date
     fun onCheckStartDate(listener: (data: JSONObject) -> Unit) {
@@ -225,9 +263,32 @@ object SocketManager {
     }
 
 
-    // Nuoi pet
+    //====================================== Nuoi pet
+    // Gửi trạng thái mèo qua Socket với key PET_ACTIVE
+    fun sendCatStateToSocket(state: String, myLoveId: String) {
+        val payLoad = JSONObject().apply {
+            put("active", state)
+            put("myLoveId", myLoveId)
+        }
+        socket.emit("USER_SEND_PET_ACTIVE", payLoad)
+        Log.d("SocketManager", "Sent cat state: $state, sendTo: $myLoveId")
+    }
 
     //Listener
+    fun onListenForPetActive(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_SEND_PET_ACTIVE") { args ->
+            val data = args.getOrNull(0) as? JSONObject ?: return@on
+            val sendTo = data.optString("myLoveId", "")
+            val myId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+            Log.d("SocketManager", "onListenForPetActive: data=$data, myLoveId=$sendTo, myId=$myId")
+            // Nếu không phải gửi cho mình thì bỏ qua
+            if (sendTo != myId) return@on
+
+            Log.d("SocketManager", "Received pet active: $data")
+            Handler(Looper.getMainLooper()).post { listener(data) }
+        }
+    }
+
     fun onFeedPetSuccess(listener: (data: JSONObject) -> Unit) {
         socket.on("SERVER_FEED_PET_SUCCESS") { args ->
             (args.getOrNull(0) as? JSONObject)?.let { data ->
@@ -244,9 +305,114 @@ object SocketManager {
         }
     }
 
+
+    //=====================================================
+    // Mission
+    fun onMissionCompleted(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_MISSION_COMPLETED") { args ->
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Mission completed: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
+
+    //=====================================================
+    // Notification
+
+    fun onNotificationReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_SEND_NOT_TO_USER") { args ->
+            // 1. Lấy wrapper JSON
+            val wrapper = args.getOrNull(0) as? JSONObject ?: return@on
+            // 2. Unwrap object "not" (nếu không có thì bỏ qua)
+            val notObj = wrapper.optJSONObject("not") ?: return@on
+
+            Log.d("SocketManager", "unwrapped notification: $notObj")
+            Handler(Looper.getMainLooper()).post {
+                // 3. Gọi callback với object đã unwrap
+                listener(notObj)
+                // 4. Đẩy vào LiveData cũng là object unwrap
+                _notifications.postValue(notObj)
+            }
+        }
+    }
+
+    //=====================================================
+    // Message
+
+    fun sendRoomChatId(roomId: String) {
+        val payload = JSONObject().apply {
+            put("roomChatId", roomId)
+        }
+        socket.emit("USER_SEND_ROOM_CHAT_ID", payload)
+        Log.d("SocketManager", "Sending roomChatId: $roomId")
+    }
+
+    fun sendMessage(content: String, images: List<String> = emptyList()) {
+        val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+        val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, "") ?: ""
+        val coupleId = prefs.getString(AuthPrefersConstants.COUPLE_ID, "") ?: ""
+        val payload = JSONObject().apply {
+            put("coupleId", coupleId)
+            put("senderId", myUserId)
+            put("toUserId", myLoveId)
+            put("content", content)
+            put("images", JSONArray(images))
+        }
+        Log.d("SocketManager", "Sending message: $payload")
+        socket.emit("USER_SEND_MESSAGE", payload)
+    }
+
+    fun sendTyping() {
+        val myUserId = prefs.getString(AuthPrefersConstants.MY_USER_ID, "") ?: ""
+        val payload = JSONObject().apply {
+            put("senderId", myUserId)
+        }
+        socket.emit("CLIENT_SEND_TYPING", payload)
+        Log.d("SocketManager", "emit CLIENT_SEND_TYPING: $payload")
+    }
+
     /**
-     * Kiểm tra trạng thái kết nối hiện tại
+     * Lắng nghe sự kiện gửi tin nhắn từ server
      */
-    fun isConnected(): Boolean = ::socket.isInitialized && socket.connected()
+    fun onMessageReceived(listener: (JSONObject) -> Unit): Emitter =
+        socket.on("SERVER_RETURN_MESSAGE") { args ->
+            (args.firstOrNull() as? JSONObject)?.let { data ->
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+
+    fun onTypingReceived(listener: (senderId: String) -> Unit) {
+        socket.on("SERVER_RETURN_TYPING") { args ->
+            (args.firstOrNull() as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received typing from: ${data.optString("senderId")}")
+                val senderId = data.optString("senderId", "")
+                Handler(Looper.getMainLooper()).post {
+                    listener(senderId)
+                }
+            }
+        }
+    }
+
+    //=======================================================
+    // AES
+    fun sendNewPubKey(pubKey: String, myLoveId: String) {
+        val payload = JSONObject().apply {
+            put("public_key", pubKey)
+            put("myLoveId", myLoveId)
+        }
+        socket.emit("USER_SEND_PUBLIC_KEY", payload)
+        Log.d("SocketManager", "Sending key: $pubKey, to: $myLoveId")
+    }
+
+    fun onNewPubKeyReceived(listener: (data: JSONObject) -> Unit) {
+        socket.on("SERVER_RETURN_PUBLIC_KEY") { args ->
+            Log.d("SocketManager", "onNewPubKeyReceived called")
+            (args.getOrNull(0) as? JSONObject)?.let { data ->
+                Log.d("SocketManager", "Received new public key: $data")
+                Handler(Looper.getMainLooper()).post { listener(data) }
+            }
+        }
+    }
 
 }

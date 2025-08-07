@@ -9,7 +9,7 @@
     <stroke
         android:width="2dp"
         android:color="@color/borderBrown"
-        android:dashWidth="6dp"
+        android:dashWidth="4dp"
         android:dashGap="4dp" />
 
     <!-- Tùy chọn bo góc -->

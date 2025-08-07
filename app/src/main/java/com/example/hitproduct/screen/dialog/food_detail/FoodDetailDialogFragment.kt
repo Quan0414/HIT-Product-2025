@@ -1,6 +1,5 @@
 package com.example.hitproduct.screen.dialog.food_detail
 
-import android.annotation.SuppressLint
 import android.content.Context
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -15,6 +14,9 @@ import androidx.fragment.app.activityViewModels
 import com.bumptech.glide.Glide
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.Constant
+import com.example.hitproduct.common.util.FcmClient
+import com.example.hitproduct.common.util.NotificationConfig
 import com.example.hitproduct.common.util.toThousandComma
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.model.food.Food
@@ -22,7 +24,6 @@ import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.DialogFoodDetailBinding
 import com.example.hitproduct.screen.dialog.shop.ShopViewModel
 import com.example.hitproduct.screen.dialog.shop.ShopViewModelFactory
-import com.example.hitproduct.util.Constant
 
 class FoodDetailDialogFragment : DialogFragment() {
     private var _binding: DialogFoodDetailBinding? = null
@@ -74,7 +75,6 @@ class FoodDetailDialogFragment : DialogFragment() {
         return binding.root
     }
 
-    @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val food = requireArguments().getSerializable(Constant.ARG_FOOD) as? Food
@@ -104,6 +104,19 @@ class FoodDetailDialogFragment : DialogFragment() {
                         Toast.LENGTH_SHORT
                     ).show()
                     dismiss()
+
+                    val myLoveId = authRepo.getMyLoveId()
+                    val payload = mapOf(
+                        "type" to "pet_fed",
+                    )
+                    val tpl = NotificationConfig.getTemplate("pet_fed", payload)
+                    FcmClient.sendToTopic(
+                        receiverUserId = myLoveId,
+                        title = tpl.title,
+                        body = tpl.body,
+                        data = payload
+                    )
+
                     viewModel.clearFeedPetState()
                 }
             }

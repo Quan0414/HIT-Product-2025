@@ -1,14 +1,26 @@
 package com.example.hitproduct.data.api
 
 import com.example.hitproduct.common.constants.ApiConstants
+import com.example.hitproduct.data.model.auth.request.ChangePasswordRequest
+import com.example.hitproduct.data.model.auth.request.FindAccRequest
 import com.example.hitproduct.data.model.auth.request.LoginRequest
 import com.example.hitproduct.data.model.auth.request.RegisterRequest
+import com.example.hitproduct.data.model.auth.request.ResestPasswordRequest
 import com.example.hitproduct.data.model.auth.request.SendOtpRequest
+import com.example.hitproduct.data.model.auth.request.SendPublicKeyRequest
 import com.example.hitproduct.data.model.auth.request.VerifyCodeRequest
+import com.example.hitproduct.data.model.auth.response.FindAccResponse
 import com.example.hitproduct.data.model.auth.response.RegisterResponse
 import com.example.hitproduct.data.model.auth.response.SendOtpResponse
 import com.example.hitproduct.data.model.auth.response.SetupProfileResponse
+import com.example.hitproduct.data.model.auth.response.VerifyCodeResponse
+import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
+import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
+import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
+import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
+import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
 import com.example.hitproduct.data.model.common.ApiResponse
+import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
 import com.example.hitproduct.data.model.couple.CoupleData
 import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
@@ -16,24 +28,20 @@ import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRe
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
-import com.example.hitproduct.data.model.calendar.request.NewNoteRequest
-import com.example.hitproduct.data.model.calendar.response.GetNoteResponse
-import com.example.hitproduct.data.model.calendar.response.NewNoteResponse
+import com.example.hitproduct.data.model.message.MessageResponse
+import com.example.hitproduct.data.model.mission.MissionResponse
+import com.example.hitproduct.data.model.notification.NotificationResponse
 import com.example.hitproduct.data.model.pet.FeedPetData
 import com.example.hitproduct.data.model.pet.FeedPetRequest
 import com.example.hitproduct.data.model.pet.PetData
 import com.example.hitproduct.data.model.user_profile.User
 import com.example.hitproduct.data.model.user_profile.UserProfileResponse
-import com.example.hitproduct.data.model.calendar.request.EditNoteRequest
-import com.example.hitproduct.data.model.calendar.response.EditNoteResponse
-import com.example.hitproduct.data.model.couple.ChooseStartDateRequest
 import okhttp3.MultipartBody
 import okhttp3.RequestBody
 import retrofit2.Response
 import retrofit2.http.Body
 import retrofit2.http.DELETE
 import retrofit2.http.GET
-import retrofit2.http.Header
 import retrofit2.http.Multipart
 import retrofit2.http.PATCH
 import retrofit2.http.POST
@@ -64,6 +72,23 @@ interface ApiService {
         @Body request: VerifyCodeRequest
     ): Response<ApiResponse<String>>
 
+    //================ Forgot method ================
+    @POST(ApiConstants.AUTH_FORGOT_PASSWORD)
+    suspend fun findAcc(
+        @Body request: FindAccRequest
+    ): Response<ApiResponse<FindAccResponse>>
+
+    @POST(ApiConstants.AUTH_VERIFY_CODE)
+    suspend fun verifyCode2(
+        @Body request: VerifyCodeRequest
+    ): Response<ApiResponse<VerifyCodeResponse>>
+
+    @POST(ApiConstants.AUTH_RESET_PASSWORD)
+    suspend fun resetPassword(
+        @Body request: ResestPasswordRequest
+    ): Response<ApiResponse<String>>
+
+    //==============================================
     @Multipart
     @POST(ApiConstants.SETUP_PROFILE)
     suspend fun setupProfile(
@@ -87,6 +112,11 @@ interface ApiService {
     suspend fun getProfile(
 //        @Header("Authorization") bearerToken: String
     ): Response<ApiResponse<User>>
+
+    @POST(ApiConstants.AUTH_CHANGE_PASSWORD)
+    suspend fun changePassword(
+        @Body request: ChangePasswordRequest
+    ): Response<ApiResponse<String>>
 
     @DELETE(ApiConstants.DISCONNECT_COUPLE)
     suspend fun disconnectCouple(
@@ -147,4 +177,26 @@ interface ApiService {
         @Path("id") noteId: String,
         @Body request: EditNoteRequest
     ): Response<ApiResponse<EditNoteResponse>>
+
+    @GET(ApiConstants.GET_NOTIFICATIONS)
+    suspend fun getNotifications(
+    ): Response<ApiResponse<NotificationResponse>>
+
+    @GET(ApiConstants.GET_MISSIONS)
+    suspend fun getMissions(
+    ): Response<ApiResponse<MissionResponse>>
+
+    @GET(ApiConstants.GET_MESSAGE)
+    suspend fun getMessages(
+        @Path("roomChatId") roomChatId: String,
+        @Query("limit") limit: Int,
+        @Query("before") before: String? = null
+    ): Response<ApiResponse<MessageResponse>>
+
+
+    // Key
+    @POST(ApiConstants.PUBLIC_KEY)
+    suspend fun sendPublicKey(
+        @Body request: SendPublicKeyRequest
+    ): Response<ApiResponse<String>>
 }

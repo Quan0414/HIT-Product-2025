@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/bg_login"
-    android:paddingBottom="100dp"
+    android:paddingBottom="120dp"
     tools:context=".screen.home_page.couple.CoupleFragment">
 
     <ImageView
@@ -13,7 +13,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="16dp"
-        android:layout_marginTop="48dp"
+        android:layout_marginTop="76dp"
         android:adjustViewBounds="true"
         android:src="@drawable/tv_couple_header"
         app:layout_constraintEnd_toEndOf="parent"
@@ -25,7 +25,6 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginHorizontal="80dp"
-        android:layout_marginTop="80dp"
         android:adjustViewBounds="true"
         android:fontFamily="@font/f900"
         android:gravity="center"
@@ -33,53 +32,53 @@
         android:text="Hai bạn đã bên nhau"
         android:textColor="@color/white"
         android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/imageView6"
-        app:layout_constraintStart_toStartOf="@+id/imageView6"
+        android:layout_marginTop="80dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView6"
         app:strokeColor="@color/borderBrown"
         app:strokeWidth="4dp" />
 
-    <com.example.hitproduct.common.util.OutlinedTextView
-        android:id="@+id/tvDay"
+    <ViewSwitcher
+        android:id="@+id/viewSwitcher"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="40dp"
-        android:fontFamily="@font/f900"
-        android:gravity="center"
-        android:textColor="@color/white"
-        android:textSize="96dp"
         app:layout_constraintEnd_toEndOf="@+id/imageView6"
         app:layout_constraintStart_toStartOf="@+id/imageView6"
-        app:layout_constraintTop_toBottomOf="@+id/imageView7"
-        app:strokeColor="@color/borderBrown"
-        app:strokeWidth="8dp" />
+        app:layout_constraintTop_toBottomOf="@+id/imageView7">
 
-    <com.example.hitproduct.common.util.OutlinedTextView
-        android:id="@+id/outlinedTextView3"
-        android:layout_width="0dp"
+        <include
+            android:id="@+id/l1"
+            layout="@layout/layout_one" />
+
+        <include
+            android:id="@+id/l2"
+            layout="@layout/layout_two" />
+
+
+    </ViewSwitcher>
+
+    <ImageView
+        android:id="@+id/btn_switch"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="170dp"
-        android:fontFamily="@font/f900"
-        android:gravity="center"
-        android:text="Ngày"
-        android:textColor="@color/white"
-        android:textSize="20dp"
-        app:layout_constraintEnd_toEndOf="@+id/tvDay"
-        app:layout_constraintStart_toStartOf="@+id/tvDay"
-        app:layout_constraintTop_toBottomOf="@+id/imageView7"
-        app:strokeColor="@color/borderBrown"
-        app:strokeWidth="4dp" />
+        android:src="@drawable/btn_switch"
+        app:layout_constraintBottom_toTopOf="@+id/imageView8"
+        app:layout_constraintEnd_toEndOf="@+id/viewSwitcher"
+        app:layout_constraintStart_toStartOf="@+id/viewSwitcher"
+        app:layout_constraintTop_toTopOf="@+id/imageView9" />
 
     <ImageView
         android:id="@+id/imageView8"
         android:layout_width="110dp"
         android:layout_height="146dp"
-        android:layout_marginEnd="18dp"
+        android:layout_marginEnd="36dp"
         android:src="@drawable/bg_avatar_couple"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/imageView9"
-        app:layout_constraintStart_toStartOf="@+id/outlinedTextView3"
-        app:layout_constraintTop_toBottomOf="@+id/outlinedTextView3" />
+        app:layout_constraintEnd_toStartOf="@id/imageView9"
+        app:layout_constraintStart_toStartOf="@+id/viewSwitcher"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:layout_constraintVertical_bias="0.81" />
 
     <io.getstream.avatarview.AvatarView
         android:id="@+id/imgAvatar1"
@@ -122,9 +121,9 @@
         android:layout_height="wrap_content"
         android:src="@drawable/ic_heart_couple"
         app:layout_constraintBottom_toBottomOf="@+id/imgAvatar1"
-        app:layout_constraintEnd_toStartOf="@+id/imageView9"
-        app:layout_constraintStart_toEndOf="@+id/imageView8"
-        app:layout_constraintTop_toTopOf="@+id/imgAvatar2" />
+        app:layout_constraintEnd_toStartOf="@+id/imgAvatar2"
+        app:layout_constraintStart_toEndOf="@+id/imgAvatar1"
+        app:layout_constraintTop_toTopOf="@+id/imgAvatar1" />
 
     <ImageView
         android:id="@+id/imageView9"
@@ -132,9 +131,10 @@
         android:layout_height="146dp"
         android:src="@drawable/bg_avatar_couple"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="@+id/outlinedTextView3"
-        app:layout_constraintStart_toEndOf="@+id/imageView8"
-        app:layout_constraintTop_toBottomOf="@+id/outlinedTextView3" />
+        app:layout_constraintEnd_toEndOf="@+id/viewSwitcher"
+        app:layout_constraintStart_toEndOf="@id/imageView8"
+        app:layout_constraintTop_toBottomOf="@+id/imageView6"
+        app:layout_constraintVertical_bias="0.81" />
 
     <io.getstream.avatarview.AvatarView
         android:id="@+id/imgAvatar2"

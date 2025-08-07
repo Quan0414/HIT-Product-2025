@@ -30,4 +30,9 @@ replay_pid*
 .gradle/
 # Ignore local SDK settings
 local.properties
+# Firebase config
+app/google-services.json
+#FCM Token
+/app/src/main/java/com/example/hitproduct/common/util/AccessToken.kt
+
 
