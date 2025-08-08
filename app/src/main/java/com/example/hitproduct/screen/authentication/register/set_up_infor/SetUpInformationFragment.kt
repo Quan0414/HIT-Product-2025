@@ -5,6 +5,7 @@ import android.content.Context
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,10 +16,13 @@ import androidx.fragment.app.viewModels
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.state.UiState
+import com.example.hitproduct.common.util.TopicManager
 import com.example.hitproduct.data.api.NetworkClient
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentSetUpInformationBinding
 import com.example.hitproduct.screen.authentication.create_pin.CreatePinFragment
+import com.example.hitproduct.screen.authentication.login.LoginViewModel
+import com.example.hitproduct.screen.authentication.login.LoginViewModelFactory
 import com.example.hitproduct.screen.dialog.start_date.DialogStartDate.ValidationResult
 import com.google.android.material.datepicker.MaterialDatePicker
 import java.text.SimpleDateFormat
@@ -45,6 +49,9 @@ class SetUpInformationFragment : Fragment() {
     private val viewModel by viewModels<SetUpInformationViewModel> {
         SetUpInformationViewModelFactory(authRepo)
     }
+    private val viewModel2 by viewModels<LoginViewModel> {
+        LoginViewModelFactory(authRepo)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -57,6 +64,8 @@ class SetUpInformationFragment : Fragment() {
     @SuppressLint("ClickableViewAccessibility")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        viewModel2.checkProfile()
 
         // Observe updateState
         viewModel.updateState.observe(viewLifecycleOwner) { state ->
@@ -92,6 +101,27 @@ class SetUpInformationFragment : Fragment() {
                     Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
                 }
                 UiState.Idle -> { /* no-op */ }
+            }
+        }
+
+        viewModel2.profileState.observe(viewLifecycleOwner) { state ->
+            when (state) {
+                is UiState.Loading -> {
+
+                }
+
+                is UiState.Success -> {
+                    val myUserId = state.data.id
+                    prefs.edit().putString(AuthPrefersConstants.MY_USER_ID, myUserId).apply()
+                    TopicManager.subscribeToOwnTopic(requireContext())
+                    Log.d("VerifyCodeFragment", "Subscribed to own topic: $myUserId")
+                }
+
+                is UiState.Error -> {
+                    Toast.makeText(requireContext(), state.error.message, Toast.LENGTH_SHORT).show()
+                }
+
+                else -> {}
             }
         }
 
@@ -240,7 +270,7 @@ class SetUpInformationFragment : Fragment() {
             outputFormat.timeZone = TimeZone.getTimeZone("UTC")
             outputFormat.format(date)
         } catch (e: Exception) {
-            this ?: ""
+            this
         }
     }
 }
