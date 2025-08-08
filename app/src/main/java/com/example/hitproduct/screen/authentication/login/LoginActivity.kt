@@ -10,9 +10,15 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.example.hitproduct.common.util.DialogNetworkDisconnect
+import com.example.hitproduct.MyApp
 import com.example.hitproduct.R
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.databinding.ActivityLoginBinding
+import kotlinx.coroutines.launch
 
 class LoginActivity : AppCompatActivity() {
 
@@ -20,6 +26,9 @@ class LoginActivity : AppCompatActivity() {
     private val prefs by lazy {
         getSharedPreferences(AuthPrefersConstants.PREFS_NAME, Context.MODE_PRIVATE)
     }
+
+    private val net by lazy { (application as MyApp).networkMonitor }
+    private var netDialog: DialogNetworkDisconnect? = null
 
     private val requestNotificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
@@ -48,18 +57,32 @@ class LoginActivity : AppCompatActivity() {
             insets
         }
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                net.isOnline.collect { online ->
+                    if (online) hideNoNetDialog() else showNoNetDialog()
+                }
+            }
+        }
+
 
         // Kiểm tra nếu chưa có Fragment, thay thế Fragment bằng LoginFragment
         if (supportFragmentManager.findFragmentByTag("LOGIN_FRAGMENT") == null) {
-            val loginFragment = LoginFragment() // Tạo một instance của LoginFragment
             supportFragmentManager.beginTransaction()
-                .replace(
-                    R.id.fragmentStart,
-                    loginFragment,
-                    "LOGIN_FRAGMENT"
-                ) // Thay thế vào container
+                .replace(R.id.fragmentStart, LoginFragment(), "LOGIN_FRAGMENT")
                 .commit()
         }
+    }
 
+    private fun showNoNetDialog() {
+        if (isFinishing || isDestroyed) return
+        if (netDialog?.isAdded == true) return
+        netDialog = DialogNetworkDisconnect().apply { isCancelable = false }
+        netDialog!!.show(supportFragmentManager, "net_disconnect")
+    }
+
+    private fun hideNoNetDialog() {
+        netDialog?.dismissAllowingStateLoss()
+        netDialog = null
     }
 }

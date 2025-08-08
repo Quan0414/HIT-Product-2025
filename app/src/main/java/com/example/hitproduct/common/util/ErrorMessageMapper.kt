@@ -12,9 +12,6 @@ data class MappedError(
 object ErrorMessageMapper {
     fun fromBackend(raw: String): MappedError {
 
-        val serverError =
-            raw.contains("Cannot read properties of null (reading 'id')", ignoreCase = true)
-
         val tokenExpired = raw.contains("token hết hạn!", ignoreCase = true)
 
         val emailError = raw.contains("must be a valid email", ignoreCase = true)
@@ -58,9 +55,6 @@ object ErrorMessageMapper {
 
 
         val message = when {
-            serverError ->
-                "Máy chủ đang gặp chút vấn đề, bạn vui lòng thử lại sau nhé."
-
             tokenExpired ->
                 "Phiên đăng nhập đã kết thúc, mời bạn đăng nhập lại."
 

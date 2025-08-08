@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.NetworkMonitor
 import com.example.hitproduct.common.util.createNotificationChannel
 import com.example.hitproduct.socket.SocketManager
 import com.google.firebase.FirebaseApp
@@ -14,6 +15,8 @@ class MyApp : Application() {
     private val prefs by lazy {
         getSharedPreferences(AuthPrefersConstants.PREFS_NAME, MODE_PRIVATE)
     }
+
+    lateinit var networkMonitor: NetworkMonitor private set
 
     override fun onCreate() {
         super.onCreate()
@@ -28,6 +31,9 @@ class MyApp : Application() {
             SocketManager.connect(token)
             registerSocketListeners()
         }
+
+        networkMonitor = NetworkMonitor(this)
+        networkMonitor.start()
 
 
     }
