@@ -127,13 +127,14 @@
 
                         <EditText
                             android:id="@+id/edtHo"
-                            android:backgroundTint="@color/grayUnderline"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
+                            android:backgroundTint="@color/grayUnderline"
                             android:drawableEnd="@drawable/ic_edit_text"
                             android:drawablePadding="8dp"
                             android:enabled="false"
                             android:fontFamily="@font/f500"
+                            android:maxLines="1"
                             android:textSize="14dp" />
                     </LinearLayout>
 
@@ -156,12 +157,13 @@
                         <EditText
                             android:id="@+id/edtTen"
                             android:layout_width="match_parent"
-                            android:backgroundTint="@color/grayUnderline"
                             android:layout_height="wrap_content"
+                            android:backgroundTint="@color/grayUnderline"
                             android:drawableEnd="@drawable/ic_edit_text"
                             android:drawablePadding="8dp"
                             android:enabled="false"
                             android:fontFamily="@font/f500"
+                            android:maxLines="1"
                             android:textSize="14dp" />
                     </LinearLayout>
                 </LinearLayout>
@@ -186,6 +188,7 @@
                     android:drawablePadding="8dp"
                     android:enabled="false"
                     android:fontFamily="@font/f500"
+                    android:maxLines="1"
                     android:textSize="14dp" />
 
                 <!-- Email -->
@@ -202,9 +205,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:layout_marginBottom="16dp"
+                    android:backgroundTint="@color/grayUnderline"
                     android:drawablePadding="8dp"
                     android:enabled="false"
-                    android:backgroundTint="@color/grayUnderline"
                     android:fontFamily="@font/f500"
                     android:inputType="textEmailAddress"
                     android:textSize="14dp" />

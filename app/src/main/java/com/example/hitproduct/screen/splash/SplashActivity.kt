@@ -5,8 +5,6 @@ import android.animation.AnimatorListenerAdapter
 import android.animation.ObjectAnimator
 import android.content.Context
 import android.content.Intent
-import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -24,7 +22,9 @@ import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.lifecycleScope
+import com.example.hitproduct.common.util.DialogNetworkDisconnect
 import com.example.hitproduct.MainActivity
+import com.example.hitproduct.MyApp
 import com.example.hitproduct.R
 import com.example.hitproduct.base.DataResult
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -47,6 +47,10 @@ class SplashActivity : AppCompatActivity() {
             prefs
         )
     }
+
+    private val net by lazy { (application as MyApp).networkMonitor }
+
+    private var netDialog: DialogNetworkDisconnect? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,6 +104,13 @@ class SplashActivity : AppCompatActivity() {
             }
         }
 
+        // Theo dõi trạng thái mạng: mất mạng -> show dialog, có mạng -> ẩn dialog
+        lifecycleScope.launch {
+            net.isOnline.collect { online ->
+                if (online) hideNoNetDialog() else showNoNetDialog()
+            }
+        }
+
         val myPub = CryptoHelper.getMyPublicKey(this)
         val myLovePub = CryptoHelper.getPeerPublicKey(this)
         Log.d("SplashActivity", "My Public Key: $myPub")
@@ -109,16 +120,8 @@ class SplashActivity : AppCompatActivity() {
 
     private fun routeNext() {
         // Kiểm tra kết nối internet
-        if (!isNetworkAvailable()) {
-            // Nếu không có kết nối, hiển thị thông báo lỗi
-            Toast.makeText(
-                this,
-                "Không có kết nối Internet. Vui lòng kiểm tra lại!",
-                Toast.LENGTH_LONG
-            ).show()
-            Handler(mainLooper).postDelayed({
-                finishAffinity()
-            }, 1000)
+        if (!net.isOnline.value) {
+            showNoNetDialog()
             return
         }
 
@@ -229,13 +232,13 @@ class SplashActivity : AppCompatActivity() {
     }
 
     // Kiểm tra kết nối internet
-    private fun isNetworkAvailable(): Boolean {
-        val connectivityManager =
-            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        val networkCapabilities = connectivityManager.activeNetwork ?: return false
-        val activeNetwork = connectivityManager.getNetworkCapabilities(networkCapabilities)
-        return activeNetwork != null && activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
-    }
+//    private fun isNetworkAvailable(): Boolean {
+//        val connectivityManager =
+//            getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+//        val networkCapabilities = connectivityManager.activeNetwork ?: return false
+//        val activeNetwork = connectivityManager.getNetworkCapabilities(networkCapabilities)
+//        return activeNetwork != null && activeNetwork.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+//    }
 
     private fun startProgressBarAndRoute() {
         val pb = findViewById<ProgressBar>(R.id.state)
@@ -251,17 +254,11 @@ class SplashActivity : AppCompatActivity() {
 
         // Mỗi lần giá trị progress thay đổi, kiểm tra mạng
         animator.addUpdateListener {
-            if (!isNetworkAvailable()) {
-                // Hủy animation, thông báo và thoát app
-                animator.cancel()
-                Toast.makeText(
-                    this@SplashActivity,
-                    "Không có kết nối Internet. Vui lòng kiểm tra lại!",
-                    Toast.LENGTH_LONG
-                ).show()
-                Handler(mainLooper).postDelayed({
-                    finishAffinity()
-                }, 1000)
+            animator.addUpdateListener {
+                if (!net.isOnline.value) {
+                    animator.cancel()
+                    showNoNetDialog()
+                }
             }
         }
 
@@ -283,5 +280,16 @@ class SplashActivity : AppCompatActivity() {
         animator.start()
     }
 
+    private fun showNoNetDialog() {
+        if (netDialog?.isAdded == true) return
+        netDialog = DialogNetworkDisconnect().apply {
+            isCancelable = false
+        }
+        netDialog!!.show(supportFragmentManager, "net_disconnect")
+    }
 
+    private fun hideNoNetDialog() {
+        netDialog?.dismiss()
+        netDialog = null
+    }
 }

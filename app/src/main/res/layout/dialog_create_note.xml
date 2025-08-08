@@ -22,8 +22,8 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:fontFamily="@font/f900"
-        android:text="Viết ghi chú"
         android:paddingVertical="4dp"
+        android:text="Viết ghi chú"
         android:textColor="@color/textBrown"
         android:textSize="24dp"
         app:layout_constraintEnd_toEndOf="@+id/iv1"
@@ -43,42 +43,30 @@
         android:id="@+id/outlinedEditText"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="24dp"
         android:layout_marginTop="14dp"
+        android:layout_marginBottom="24dp"
         android:background="@drawable/bg_orange_border"
         android:fontFamily="@font/f900"
         android:gravity="start"
         android:padding="12dp"
         android:textColor="@color/textBrown"
         android:textSize="20dp"
-        app:layout_constraintBottom_toTopOf="@id/btnCheckQuestion"
+        app:layout_constraintBottom_toTopOf="@id/btnSaveAnswer"
         app:layout_constraintEnd_toEndOf="@+id/tvTitle"
         app:layout_constraintStart_toStartOf="@+id/tvTitle"
         app:layout_constraintTop_toBottomOf="@+id/tvTitle"
         app:layout_constraintVertical_bias="0.0" />
 
     <ImageView
-        android:id="@+id/btnCheckQuestion"
-        android:layout_width="wrap_content"
-        android:layout_height="48dp"
-        android:layout_marginEnd="24dp"
-        android:layout_marginBottom="32dp"
-        android:adjustViewBounds="true"
-        android:src="@drawable/btn_hint"
-        app:layout_constraintBottom_toBottomOf="@id/iv1"
-        app:layout_constraintEnd_toStartOf="@+id/btnSaveAnswer"
-        app:layout_constraintHorizontal_chainStyle="spread"
-        app:layout_constraintStart_toStartOf="@+id/outlinedEditText" />
-
-    <ImageView
         android:id="@+id/btnSaveAnswer"
         android:layout_width="wrap_content"
-        android:layout_height="48dp"
+        android:layout_height="56dp"
+        android:layout_marginBottom="32dp"
         android:adjustViewBounds="true"
         android:src="@drawable/btn_save_note"
-        app:layout_constraintBottom_toBottomOf="@+id/btnCheckQuestion"
+        app:layout_constraintBottom_toBottomOf="@id/iv1"
         app:layout_constraintEnd_toEndOf="@+id/outlinedEditText"
-        app:layout_constraintStart_toEndOf="@id/btnCheckQuestion"
-        app:layout_constraintTop_toTopOf="@+id/btnCheckQuestion" />
+        app:layout_constraintHorizontal_chainStyle="spread" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>

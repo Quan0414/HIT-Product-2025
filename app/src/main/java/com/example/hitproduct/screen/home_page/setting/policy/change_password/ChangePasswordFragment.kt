@@ -125,15 +125,15 @@ class ChangePasswordFragment : BaseFragment<FragmentChangePasswordBinding>() {
 
     }
 
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as? MainActivity)?.hideBottomNav()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        (requireActivity() as? MainActivity)?.showBottomNav()
-    }
+//    override fun onResume() {
+//        super.onResume()
+//        (requireActivity() as? MainActivity)?.hideBottomNav()
+//    }
+//
+//    override fun onDestroyView() {
+//        super.onDestroyView()
+//        (requireActivity() as? MainActivity)?.showBottomNav()
+//    }
 
     private fun setupPasswordToggles() {
         // Old password

@@ -355,7 +355,10 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                             .firstOrNull()
                         Log.d("HomeFragment", "Cat state key: $keyState")
                         if (keyState != null) {
-                            SocketManager.sendCatStateToSocket(keyState, myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null) ?: "")
+                            SocketManager.sendCatStateToSocket(keyState,
+                                myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null)
+                                    ?: ""
+                            )
                             Log.d("HomeFragment", "Cat state sent to server")
                         }
 
@@ -485,8 +488,8 @@ class HomeFragment : BaseFragment<FragmentHomeBinding>() {
                 if (bar.id == R.id.state1) {
                     val colorRes = when {
                         v > Constant.HUNGER_MEDIUM * 10 -> R.color.status4
-                        v > Constant.HUNGER_LOW * 10    -> R.color.status3
-                        else                             -> R.color.status1
+                        v > Constant.HUNGER_LOW * 10 -> R.color.status3
+                        else -> R.color.status1
                     }
                     tintOnlyFill(bar, colorRes)
                 }

@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.activityViewModels
+import com.example.hitproduct.MainActivity
 import com.example.hitproduct.R
 import com.example.hitproduct.screen.home_page.setting.policy.SecurityFragment
 import com.example.hitproduct.base.BaseFragment
@@ -200,6 +201,16 @@ class SettingFragment : BaseFragment<FragmentSettingBinding>() {
 
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        (requireActivity() as? MainActivity)?.showBottomNav()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        (requireActivity() as? MainActivity)?.hideBottomNav()
     }
 
     override fun inflateLayout(

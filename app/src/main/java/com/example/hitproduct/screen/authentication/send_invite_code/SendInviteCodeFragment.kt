@@ -102,7 +102,7 @@ class SendInviteCodeFragment : Fragment() {
 
         token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "").orEmpty()
         SocketManager.connect(token)
-
+        Log.d("SendInvite",  "Socket connected: ${SocketManager.isConnected()}")
 
         // 1. Tạo dialog + adapter sẵn, nhưng chưa show
         setupInviteDialog()
@@ -330,8 +330,8 @@ class SendInviteCodeFragment : Fragment() {
         }
         SocketManager.onError { message ->
             Handler(Looper.getMainLooper()).post {
-                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
-//                Log.e("SendInvite", "Socket error: $message")
+//                Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+                Log.e("SendInvite", "Socket error: $message")
             }
         }
         SocketManager.onRequestSent { data ->

@@ -220,16 +220,6 @@ class AccountSettingFragment : BaseFragment<FragmentAccountSettingBinding>() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        (requireActivity() as? MainActivity)?.hideBottomNav()
-    }
-
-    override fun onDestroyView() {
-        super.onDestroyView()
-        (requireActivity() as? MainActivity)?.showBottomNav()
-    }
-
     private fun toggleFields(enabled: Boolean) {
 
         binding.btnEditAvatar.visibility = if (enabled) View.VISIBLE else View.INVISIBLE
