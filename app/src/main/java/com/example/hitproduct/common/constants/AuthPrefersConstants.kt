@@ -11,5 +11,5 @@ object AuthPrefersConstants {
     const val COUPLE_ID = "couple_id"
     const val MY_USER_ID = "my_user_id"
     const val MY_LOVE_ID = "user_a_id"
-    const val DAILY_STATUS = "daily_status"
+//    const val DAILY_STATUS = "daily_status"
 }

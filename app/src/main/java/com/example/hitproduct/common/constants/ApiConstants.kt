@@ -3,7 +3,7 @@ package com.example.hitproduct.common.constants
 object ApiConstants {
 
     // Base
-    const val BASE_URL = "https://love-story-app.onrender.com/"
+    const val BASE_URL = "https://x2snxnrc-3000.asse.devtunnels.ms/"
 
     // Auth
     const val AUTH_REGISTER = "api/v1/auth/register"
@@ -49,5 +49,8 @@ object ApiConstants {
 
     // Public key
     const val PUBLIC_KEY = "api/v1/users/key"
+
+    // Status
+    const val GET_STATUS = "api/v1/status/daily"
 
 }

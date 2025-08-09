@@ -86,7 +86,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="88dp"
-                        android:src="@drawable/ic_mess_selected2" />
+                        android:src="@drawable/ic_mess_selected" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -132,7 +132,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="88dp"
-                        android:src="@drawable/ic_note_selected2" />
+                        android:src="@drawable/ic_note_selected" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -178,7 +178,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="88dp"
-                        android:src="@drawable/ic_home_selected2" />
+                        android:src="@drawable/ic_home_selected" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -224,7 +224,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="88dp"
-                        android:src="@drawable/ic_couple_selected2" />
+                        android:src="@drawable/ic_couple_selected" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"
@@ -271,7 +271,7 @@
                     <ImageView
                         android:layout_width="wrap_content"
                         android:layout_height="88dp"
-                        android:src="@drawable/ic_setting_selected2" />
+                        android:src="@drawable/ic_setting_selected" />
 
                     <com.example.hitproduct.common.util.OutlinedTextView
                         android:layout_width="wrap_content"

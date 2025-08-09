@@ -30,6 +30,7 @@ import com.example.hitproduct.data.model.daily_question.get_question.DailyQuesti
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerResponse
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
+import com.example.hitproduct.data.model.daily_status.DailyStatusResponse
 import com.example.hitproduct.data.model.food.Food
 import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.message.ChatItem
@@ -424,6 +425,13 @@ class AuthRepository(
         return when (val result =
             getResult { api.sendPublicKey(SendPublicKeyRequest(publicKey, privateKey)) }) {
             is DataResult.Success -> DataResult.Success(result.data.data)
+            is DataResult.Error -> result
+        }
+    }
+
+    suspend fun getStatus(): DataResult<ApiResponse<DailyStatusResponse>> {
+        return when (val result = getResult { api.getStatus() }) {
+            is DataResult.Success -> DataResult.Success(result.data)
             is DataResult.Error -> result
         }
     }

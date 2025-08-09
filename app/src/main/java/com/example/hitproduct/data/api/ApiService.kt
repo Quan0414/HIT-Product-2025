@@ -26,6 +26,7 @@ import com.example.hitproduct.data.model.daily_question.get_question.DailyQuesti
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerRequest
 import com.example.hitproduct.data.model.daily_question.post_answer.SaveAnswerResponse
 import com.example.hitproduct.data.model.daily_question.see_my_love_answer.GetYourLoveAnswerResponse
+import com.example.hitproduct.data.model.daily_status.DailyStatusResponse
 import com.example.hitproduct.data.model.food.FoodData
 import com.example.hitproduct.data.model.invite.InviteData
 import com.example.hitproduct.data.model.message.MessageResponse
@@ -193,10 +194,13 @@ interface ApiService {
         @Query("before") before: String? = null
     ): Response<ApiResponse<MessageResponse>>
 
-
     // Key
     @POST(ApiConstants.PUBLIC_KEY)
     suspend fun sendPublicKey(
         @Body request: SendPublicKeyRequest
     ): Response<ApiResponse<String>>
+
+    @GET(ApiConstants.GET_STATUS)
+    suspend fun getStatus(
+    ): Response<ApiResponse<DailyStatusResponse>>
 }
