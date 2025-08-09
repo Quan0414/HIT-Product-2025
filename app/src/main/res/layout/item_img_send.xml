@@ -21,8 +21,7 @@
             android:layout_height="wrap_content"
             android:adjustViewBounds="true"
             android:src="@drawable/b"
-            android:maxWidth="200dp"
-            android:maxHeight="200dp"
+
             android:scaleType="centerInside" />
     </com.google.android.material.card.MaterialCardView>
 

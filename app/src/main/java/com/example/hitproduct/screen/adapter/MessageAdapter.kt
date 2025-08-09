@@ -78,11 +78,13 @@ class MessageAdapter(
 
     inner class ImageInVH(view: View) : RecyclerView.ViewHolder(view) {
         val iv: ImageView = view.findViewById(R.id.ivImgReceive)
+        val tvTime: TextView = view.findViewById(R.id.tvTimeReceive)
 //        val avatar: AvatarView = view.findViewById(R.id.imgAvatar)
     }
 
     inner class ImageOutVH(view: View) : RecyclerView.ViewHolder(view) {
         val iv: ImageView = view.findViewById(R.id.ivImgSend)
+        val tvTime: TextView = view.findViewById(R.id.tvTimeSend)
     }
 
     inner class TypingVH(view: View) : RecyclerView.ViewHolder(view) {
@@ -148,6 +150,7 @@ class MessageAdapter(
                 if (holder is ImageInVH) {
                     // bind ảnh
                     Glide.with(holder.iv).load(item.imageUrl).into(holder.iv)
+                    holder.tvTime.text = item.sentAt.formatTime()
 
                     // bind avatar
 //                    holder.avatar.visibility = if (showAvatar) View.VISIBLE else View.INVISIBLE
@@ -157,6 +160,7 @@ class MessageAdapter(
                 }
                 if (holder is ImageOutVH) {
                     Glide.with(holder.iv).load(item.imageUrl).into(holder.iv)
+                    holder.tvTime.text = item.sentAt.formatTime()
                 }
             }
 

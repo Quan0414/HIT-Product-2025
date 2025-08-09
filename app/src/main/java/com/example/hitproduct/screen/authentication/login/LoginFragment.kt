@@ -180,7 +180,7 @@ class LoginFragment : Fragment() {
 
                     binding.tvLogin.isEnabled = true
 
-                    if (err.message == "Tài khoản chưa được xác nhận!") {
+                    if (err.message == "Tài khoản chưa được xác nhận.") {
                         Toast.makeText(
                             requireContext(),
                             "Tài khoản chưa được xác nhận! Vui lòng nhập email để xác nhận tài khoản. ",

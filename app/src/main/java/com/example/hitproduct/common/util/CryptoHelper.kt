@@ -238,7 +238,7 @@ object CryptoHelper {
     fun clearPairingData(ctx: Context) {
         getPrefs(ctx).edit().apply {
             remove(KEY_PEER_PUB)
-            remove(KEY_SHARED_AES)
+//            remove(KEY_SHARED_AES)
             apply()
         }
     }

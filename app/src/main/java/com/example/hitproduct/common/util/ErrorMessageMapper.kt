@@ -59,7 +59,7 @@ object ErrorMessageMapper {
                 "Phiên đăng nhập đã kết thúc, mời bạn đăng nhập lại."
 
             unauthorized ->
-                "Bạn chưa được cấp quyền, hãy kiểm tra email xác thực."
+                "Tài khoản chưa được xác nhận."
 
             accountExits ->
                 "Email hoặc tên người dùng đã tồn tại, chọn cái khác nha."
