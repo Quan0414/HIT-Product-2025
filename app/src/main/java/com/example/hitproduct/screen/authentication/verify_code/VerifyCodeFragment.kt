@@ -54,7 +54,7 @@ class VerifyCodeFragment : Fragment() {
 
     // Biến để quản lý bộ đếm ngược
     private var timer: CountDownTimer? = null
-    private val totalTime = 120_000L  // 120s = 120.000 ms
+    private val totalTime = 60_000L  // 120s = 120.000 ms
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -81,10 +81,12 @@ class VerifyCodeFragment : Fragment() {
         viewModel.sendOtpState.observe(viewLifecycleOwner) { state ->
             when (state) {
                 is UiState.Loading -> {
-                    // show loading nếu cần
+                    binding.tvSendCode.isEnabled = false
+                    binding.loadingProgressBar.visibility = View.VISIBLE
                 }
 
                 is UiState.Success -> {
+                    binding.loadingProgressBar.visibility = View.GONE
                     Toast.makeText(requireContext(), state.data, Toast.LENGTH_SHORT).show()
                     // sau khi gửi lại thành công, restart đếm
                     binding.tvSendCode.isEnabled = false
@@ -111,6 +113,7 @@ class VerifyCodeFragment : Fragment() {
 
         // Nút gửi lại OTP
         binding.tvSendCode.setOnClickListener {
+            binding.tvSendCode.isEnabled = false
             viewModel.sendOtp(email)
         }
 
@@ -302,16 +305,20 @@ class VerifyCodeFragment : Fragment() {
 
     private fun startCountdown() {
         timer?.cancel()
+        // disable ngay sau khi gửi THÀNH CÔNG
+        binding.tvSendCode.isEnabled = false
+        binding.tvSendCode.setTextColor(
+            ContextCompat.getColor(requireContext(), R.color.grayText)
+        )
+
         timer = object : CountDownTimer(totalTime, 1_000) {
             override fun onTick(millisUntilFinished: Long) {
                 if (_binding == null) return
                 val seconds = (millisUntilFinished / 1_000).toInt()
                 binding.tvTime.text = getString(R.string.code_expired, seconds)
             }
-
             override fun onFinish() {
                 if (_binding == null) return
-                // Bật lại nút gửi mã và đổi màu
                 binding.tvSendCode.isEnabled = true
                 binding.tvSendCode.setTextColor(
                     ContextCompat.getColor(requireContext(), R.color.orange)

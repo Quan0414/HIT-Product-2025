@@ -9,17 +9,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.example.hitproduct.common.constants.ApiConstants
 import com.example.hitproduct.common.constants.AuthPrefersConstants
-import com.example.hitproduct.data.model.message.ChatItem
 import io.socket.client.IO
 import io.socket.client.IO.Options
 import io.socket.client.Socket
 import io.socket.emitter.Emitter
 import org.json.JSONArray
 import org.json.JSONObject
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.UUID
 
 /**
  * SocketManager handles real-time friend request events:
@@ -413,6 +408,17 @@ object SocketManager {
                 Handler(Looper.getMainLooper()).post { listener(data) }
             }
         }
+    }
+
+
+    //=======================================================
+    // FIX tum lum
+    fun sendCoupleId(coupleId: String) {
+        val payload = JSONObject().apply {
+            put("coupleId", coupleId)
+        }
+        socket.emit("USER_SEND_COUPLE_ID", payload)
+        Log.d("SocketManager", "Sending: $coupleId")
     }
 
 }

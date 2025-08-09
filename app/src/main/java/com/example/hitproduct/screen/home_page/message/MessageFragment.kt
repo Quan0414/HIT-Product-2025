@@ -1,16 +1,20 @@
 package com.example.hitproduct.screen.home_page.message
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.widget.addTextChangedListener
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.hitproduct.screen.dialog.emoji.DialogEmoji
 import com.example.hitproduct.R
 import com.example.hitproduct.base.BaseFragment
 import com.example.hitproduct.common.constants.AuthPrefersConstants
@@ -22,10 +26,10 @@ import com.example.hitproduct.data.model.message.ChatItem
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.databinding.FragmentMessageBinding
 import com.example.hitproduct.screen.adapter.MessageAdapter
+import com.example.hitproduct.screen.dialog.emoji.DialogEmoji
 import com.example.hitproduct.screen.home_page.home.HomeViewModel
 import com.example.hitproduct.screen.home_page.home.HomeViewModelFactory
 import io.getstream.avatarview.glide.loadImage
-
 
 class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
@@ -58,8 +62,43 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
 
     private var selectedImageUri: Uri? = null
 
-    override fun initView() {
+    override fun inflateLayout(
+        inflater: LayoutInflater,
+        container: ViewGroup?
+    ): FragmentMessageBinding = FragmentMessageBinding.inflate(inflater, container, false)
 
+    // Android 13+
+    private val pick13Plus = registerForActivityResult(
+        ActivityResultContracts.PickVisualMedia()
+    ) { uri ->
+        uri?.let { showPreview(it) }
+    }
+
+    // Android <= 12
+    private val openDoc = registerForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri ->
+        uri?.let {
+            requireActivity().contentResolver.takePersistableUriPermission(
+                it, Intent.FLAG_GRANT_READ_URI_PERMISSION
+            )
+            showPreview(it)
+        }
+    }
+
+    private fun showPreview(uri: Uri) {
+        selectedImageUri = uri
+        binding.previewContainer.visibility = View.VISIBLE
+        binding.previewImage.setImageURI(uri)
+    }
+
+    private fun clearPreview() {
+        selectedImageUri = null
+        binding.previewContainer.visibility = View.GONE
+        binding.previewImage.setImageDrawable(null)
+    }
+
+    override fun initView() {
         viewModel.sendRoomChatId(roomId)
 
         adapter = MessageAdapter()
@@ -79,34 +118,51 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     }
 
     override fun initListener() {
-//        binding.btnSendMessage.setOnClickListener {
-//            pickImagesLauncher.launch("image/*") // Mở bộ chọn nhiều ảnh
-//        }
+        binding.btnSendImage.setOnClickListener {
+            if (Build.VERSION.SDK_INT >= 33) {
+                pick13Plus.launch(PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly))
+            } else {
+                openDoc.launch(arrayOf("image/*"))
+            }
+        }
 
+        binding.btnRemovePreview.setOnClickListener { clearPreview() }
+
+        // Gửi chung: text + (optional) ảnh -> 1 socket
         binding.btnSendMessage.setOnClickListener {
-            val text = binding.etMessage.text.toString().trim()
-            if (text.isNotEmpty()) {
+            val text = binding.etMessage.text?.toString()?.trim().orEmpty()
+            val imgUri = selectedImageUri
+
+            if (text.isEmpty() && imgUri == null) return@setOnClickListener
+
+            binding.btnSendMessage.isEnabled = false
+
+            // Nếu có ảnh: encode Base64 data URI rồi gửi kèm images
+            if (imgUri != null) {
+                viewModel.encodeImageToDataUri(
+                    ctx = requireContext(),
+                    uri = imgUri,
+                    onDone = { dataUri ->
+                        viewModel.sendMessage(text, images = listOf(dataUri))
+                        binding.etMessage.text?.clear()
+                        clearPreview()
+                        sendFcmIfText(text)
+                    },
+                    onError = { err ->
+                        Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()
+                        binding.btnSendMessage.isEnabled = true
+                    }
+                )
+            } else {
+                // Chỉ text
                 viewModel.sendMessage(text)
                 binding.etMessage.text?.clear()
-
-                val myLoveId = authRepo.getMyLoveId()
-                val payload = mapOf(
-                    "type" to "chat_message",
-                )
-                val tpl = NotificationConfig.getTemplate("chat_message", payload)
-                FcmClient.sendToTopic(
-                    receiverUserId = myLoveId,
-                    title = tpl.title,
-                    body = tpl.body,
-                    data = payload
-                )
+                sendFcmIfText(text)
             }
         }
 
         binding.etMessage.addTextChangedListener { text ->
-            if (!text.isNullOrEmpty()) {
-                viewModel.sendIsTyping()
-            }
+            if (!text.isNullOrEmpty()) viewModel.sendIsTyping()
         }
 
         binding.tilMessage.setEndIconOnClickListener {
@@ -119,86 +175,67 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
         }
     }
 
+    private fun sendFcmIfText(text: String) {
+        if (text.isNotEmpty()) {
+            val myLoveId = authRepo.getMyLoveId()
+            val payload = mapOf("type" to "chat_message")
+            val tpl = NotificationConfig.getTemplate("chat_message", payload)
+            FcmClient.sendToTopic(
+                receiverUserId = myLoveId,
+                title = tpl.title,
+                body = tpl.body,
+                data = payload
+            )
+        }
+    }
+
     override fun initData() {
         viewModel.fetchInitialMessages(roomId)
         viewModel2.getCoupleProfile()
     }
 
-    override fun handleEvent() {
-
-    }
+    override fun handleEvent() {}
 
     override fun bindData() {
-
+        // Header tên + avatar
         viewModel2.coupleProfile.observe(viewLifecycleOwner) { state ->
-            when (state) {
-                is UiState.Error -> {}
-                UiState.Idle -> {}
-                UiState.Loading -> {}
-                is UiState.Success -> {
-                    //lay avatar va username cua  my love
-                    val couple = state.data
-                    if ((prefs.getString(
-                            AuthPrefersConstants.MY_LOVE_ID,
-                            null
-                        ) ?: "") == couple.userA.id
-                    ) {
-                        val userA = couple.userA
-                        binding.tvName.text = userA.nickname
-                            ?.takeIf { it.isNotBlank() }
-                            ?: userA.firstName
-                                ?.takeIf { it.isNotBlank() }
-                                    ?: userA.username
+            if (state is UiState.Success) {
+                val couple = state.data
+                val myLoveId = prefs.getString(AuthPrefersConstants.MY_LOVE_ID, null) ?: ""
+                val target = if (myLoveId == couple.userA.id) couple.userA else couple.userB
 
-                        val avatar = couple.userA.avatar
-                            ?.takeIf { it.isNotBlank() && it != "/example.png" }
-                            ?.replaceFirst("http://", "https://")
-                        if (avatar != null) {
-                            binding.imgAvatar.loadImage(avatar)
-                        } else {
-                            binding.imgAvatar.loadImage(R.drawable.avatar_default)
-                        }
-                    } else {
-                        val userB = couple.userB
-                        binding.tvName.text = userB.nickname
-                            ?.takeIf { it.isNotBlank() }
-                            ?: userB.firstName
-                                ?.takeIf { it.isNotBlank() }
-                                    ?: userB.username
-                        val avatar = couple.userB.avatar
-                            ?.takeIf { it.isNotBlank() && it != "/example.png" }
-                            ?.replaceFirst("http://", "https://")
-                        if (avatar != null) {
-                            binding.imgAvatar.loadImage(avatar)
-                        } else {
-                            binding.imgAvatar.loadImage(R.drawable.avatar_default)
-                        }
-                    }
+                binding.tvName.text = target.nickname?.takeIf { it.isNotBlank() }
+                    ?: target.firstName?.takeIf { it.isNotBlank() }
+                            ?: target.username
 
-                }
+                val avatar = target.avatar
+                    ?.takeIf { it.isNotBlank() && it != "/example.png" }
+                    ?.replaceFirst("http://", "https://")
+
+                if (avatar != null) binding.imgAvatar.loadImage(avatar)
+                else binding.imgAvatar.loadImage(R.drawable.avatar_default)
             }
         }
 
-
-        // Lần đầu load
+        // Lần đầu
         viewModel.messagesState.observe(viewLifecycleOwner) { state ->
             if (state is UiState.Success) {
                 currentMessages.clear()
                 currentMessages.addAll(state.data)
-                adapter.submitList(currentMessages)
-                binding.rvMessage.scrollToPosition(currentMessages.size - 1)
+                adapter.submitList(currentMessages.toList())
+                if (currentMessages.isNotEmpty()) {
+                    binding.rvMessage.scrollToPosition(currentMessages.size - 1)
+                }
             }
         }
 
         // Load thêm
         viewModel.loadMoreState.observe(viewLifecycleOwner) { state ->
             if (state is UiState.Success) {
-                val fullList = state.data
-
-                val newItems = fullList.filter { it !in currentMessages }
+                val full = state.data
+                val newItems = full.filter { it !in currentMessages }
                 if (newItems.isEmpty()) return@observe
 
-                // lưu vị trí và offset trước khi insert
                 val lm = binding.rvMessage.layoutManager as LinearLayoutManager
                 val firstPos = lm.findFirstVisibleItemPosition()
                 val firstView = lm.findViewByPosition(firstPos)
@@ -213,39 +250,27 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             }
         }
 
-        // disable nut gui khi dang gui
+        // Trạng thái gửi
         viewModel.sendState.observe(viewLifecycleOwner) { state ->
-            state ?: return@observe
-
             when (state) {
                 is UiState.Error -> {
-                    Toast.makeText(
-                        requireContext(),
-                        state.error.toString(),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    Toast.makeText(requireContext(), state.error.toString(), Toast.LENGTH_SHORT)
+                        .show()
                     binding.btnSendMessage.isEnabled = true
                 }
 
-                UiState.Idle -> {
-                    binding.btnSendMessage.isEnabled = true
-                }
-
-                UiState.Loading -> {
-                    binding.btnSendMessage.isEnabled = false
-                }
-
-                is UiState.Success -> {
-                    binding.btnSendMessage.isEnabled = true
-                }
+                UiState.Idle -> binding.btnSendMessage.isEnabled = true
+                UiState.Loading -> binding.btnSendMessage.isEnabled = false
+                is UiState.Success -> binding.btnSendMessage.isEnabled = true
+                null -> Unit
             }
         }
 
+        // Typing
         viewModel.typingState.observe(viewLifecycleOwner) { isTyping ->
             adapter.showTyping(isTyping)
             if (isTyping) {
                 Log.d("MessageFragment", "User is typing...")
-                // scroll xuống cuối để thấy bubble
                 binding.rvMessage.scrollToPosition(adapter.itemCount - 1)
             }
         }
@@ -258,12 +283,4 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
             viewModel.fetchInitialMessages(roomId)
         }
     }
-
-    override fun inflateLayout(
-        inflater: LayoutInflater,
-        container: ViewGroup?
-    ): FragmentMessageBinding {
-        return FragmentMessageBinding.inflate(inflater, container, false)
-    }
-
 }

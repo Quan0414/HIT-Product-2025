@@ -10,6 +10,7 @@ import com.example.hitproduct.common.state.UiState
 import com.example.hitproduct.common.util.CryptoHelper
 import com.example.hitproduct.data.model.couple.CoupleProfile
 import com.example.hitproduct.data.model.daily_question.get_question.DailyQuestionResponse
+import com.example.hitproduct.data.model.daily_status.DailyStatusResponse
 import com.example.hitproduct.data.model.pet.Pet
 import com.example.hitproduct.data.repository.AuthRepository
 import com.example.hitproduct.socket.SocketManager
@@ -40,6 +41,9 @@ class HomeViewModel(
     private val _eatEvent = MutableLiveData<Unit>()
     val eatEvent: LiveData<Unit> = _eatEvent
 
+    private val _dailyStatus = MutableLiveData<UiState<DailyStatusResponse>>(UiState.Idle)
+    val dailyStatus: LiveData<UiState<DailyStatusResponse>> = _dailyStatus
+
     fun getCoupleProfile() {
         _coupleProfile.value = UiState.Loading
         viewModelScope.launch {
@@ -65,6 +69,21 @@ class HomeViewModel(
 
                 is DataResult.Error -> {
                     _pet.value = UiState.Error(result.error)
+                }
+            }
+        }
+    }
+
+    fun getDailyStatus() {
+        _dailyStatus.value = UiState.Loading
+        viewModelScope.launch {
+            when (val result = authRepository.getStatus()) {
+                is DataResult.Success -> {
+                    _dailyStatus.value = UiState.Success(result.data.data)
+                }
+
+                is DataResult.Error -> {
+                    _dailyStatus.value = UiState.Error(result.error)
                 }
             }
         }

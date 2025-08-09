@@ -1,20 +1,20 @@
 package com.example.hitproduct
 
-import android.content.Context
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.view.Window
-import android.widget.FrameLayout
-import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import com.example.hitproduct.common.constants.AuthPrefersConstants
 import com.example.hitproduct.common.util.CryptoHelper
+import com.example.hitproduct.common.util.DialogNetworkDisconnect
 import com.example.hitproduct.databinding.ActivityMainBinding
 import com.example.hitproduct.screen.home_page.calendar.NoteFragment
 import com.example.hitproduct.screen.home_page.couple.CoupleFragment
@@ -22,10 +22,14 @@ import com.example.hitproduct.screen.home_page.home.HomeFragment
 import com.example.hitproduct.screen.home_page.message.MessageFragment
 import com.example.hitproduct.screen.home_page.setting.main.SettingFragment
 import com.example.hitproduct.socket.SocketManager
+import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
+
+    private val net by lazy { (application as MyApp).networkMonitor }
+    private var netDialog: DialogNetworkDisconnect? = null
 
     // index 0..4 tương đương Message, Note, Home, Couple(Game), Setting
     private val fragments = listOf(
@@ -59,8 +63,17 @@ class MainActivity : AppCompatActivity() {
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                net.isOnline.collect { online ->
+                    if (online) hideNoNetDialog() else showNoNetDialog()
+                }
+            }
+        }
+
         val token = prefs.getString(AuthPrefersConstants.ACCESS_TOKEN, "")
         SocketManager.connect(token ?: "")
+        Log.d("MainActivity", "Socket connected: ${SocketManager.isConnected()}")
         SocketManager.onNotificationReceived {}
         SocketManager.onNewPubKeyReceived { data ->
             val newPubKey = data.optString("public_key", "")
@@ -171,6 +184,18 @@ class MainActivity : AppCompatActivity() {
 
     fun showBottomNav() {
         binding.bottomNavigationContainer.visibility = View.VISIBLE
+    }
+
+    private fun showNoNetDialog() {
+        if (isFinishing || isDestroyed) return
+        if (netDialog?.isAdded == true) return
+        netDialog = DialogNetworkDisconnect().apply { isCancelable = false }
+        netDialog!!.show(supportFragmentManager, "net_disconnect")
+    }
+
+    private fun hideNoNetDialog() {
+        netDialog?.dismissAllowingStateLoss()
+        netDialog = null
     }
 
 }
