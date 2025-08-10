@@ -80,21 +80,22 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            android:padding="8dp"
             android:visibility="gone">
 
-            <ImageView
+            <io.getstream.avatarview.AvatarView
                 android:id="@+id/previewImage"
                 android:layout_width="72dp"
                 android:layout_height="72dp"
+                android:layout_marginStart="40dp"
                 android:layout_gravity="center"
-                android:scaleType="centerCrop" />
+                android:scaleType="centerCrop"
+                app:avatarViewShape="rounded_rect" />
 
             <ImageView
                 android:id="@+id/btnRemovePreview"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
-                android:src="@drawable/btn_close_medium"/>
+                android:src="@drawable/btn_close_medium" />
         </LinearLayout>
 
         <LinearLayout
