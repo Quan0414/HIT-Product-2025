@@ -29,8 +29,9 @@
             android:id="@+id/ivImgReceive"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:maxHeight="250dp"
+            android:maxWidth="250dp"
             android:adjustViewBounds="true"
-
             android:scaleType="centerInside"
             android:src="@drawable/b" />
     </com.google.android.material.card.MaterialCardView>
