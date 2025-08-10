@@ -89,7 +89,7 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
     private fun showPreview(uri: Uri) {
         selectedImageUri = uri
         binding.previewContainer.visibility = View.VISIBLE
-        binding.previewImage.setImageURI(uri)
+        binding.previewImage.loadImage(uri)
     }
 
     private fun clearPreview() {
