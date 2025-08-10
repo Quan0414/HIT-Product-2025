@@ -17,13 +17,11 @@
 
         <ImageView
             android:id="@+id/ivImgSend"
-            android:layout_width="wrap_content"
+            android:layout_width="200dp"
             android:layout_height="wrap_content"
-            android:maxHeight="250dp"
-            android:maxWidth="250dp"
             android:adjustViewBounds="true"
-            android:src="@drawable/b"
-            android:scaleType="centerInside" />
+            android:scaleType="fitXY"
+            android:src="@drawable/b" />
     </com.google.android.material.card.MaterialCardView>
 
     <TextView
@@ -31,9 +29,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
+        android:layout_marginEnd="10dp"
         android:fontFamily="@font/f700"
         android:text="09:45"
-        android:layout_marginEnd="10dp"
         android:textColor="@color/textBrown"
         android:textSize="10dp"
         app:layout_constraintEnd_toEndOf="@id/cardImage"
