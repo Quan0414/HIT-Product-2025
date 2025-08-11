@@ -4,6 +4,8 @@ import android.content.Context
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -143,10 +145,14 @@ class MessageFragment : BaseFragment<FragmentMessageBinding>() {
                     ctx = requireContext(),
                     uri = imgUri,
                     onDone = { dataUri ->
-                        viewModel.sendMessage(text, images = listOf(dataUri))
+                        viewModel.sendMessage("", images = listOf(dataUri))
+                        Handler(Looper.getMainLooper()).postDelayed({
+                            viewModel.sendMessage(text)
+                            sendFcmIfText(text)
+                        }, 100)
+
                         binding.etMessage.text?.clear()
                         clearPreview()
-                        sendFcmIfText(text)
                     },
                     onError = { err ->
                         Toast.makeText(requireContext(), err, Toast.LENGTH_SHORT).show()
