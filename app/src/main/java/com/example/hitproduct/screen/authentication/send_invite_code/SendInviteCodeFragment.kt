@@ -164,6 +164,10 @@ class SendInviteCodeFragment : Fragment() {
                     Log.d("SendInvite", "Couple profile loaded: ${state.data}")
                     val myLovePubKey = state.data.myLovePubKey
                     Log.d("SendInvite", "My love public key: $myLovePubKey")
+
+                    //xoá key cũ nếu có
+                    CryptoHelper.clearPairingData(requireContext())
+
                     if (myLovePubKey != null) {
                         CryptoHelper.storePeerPublicKey(requireContext(), myLovePubKey)
                         CryptoHelper.deriveAndStoreSharedAesKey(requireContext())
