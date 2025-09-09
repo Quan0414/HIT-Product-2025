@@ -1,9 +1,9 @@
-# Đếm Ngày "Xa" Nhau ## 
-
+# Đếm Ngày "Xa" Nhau - Ứng dụng gắn kết tình yêu
 
 ## Tổng quan
 
 **Đếm Ngày "Xa" Nhau** là một ứng dụng di động được phát triển trên nền tảng Android, được thiết kế đặc biệt cho các cặp đôi. Ứng dụng không chỉ là một công cụ đếm ngày kỷ niệm mà còn là một không gian riêng tư, giúp các cặp đôi duy trì và vun đắp tình cảm thông qua các hoạt động tương tác thú vị, đặc biệt hữu ích cho các cặp đôi yêu xa.
+
 
 ## ✨ Tính năng nổi bật
 
@@ -18,14 +18,8 @@
 | **💬 Nhắn tin** | Tích hợp tính năng nhắn tin mã hóa đầu cuối (E2EE) bằng AES, giúp cuộc trò chuyện trở nên riêng tư và gắn liền với các hoạt động khác. |
 | **📔 Nhật ký chung** | Ghi lại những khoảnh khắc, cảm xúc và hình ảnh đáng nhớ. Mỗi ghi chú đều được chia sẻ và lưu giữ như một phần của câu chuyện tình yêu. |
 
-## 📸 Giao diện ứng dụng
-### Đăng nhập
-![Màn hình onboarding](images/login.png)
 
-### Màn hình chính & Tính năng
-![Giao diện chính](images/home.png)
-
-## �🛠️ Công nghệ sử dụng
+## 🛠️ Công nghệ sử dụng
 
 - **Ngôn ngữ:** Kotlin  
 - **Kiến trúc:** MVVM (Model–View–ViewModel)  
