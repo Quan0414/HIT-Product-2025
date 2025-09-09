@@ -21,16 +21,14 @@
 
 ## 🛠️ Công nghệ sử dụng
 
-Dự án được xây dựng với kiến trúc và công nghệ hiện đại, đảm bảo hiệu năng và khả năng mở rộng:
-
-- **Ngôn ngữ:** [Kotlin](https://kotlinlang.org/)
-- **Kiến trúc:** MVVM (Model-View-ViewModel)
-- **UI:** XML, Material Design
-- **Bất đồng bộ:** Coroutines, Flow
-- **Networking:** Retrofit (API), Socket.IO (Real-time)
-- **Database:** (Nếu có, ví dụ: Room, SQLite)
-- **Xác thực & Backend:** Firebase (Authentication, Cloud Messaging)
-- **Dependency Injection:** (Nếu có, ví dụ: Hilt, Koin)
+- **Ngôn ngữ:** Kotlin  
+- **Kiến trúc:** MVVM (Model–View–ViewModel)  
+- **UI:** XML Layout, ViewBinding, Material Design  
+- **Bất đồng bộ:** Coroutines  
+- **Networking:** Retrofit (RESTful API)  
+- **Realtime:** Socket.IO (chat)  
+- **Database & Lưu trữ:** SharedPreferences, Cloudinary (hình ảnh)  
+- **Thông báo:** Firebase Cloud Messaging  
 
 ## 🚀 Cài đặt và Chạy thử
 
