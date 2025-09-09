@@ -1,9 +1,9 @@
-# Đếm Ngày "Xa" Nhau - Ứng dụng gắn kết tình yêu
+# Đếm Ngày "Xa" Nhau ## 
+
 
 ## Tổng quan
 
 **Đếm Ngày "Xa" Nhau** là một ứng dụng di động được phát triển trên nền tảng Android, được thiết kế đặc biệt cho các cặp đôi. Ứng dụng không chỉ là một công cụ đếm ngày kỷ niệm mà còn là một không gian riêng tư, giúp các cặp đôi duy trì và vun đắp tình cảm thông qua các hoạt động tương tác thú vị, đặc biệt hữu ích cho các cặp đôi yêu xa.
-
 
 ## ✨ Tính năng nổi bật
 
@@ -18,19 +18,23 @@
 | **💬 Nhắn tin** | Tích hợp tính năng nhắn tin mã hóa đầu cuối (E2EE) bằng AES, giúp cuộc trò chuyện trở nên riêng tư và gắn liền với các hoạt động khác. |
 | **📔 Nhật ký chung** | Ghi lại những khoảnh khắc, cảm xúc và hình ảnh đáng nhớ. Mỗi ghi chú đều được chia sẻ và lưu giữ như một phần của câu chuyện tình yêu. |
 
+## 📸 Giao diện ứng dụng
+### Đăng nhập
+![Màn hình onboarding](images/login.png)
 
-## 🛠️ Công nghệ sử dụng
+### Màn hình chính & Tính năng
+![Giao diện chính](images/home.png)
 
-Dự án được xây dựng với kiến trúc và công nghệ hiện đại, đảm bảo hiệu năng và khả năng mở rộng:
+## �🛠️ Công nghệ sử dụng
 
-- **Ngôn ngữ:** [Kotlin](https://kotlinlang.org/)
-- **Kiến trúc:** MVVM (Model-View-ViewModel)
-- **UI:** XML, Material Design
-- **Bất đồng bộ:** Coroutines, Flow
-- **Networking:** Retrofit (API), Socket.IO (Real-time)
-- **Database:** (Nếu có, ví dụ: Room, SQLite)
-- **Xác thực & Backend:** Firebase (Authentication, Cloud Messaging)
-- **Dependency Injection:** (Nếu có, ví dụ: Hilt, Koin)
+- **Ngôn ngữ:** Kotlin  
+- **Kiến trúc:** MVVM (Model–View–ViewModel)  
+- **UI:** XML Layout, ViewBinding, Material Design  
+- **Bất đồng bộ:** Coroutines  
+- **Networking:** Retrofit (RESTful API)  
+- **Realtime:** Socket.IO (chat)  
+- **Database & Lưu trữ:** SharedPreferences, Cloudinary (hình ảnh)  
+- **Thông báo:** Firebase Cloud Messaging  
 
 ## 🚀 Cài đặt và Chạy thử
 
