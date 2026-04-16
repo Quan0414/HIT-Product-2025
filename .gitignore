@@ -1,7 +1,15 @@
-# Compiled class file
+###########################
+# Android
+###########################
+*.apk
+*.aab
+*.ap_
+*.dex
+
+# Java/Kotlin compiled files
 *.class
 
-# Log file
+# Log files
 *.log
 
 # BlueJ files
@@ -10,7 +18,7 @@
 # Mobile Tools for Java (J2ME)
 .mtj.tmp/
 
-# Package Files #
+# Package Files
 *.jar
 *.war
 *.nar
@@ -19,20 +27,88 @@
 *.tar.gz
 *.rar
 
-# virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
+# Virtual machine crash logs
 hs_err_pid*
 replay_pid*
 
-# Kotlin Gradle plugin data, see https://kotlinlang.org/docs/whatsnew20.html#new-directory-for-kotlin-data-in-gradle-projects
+###########################
+# Build outputs
+###########################
+build/
+*/build/
+bin/
+gen/
+out/
+
+###########################
+# Gradle
+###########################
+.gradle/
+gradle-app.setting
+!gradle-wrapper.jar
+!gradle-wrapper.properties
+
+###########################
+# Local configuration
+###########################
+local.properties
+*.properties
+!gradle.properties
+!gradle/libs.versions.toml
+
+###########################
+# IntelliJ IDEA / Android Studio
+###########################
+.idea/
+*.iml
+*.iws
+*.ipr
+.idea/workspace.xml
+.idea/tasks.xml
+.idea/gradle.xml
+.idea/assetWizardSettings.xml
+.idea/dictionaries
+.idea/encoded-project-name
+.idea/libraries
+.idea/caches
+.idea/modules.xml
+.idea_modules/
+captures/
+
+###########################
+# OS files
+###########################
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+###########################
+# Kotlin
+###########################
 .kotlin/
 
-# Ignore Gradle caches and wrappers
-.gradle/
-# Ignore local SDK settings
-local.properties
-# Firebase config
+###########################
+# Firebase / Sensitive config
+###########################
 app/google-services.json
-#FCM Token
+google-services.json
+
+###########################
+# FCM / Tokens / Secrets
+###########################
 /app/src/main/java/com/example/hitproduct/common/util/AccessToken.kt
 
-
+###########################
+# Test results & coverage
+###########################
+.test/
+test-results/
+*.exec
